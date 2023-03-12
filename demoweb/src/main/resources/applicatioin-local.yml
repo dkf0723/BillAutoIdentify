@@ -1,0 +1,9 @@
+server:
+  ip: 127.0.0.1
+  delegate-port: 8080
+bill_auto_identify:
+  database:
+    url: jdbc:mysql://localhost:3306/test
+    account: root
+    password: root
+
