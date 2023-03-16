@@ -9,13 +9,14 @@ spring:
       max-file-size: 200MB
       max-request-size: 250MB
   datasource:
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://120.97.29.31:1433;databaseName=Inv;integratedSecurity=false;
-    username: Inv
-    password: NtubInv
+    type: com.mchange.v2.c3p0.ComboPooledDataSource
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:mysql://localhost:3306/test
+    username: root
+    password: root
   jpa:
-    database: sqlserver
-    database-platform: org.hibernate.dialect.SQLServer2012Dialect
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     open-in-view: true
     show-sql: false
     generate-ddl: false
@@ -26,7 +27,7 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.SQLServer2012Dialect
+        dialect: ${spring.jpa.database-platform}
         hbm2ddl:
           auto: ${spring.jpa.hibernate.ddl-auto}
         show_sql: ${spring.jpa.show-sql}
@@ -36,11 +37,10 @@ spring:
       repositories:
         enabled: true
       mapping-locations: classpath*:META-INF/spring-data/*-mapping:xml
-
 server:
   port: 8080
   delegate-port: 8080
   servlet:
-    context-path: /bill-auto-identify
+    context-path: /
     encoding:
       charset: UTF-8
