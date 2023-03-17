@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.Service.TestService;
-import com.example.demo.entity.Test;
+import com.example.demo.model.entity.Bill;
+import com.example.demo.model.entity.User;
+import com.example.demo.model.service.BillService;
+import com.example.demo.model.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,23 +19,20 @@ public class MyController {
 
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
-//    public MyController(TestService testService) {
-//        this.testService = testService;
-//    }
 
     @Autowired
-    private  TestService testService;
+    private UserService userService;
 
-
-//    @Autowired
-//    public MyController(TestService testService) {
-//        this.testService = testService;
-//    }
+    @Autowired
+    private BillService billService;
 
     @GetMapping("/hello")
-    public List<Test> sayHello() {
-        List<Test> tests = testService.findAll();
-        logger.info("tests: {}", tests.get(0).getId());
-        return tests;
+    public User sayHello() {
+        return userService.findByUserId("user1");
+    }
+
+    @GetMapping("/check")
+    public List<Bill> check() {
+        return billService.findMistakeBill();
     }
 }
