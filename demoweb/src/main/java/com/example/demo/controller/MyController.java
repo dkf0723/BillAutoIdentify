@@ -30,6 +30,10 @@ public class MyController {
     public User sayHello() {
         return userService.findByUserId("user1");
     }
+    @GetMapping("/all")
+    public List<User> all(){
+        return userService.findAll();
+    }
 
     @GetMapping("/check")
     public List<Bill> check() {
