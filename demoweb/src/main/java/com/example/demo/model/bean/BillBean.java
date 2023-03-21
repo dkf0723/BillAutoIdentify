@@ -24,4 +24,5 @@ public class BillBean {
     private String check;
     private String picture;
     private String includeSource;
+    private Integer page;
 }
