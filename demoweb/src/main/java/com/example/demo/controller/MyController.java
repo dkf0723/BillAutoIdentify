@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.bean.BillBean;
 import com.example.demo.model.entity.Bill;
 import com.example.demo.model.entity.User;
 import com.example.demo.model.service.BillService;
@@ -7,9 +8,7 @@ import com.example.demo.model.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,4 +38,9 @@ public class MyController {
     public List<Bill> check() {
         return billService.findMistakeBill();
     }
+    @PostMapping("/check")
+    public List<Bill> checkPost(@RequestBody BillBean billBean) {
+        return billService.findMistakeBill(billBean.getSkip());
+    }
+
 }
