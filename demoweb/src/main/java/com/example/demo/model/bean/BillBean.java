@@ -1,10 +1,13 @@
 package com.example.demo.model.bean;
 
+import com.example.demo.model.entity.BillDetail;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 public class BillBean {
     private String billNumber;
@@ -25,4 +28,5 @@ public class BillBean {
     private String picture;
     private String includeSource;
     private Integer page;
+    private List<BillDetail> billDetailList;
 }

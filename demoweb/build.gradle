@@ -24,6 +24,8 @@ dependencies {
 	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 	implementation 'com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre8'
 	implementation 'javax.validation:validation-api:2.0.1.Final'
+	implementation 'org.json:json:20210307'
+
 
 
 }

@@ -4,7 +4,9 @@ import com.example.demo.model.bean.BillDetailBean;
 import com.example.demo.model.entity.BillDetail;
 import com.example.demo.model.service.transformer.BillDetailTransformer;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BillDetailTransformerImpl implements BillDetailTransformer {
     @Override
     public BillDetail transferToEntity(BillDetailBean billDetailBean) {

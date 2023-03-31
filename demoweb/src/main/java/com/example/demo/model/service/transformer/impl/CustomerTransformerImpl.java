@@ -4,7 +4,9 @@ import com.example.demo.model.bean.CustomerBean;
 import com.example.demo.model.entity.Customer;
 import com.example.demo.model.service.transformer.CustomerTransformer;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CustomerTransformerImpl implements CustomerTransformer {
     @Override
     public Customer transferToEntity(CustomerBean customerBean) {

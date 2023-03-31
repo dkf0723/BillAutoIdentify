@@ -5,7 +5,9 @@ import com.example.demo.model.entity.User;
 import com.example.demo.model.service.transformer.UserTransformer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserTransformerImpl implements UserTransformer {
     @NonNull
     @Override
