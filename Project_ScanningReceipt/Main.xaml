@@ -1,0 +1,1222 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Main" VisualBasic.Settings="{x:Null}" sap:VirtualizedContainerService.HintSize="1481,17229" sap2010:WorkflowViewState.IdRef="ActivityBuilder_1" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="31">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>UiPath.UIAutomationCore.Contracts</x:String>
+      <x:String>System.Reflection</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>UiPath.Vision.OCR</x:String>
+      <x:String>UiPath.OCR.Contracts</x:String>
+      <x:String>UiPath.OCR.Contracts.Activities</x:String>
+      <x:String>UiPath.Core.Activities.OCR.Engines</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="48">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>UiPath.UIAutomationCore</AssemblyReference>
+      <AssemblyReference>System.Reflection.DispatchProxy</AssemblyReference>
+      <AssemblyReference>System.Reflection.TypeExtensions</AssemblyReference>
+      <AssemblyReference>System.Reflection.Metadata</AssemblyReference>
+      <AssemblyReference>UiPath.Workflow</AssemblyReference>
+      <AssemblyReference>System.Private.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Formatters</AssemblyReference>
+      <AssemblyReference>System.Private.DataContractSerialization</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization.Primitives</AssemblyReference>
+      <AssemblyReference>NPOI</AssemblyReference>
+      <AssemblyReference>System.Memory.Data</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+      <AssemblyReference>System.Console</AssemblyReference>
+      <AssemblyReference>System.Configuration.ConfigurationManager</AssemblyReference>
+      <AssemblyReference>System.Security.Permissions</AssemblyReference>
+      <AssemblyReference>System.ComponentModel</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.Private.Uri</AssemblyReference>
+      <AssemblyReference>System.IO.FileSystem.Watcher</AssemblyReference>
+      <AssemblyReference>System.IO.Packaging</AssemblyReference>
+      <AssemblyReference>System.IO.FileSystem.AccessControl</AssemblyReference>
+      <AssemblyReference>System.IO.FileSystem.DriveInfo</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.OCR.Core</AssemblyReference>
+      <AssemblyReference>UiPath.Vision.Core</AssemblyReference>
+      <AssemblyReference>UiPath.OCR.Contracts</AssemblyReference>
+      <AssemblyReference>System.Drawing.Primitives</AssemblyReference>
+      <AssemblyReference>System.Drawing.Common</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <sap:WorkflowViewStateService.ViewState>
+    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+      <x:Boolean x:Key="ShouldCollapseAll">False</x:Boolean>
+      <x:Boolean x:Key="ShouldExpandAll">True</x:Boolean>
+    </scg:Dictionary>
+  </sap:WorkflowViewStateService.ViewState>
+  <Sequence DisplayName="Main Sequence" sap:VirtualizedContainerService.HintSize="1491,17164" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="s:Object[]" Name="FileList" />
+      <Variable x:TypeArguments="x:String" Name="Amount1" />
+      <Variable x:TypeArguments="x:String" Name="Product1" />
+      <Variable x:TypeArguments="x:String" Name="UnitPrice1" />
+      <Variable x:TypeArguments="x:String" Name="Sum1" />
+      <Variable x:TypeArguments="x:String" Name="Product2" />
+      <Variable x:TypeArguments="x:String" Name="Amount2" />
+      <Variable x:TypeArguments="x:String" Name="UnitPrice2" />
+      <Variable x:TypeArguments="x:String" Name="Sum2" />
+      <Variable x:TypeArguments="x:String" Name="Product3" />
+      <Variable x:TypeArguments="x:String" Name="Amount3" />
+      <Variable x:TypeArguments="x:String" Name="UnitPrice3" />
+      <Variable x:TypeArguments="x:String" Name="Sum3" />
+      <Variable x:TypeArguments="x:String" Name="Sales" />
+      <Variable x:TypeArguments="x:String" Name="UnitPrice5" />
+      <Variable x:TypeArguments="x:String" Name="Sum5" />
+      <Variable x:TypeArguments="x:String" Name="Amount5" />
+      <Variable x:TypeArguments="x:String" Name="Product5" />
+      <Variable x:TypeArguments="x:String" Name="Product4" />
+      <Variable x:TypeArguments="x:String" Name="Amount4" />
+      <Variable x:TypeArguments="x:String" Name="UnitPrice4" />
+      <Variable x:TypeArguments="x:String" Name="Sum4" />
+      <Variable x:TypeArguments="x:String" Name="Total" />
+      <Variable x:TypeArguments="x:String" Name="Tax" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Sequence DisplayName="Screenshot Sequence" sap:VirtualizedContainerService.HintSize="1429,17053" sap2010:WorkflowViewState.IdRef="Sequence_14">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <Assign sap:VirtualizedContainerService.HintSize="1367,82" sap2010:WorkflowViewState.IdRef="Assign_1">
+        <Assign.To>
+          <OutArgument x:TypeArguments="s:Object[]">[FileList]</OutArgument>
+        </Assign.To>
+        <Assign.Value>
+          <InArgument x:TypeArguments="s:Object[]">[Directory.GetFiles("F:\SynologyDrive\ScanPDF\","*.pdf")]</InArgument>
+        </Assign.Value>
+      </Assign>
+      <ui:ForEach x:TypeArguments="x:Object" CurrentIndex="{x:Null}" DisplayName="For Each" sap:VirtualizedContainerService.HintSize="1367,16820" sap2010:WorkflowViewState.IdRef="ForEach`1_3" Values="[FileList]">
+        <ui:ForEach.Body>
+          <ActivityAction x:TypeArguments="x:Object">
+            <ActivityAction.Argument>
+              <DelegateInArgument x:TypeArguments="x:Object" Name="file" />
+            </ActivityAction.Argument>
+            <Sequence DisplayName="Body" sap:VirtualizedContainerService.HintSize="1331,16694" sap2010:WorkflowViewState.IdRef="Sequence_10">
+              <sap:WorkflowViewStateService.ViewState>
+                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                </scg:Dictionary>
+              </sap:WorkflowViewStateService.ViewState>
+              <ui:StartProcess Arguments="{x:Null}" WorkingDirectory="{x:Null}" DisplayName="Start Process " FileName="F:\SynologyDrive\ScanPDF\Demo.pdf" sap:VirtualizedContainerService.HintSize="1269,88" sap2010:WorkflowViewState.IdRef="StartProcess_1" />
+              <Sequence DisplayName="Do" sap:VirtualizedContainerService.HintSize="1269,16455" sap2010:WorkflowViewState.IdRef="Sequence_2">
+                <Sequence.Variables>
+                  <Variable x:TypeArguments="ui:Image" Name="s1" />
+                  <Variable x:TypeArguments="ui:Image" Name="s2" />
+                  <Variable x:TypeArguments="ui:Image" Name="s3" />
+                  <Variable x:TypeArguments="ui:Image" Name="s4" />
+                  <Variable x:TypeArguments="ui:Image" Name="s5" />
+                  <Variable x:TypeArguments="ui:Image" Name="s6" />
+                  <Variable x:TypeArguments="ui:Image" Name="s7" />
+                  <Variable x:TypeArguments="x:String" Name="ReceiptCondition" />
+                </Sequence.Variables>
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <Sequence sap:VirtualizedContainerService.HintSize="1207,1210" sap2010:WorkflowViewState.IdRef="Sequence_12">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:SendHotkey ClickBeforeTyping="{x:Null}" DelayBefore="{x:Null}" DelayBetweenKeys="{x:Null}" DelayMS="{x:Null}" EmptyField="{x:Null}" SendWindowMessages="{x:Null}" SpecialKey="{x:Null}" Activate="True" DisplayName="Send Hotkey 'document'" sap:VirtualizedContainerService.HintSize="484,153" sap2010:WorkflowViewState.IdRef="SendHotkey_1" Key="y" KeyModifiers="Ctrl">
+                    <ui:SendHotkey.Target>
+                      <ui:Target Element="{x:Null}" Id="802c249c-58a5-4be4-831a-99e2f6202c11" InformativeScreenshot="d65a55b499e3e2bb8253ca7bcefe8097" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="1, 1, 1577, 864" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:SendHotkey.Target>
+                  </ui:SendHotkey>
+                  <ui:WindowScope ApplicationWindow="{x:Null}" SearchScope="{x:Null}" TimeoutMS="{x:Null}" Window="{x:Null}" DisplayName="Attach Window 'acrobat.exe  縮放至'" sap:VirtualizedContainerService.HintSize="484,906" sap2010:WorkflowViewState.IdRef="WindowScope_1" InformativeScreenshot="df1b3cc031ab8039334d3385c5bc2d9f" Selector="&lt;wnd app='acrobat.exe' cls='#32770' title='縮放至' /&gt;">
+                    <ui:WindowScope.Body>
+                      <ActivityAction x:TypeArguments="x:Object">
+                        <ActivityAction.Argument>
+                          <DelegateInArgument x:TypeArguments="x:Object" Name="ContextTarget" />
+                        </ActivityAction.Argument>
+                        <Sequence DisplayName="Do" sap:VirtualizedContainerService.HintSize="450,759" sap2010:WorkflowViewState.IdRef="Sequence_13">
+                          <Sequence.Variables>
+                            <Variable x:TypeArguments="ui:Image" Name="OriginImage" />
+                          </Sequence.Variables>
+                          <sap:WorkflowViewStateService.ViewState>
+                            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                            </scg:Dictionary>
+                          </sap:WorkflowViewStateService.ViewState>
+                          <ui:TypeInto AlterIfDisabled="{x:Null}" ClickBeforeTyping="{x:Null}" DelayBefore="{x:Null}" DelayBetweenKeys="{x:Null}" DelayMS="{x:Null}" EmptyField="{x:Null}" SendWindowMessages="{x:Null}" SimulateType="{x:Null}" Activate="True" DisplayName="Type Into 'Edit'" sap:VirtualizedContainerService.HintSize="388,135" sap2010:WorkflowViewState.IdRef="TypeInto_1" Text="100">
+                            <ui:TypeInto.Target>
+                              <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Id="3ebe55f0-07ba-4692-bd5c-9f597eb9dacf" InformativeScreenshot="fc1f3bbd0d6d07c64db588e5b6a4c25e" Selector="&lt;wnd aaname='放大率(M)︰' cls='ComboBoxEx32' /&gt;&lt;wnd aaname='放大率(M)︰' cls='ComboBox' /&gt;&lt;wnd aaname='放大率(M)︰' cls='Edit' /&gt;">
+                                <ui:Target.TimeoutMS>
+                                  <InArgument x:TypeArguments="x:Int32" />
+                                </ui:Target.TimeoutMS>
+                                <ui:Target.WaitForReady>
+                                  <InArgument x:TypeArguments="ui:WaitForReady" />
+                                </ui:Target.WaitForReady>
+                              </ui:Target>
+                            </ui:TypeInto.Target>
+                          </ui:TypeInto>
+                          <ui:SendHotkey ClickBeforeTyping="{x:Null}" DelayBefore="{x:Null}" DelayBetweenKeys="{x:Null}" DelayMS="{x:Null}" EmptyField="{x:Null}" SendWindowMessages="{x:Null}" Activate="True" DisplayName="Send Hotkey 'acrobat.exe  縮放至'" sap:VirtualizedContainerService.HintSize="388,153" sap2010:WorkflowViewState.IdRef="SendHotkey_2" Key="enter" KeyModifiers="None" SpecialKey="True">
+                            <ui:SendHotkey.Target>
+                              <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="{x:Null}" Id="f98a3307-62e1-4eb9-9d93-8a984434922d" InformativeScreenshot="5150cb235fc5b69b74ec17cb8977b39e">
+                                <ui:Target.TimeoutMS>
+                                  <InArgument x:TypeArguments="x:Int32" />
+                                </ui:Target.TimeoutMS>
+                                <ui:Target.WaitForReady>
+                                  <InArgument x:TypeArguments="ui:WaitForReady" />
+                                </ui:Target.WaitForReady>
+                              </ui:Target>
+                            </ui:SendHotkey.Target>
+                          </ui:SendHotkey>
+                          <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Screenshot 'graphic'" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_35" Screenshot="[OriginImage]">
+                            <ui:TakeScreenshot.Target>
+                              <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Id="7bfa599b-2385-4009-915f-2085b8c657c7" InformativeScreenshot="5d317f1660604f7476025803c72aaae1" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='graphic' /&gt;">
+                                <ui:Target.TimeoutMS>
+                                  <InArgument x:TypeArguments="x:Int32" />
+                                </ui:Target.TimeoutMS>
+                                <ui:Target.WaitForReady>
+                                  <InArgument x:TypeArguments="ui:WaitForReady" />
+                                </ui:Target.WaitForReady>
+                              </ui:Target>
+                            </ui:TakeScreenshot.Target>
+                          </ui:TakeScreenshot>
+                          <ui:SaveImage DisplayName="Save Image" FileName="Screenshot\OriginImage.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_35" Image="[OriginImage]" />
+                        </Sequence>
+                      </ActivityAction>
+                    </ui:WindowScope.Body>
+                  </ui:WindowScope>
+                </Sequence>
+                <Sequence sap:VirtualizedContainerService.HintSize="1207,2766" sap2010:WorkflowViewState.IdRef="Sequence_11">
+                  <Sequence.Variables>
+                    <Variable x:TypeArguments="x:String" Name="ReceiptNumber" />
+                    <Variable x:TypeArguments="x:String" Name="ReceiptType" />
+                    <Variable x:TypeArguments="x:String" Name="Buyer" />
+                    <Variable x:TypeArguments="x:String" Name="YearAndMounth" />
+                    <Variable x:TypeArguments="x:String" Name="UnitformNumbers" />
+                    <Variable x:TypeArguments="x:String" Name="ReceiptDate" />
+                    <Variable x:TypeArguments="x:String" Name="Address" />
+                  </Sequence.Variables>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Receipt Number Screenshot  1" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_1" Screenshot="[s1]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="80b065b6-42f8-4904-9bc1-0de978b1ac10" InformativeScreenshot="d76630d2387bcd5ea3f9a62cd79d10ed" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="11, 7, 150, 34" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 1" FileName="Screenshot\s01.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_1" Image="[s1]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 1" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_30" Image="[s1]" Text="[ReceiptNumber]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Type Screenshot  2" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_2" Screenshot="[s2]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="292851c9a4e25ae06cd28d8c081ce2af" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="337, 3, 95, 30" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 2" FileName="Screenshot\s02.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_2" Image="[s2]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 2" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_31" Image="[s2]" Text="[ReceiptType]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Buyer Screenshot 3" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_3" Screenshot="[s3]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="f3f515d4a22b1bebb3cb06f9e652d029" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="67, 35, 147, 33" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 3" FileName="Screenshot\s03.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_3" Image="[s3]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 03" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_32" Image="[s3]" Text="[Buyer]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Year and Month Screenshot 4" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_4" Screenshot="[s4]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="c8dde959a1970273972c156a3d6479d9" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="204, 27, 174, 27" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 4" FileName="Screenshot\s04.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_4" Image="[s4]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 4" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_33" Image="[s4]" Text="[YearAndMounth]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Uniform numbers Screenshot 5" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_5" Screenshot="[s5]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="297487d7d579c62263d350be828dfebb" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="79, 65, 170, 25" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 5" FileName="Screenshot\s05.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_5" Image="[s5]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 5" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_34" Image="[s5]" Text="[UnitformNumbers]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Date Screenshot 6" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_6" Screenshot="[s6]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="481b401067dda13aceca9536a8bc4de8" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="316, 60, 122, 34" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 6" FileName="Screenshot\s06.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_6" Image="[s6]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 6" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_25" Image="[s6]" Text="[ReceiptDate]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Address Screenshot 7" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_7" Screenshot="[s7]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="ea2ae5bfdea9284a70909f3d460e2f90" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="72, 87, 466, 21" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 7" FileName="Screenshot\s07.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_7" Image="[s7]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 7" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_24" Image="[s7]" Text="[Address]" />
+                </Sequence>
+                <Sequence DisplayName="Sequence Product1" sap:VirtualizedContainerService.HintSize="1207,1611" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                  <Sequence.Variables>
+                    <Variable x:TypeArguments="ui:Image" Name="s8" />
+                    <Variable x:TypeArguments="ui:Image" Name="s9" />
+                    <Variable x:TypeArguments="ui:Image" Name="s10" />
+                    <Variable x:TypeArguments="ui:Image" Name="s11" />
+                    <Variable x:TypeArguments="ui:Image" Name="s12" />
+                    <Variable x:TypeArguments="ui:Image" Name="s13" />
+                    <Variable x:TypeArguments="ui:Image" Name="s14" />
+                  </Sequence.Variables>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Product 1 Screenshot 11" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_8" Screenshot="[s11]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="6b6aeca99835e2181e55ed84ab1af35d" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="18, 129, 141, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image" FileName="Screenshot\s11.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_8" Image="[s11]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 12" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_29" Image="[s11]" Text="[Product1]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Quantity 1 Screenshot 12" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_9" Screenshot="[s12]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="e9919357460080adba942ed48ee62d9a" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="161, 129, 54, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 12" FileName="Screenshot\s12.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_9" Image="[s12]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 12" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_28" Image="[s12]" Text="[Amount1]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Unit price 1 Screenshot 13" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_10" Screenshot="[s13]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="6cbd6e09a100177f79d0530440d64769" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="216, 129, 57, 21" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 13" FileName="Screenshot\s13.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_10" Image="[s13]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 13" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_27" Image="[s13]" Text="[UnitPrice1]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take the amount 1 Screenshot 14" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_11" Screenshot="[s14]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="8340d06022348bf491144a3543bcb300" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="273, 129, 102, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 14" FileName="Screenshot\s14.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_11" Image="[s14]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 14" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_26" Image="[s14]" Text="[Sum1]" />
+                </Sequence>
+                <Sequence DisplayName="Sequence Product2" sap:VirtualizedContainerService.HintSize="1207,1611" sap2010:WorkflowViewState.IdRef="Sequence_4">
+                  <Sequence.Variables>
+                    <Variable x:TypeArguments="ui:Image" Name="s12" />
+                    <Variable x:TypeArguments="ui:Image" Name="s13" />
+                    <Variable x:TypeArguments="ui:Image" Name="s14" />
+                    <Variable x:TypeArguments="ui:Image" Name="s21" />
+                    <Variable x:TypeArguments="ui:Image" Name="s22" />
+                    <Variable x:TypeArguments="ui:Image" Name="s23" />
+                    <Variable x:TypeArguments="ui:Image" Name="s24" />
+                  </Sequence.Variables>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Product 2 Screenshot 21" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_12" Screenshot="[s21]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="b453efae982dfd76291011d79ba6d503" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="18, 151, 141, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 21" FileName="Screenshot\s21.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_12" Image="[s21]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 21" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_1" Image="[s21]" Text="[Product2]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Quantity 2 Screenshot 22" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_13" Screenshot="[s22]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="9ca55e8297ebeccd1e4ef777e1b59023" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="161, 150, 53, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 22" FileName="Screenshot\s22.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_13" Image="[s22]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 22" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_3" Image="[s22]" Text="[Amount2]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Unit price 2 Screenshot 23" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_14" Screenshot="[s23]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="e33ec9abd273df9b574232db809001df" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="216, 150, 57, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 23" FileName="Screenshot\s23.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_14" Image="[s23]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 23" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_7" Image="[s23]" Text="[UnitPrice2]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take the amount 2 Screenshot 24" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_21" Screenshot="[s24]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="24d7f218610b05535f9fca218adc85a2" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="275, 151, 99, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 24" FileName="Screenshot\s24.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_15" Image="[s24]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 24" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_10" Image="[s24]" Text="[Sum2]" />
+                </Sequence>
+                <Sequence DisplayName="Sequence Product3" sap:VirtualizedContainerService.HintSize="1207,1611" sap2010:WorkflowViewState.IdRef="Sequence_5">
+                  <Sequence.Variables>
+                    <Variable x:TypeArguments="ui:Image" Name="s16" />
+                    <Variable x:TypeArguments="ui:Image" Name="s17" />
+                    <Variable x:TypeArguments="ui:Image" Name="s18" />
+                    <Variable x:TypeArguments="ui:Image" Name="s19" />
+                    <Variable x:TypeArguments="ui:Image" Name="s31" />
+                    <Variable x:TypeArguments="ui:Image" Name="s32" />
+                    <Variable x:TypeArguments="ui:Image" Name="s33" />
+                    <Variable x:TypeArguments="ui:Image" Name="s34" />
+                  </Sequence.Variables>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Product 3 Screenshot 31" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_15" Screenshot="[s31]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="102da3a5460a3b9fdf3c5175f363f26b" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="18, 172, 142, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 31" FileName="Screenshot\s31.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_16" Image="[s31]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 31" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_5" Image="[s31]" Text="[Product3]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Quantity 3 Screenshot 32" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_16" Screenshot="[s32]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="e976c67825c82e6697ffd66331e6133d" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="161, 172, 53, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 32" FileName="Screenshot\s32.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_17" Image="[s32]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 32" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_2" Image="[s32]" Text="[Amount3]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Unit price 3 Screenshot 33" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_17" Screenshot="[s33]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="20c5a81ccea5c28a30e8a94044596cca" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="216, 171, 56, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 33" FileName="Screenshot\s33.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_18" Image="[s33]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 33" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_4" Image="[s33]" Text="[UnitPrice3]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take the amount 3 Screenshot 34" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_22" Screenshot="[s34]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="a5d088868c9edb386979bf5e9485ada7" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="274, 171, 100, 21" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 34" FileName="Screenshot\s34.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_19" Image="[s34]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 34" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_11" Image="[s34]" Text="[Sum3]" />
+                </Sequence>
+                <Sequence DisplayName="Sequence Product4" sap:VirtualizedContainerService.HintSize="1207,1611" sap2010:WorkflowViewState.IdRef="Sequence_6">
+                  <Sequence.Variables>
+                    <Variable x:TypeArguments="ui:Image" Name="s20" />
+                    <Variable x:TypeArguments="ui:Image" Name="s21" />
+                    <Variable x:TypeArguments="ui:Image" Name="s22" />
+                    <Variable x:TypeArguments="ui:Image" Name="s23" />
+                    <Variable x:TypeArguments="ui:Image" Name="s41" />
+                    <Variable x:TypeArguments="ui:Image" Name="s42" />
+                    <Variable x:TypeArguments="ui:Image" Name="s43" />
+                    <Variable x:TypeArguments="ui:Image" Name="s44" />
+                  </Sequence.Variables>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Product 4 Screenshot 41" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_18" Screenshot="[s41]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="bfb8dbc4f84f6415ed223c5401fd043f" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="18, 193, 141, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 41" FileName="Screenshot\s41.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_20" Image="[s41]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 41" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_6" Image="[s41]" Text="[Product4]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Quantity 4 Screenshot 42" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_19" Screenshot="[s42]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="5ebf36292d85e2f9399269170effad2e" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="161, 194, 53, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 42" FileName="Screenshot\s42.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_21" Image="[s42]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 42" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_8" Image="[s42]" Text="[Amount4]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Unit price 4 Screenshot 43" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_20" Screenshot="[s43]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="7f1631459c1d8e9bad2d7e5dca1f8d40" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="216, 194, 56, 18" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 43" FileName="Screenshot\s43.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_22" Image="[s43]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 43" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_9" Image="[s43]" Text="[UnitPrice4]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take the amount 4 Screenshot 44" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_23" Screenshot="[s44]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="5507b5823de2ff3c5b9627f5f797ff02" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="272, 193, 103, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 44" FileName="Screenshot\s44.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_23" Image="[s44]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 44" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_12" Image="[s44]" Text="[Sum4]" />
+                </Sequence>
+                <Sequence DisplayName="Sequence Product5" sap:VirtualizedContainerService.HintSize="1207,1611" sap2010:WorkflowViewState.IdRef="Sequence_7">
+                  <Sequence.Variables>
+                    <Variable x:TypeArguments="ui:Image" Name="s24" />
+                    <Variable x:TypeArguments="ui:Image" Name="s25" />
+                    <Variable x:TypeArguments="ui:Image" Name="s26" />
+                    <Variable x:TypeArguments="ui:Image" Name="s27" />
+                    <Variable x:TypeArguments="ui:Image" Name="s51" />
+                    <Variable x:TypeArguments="ui:Image" Name="s52" />
+                    <Variable x:TypeArguments="ui:Image" Name="s53" />
+                    <Variable x:TypeArguments="ui:Image" Name="s54" />
+                  </Sequence.Variables>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Product 5 Screenshot 51" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_24" Screenshot="[s51]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="e89c5741e02a519e32cbb2f509230bdb" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="18, 215, 141, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 51" FileName="Screenshot\s51.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_24" Image="[s51]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 51" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_13" Image="[s51]" Text="[Product5]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Quantity 5 Screenshot 52" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_25" Screenshot="[s52]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="6fec5efad88a88a0121da00aba9f43bb" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="162, 215, 52, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 52" FileName="Screenshot\s52.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_25" Image="[s52]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 52" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_14" Image="[s52]" Text="[Amount5]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Unit price 5 Screenshot 53" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_26" Screenshot="[s53]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="f02cf7b717d4e886c561b9754a599857" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="216, 216, 57, 19" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 53" FileName="Screenshot\s53.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_26" Image="[s53]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 53" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_15" Image="[s53]" Text="[UnitPrice5]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take the amount 5 Screenshot 54" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_27" Screenshot="[s54]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="c3ea9664-767e-479f-ad95-aba50081b963" InformativeScreenshot="79507216eda683a95ba7fddc6942a059" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="274, 215, 100, 21" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 54" FileName="Screenshot\s54.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_27" Image="[s54]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 54" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_16" Image="[s54]" Text="[Sum5]" />
+                </Sequence>
+                <Sequence DisplayName="Sequence Tax" sap:VirtualizedContainerService.HintSize="1207,2766" sap2010:WorkflowViewState.IdRef="Sequence_8">
+                  <Sequence.Variables>
+                    <Variable x:TypeArguments="ui:Image" Name="s29" />
+                    <Variable x:TypeArguments="ui:Image" Name="s30" />
+                    <Variable x:TypeArguments="ui:Image" Name="s31" />
+                    <Variable x:TypeArguments="ui:Image" Name="s32" />
+                    <Variable x:TypeArguments="ui:Image" Name="s61" />
+                    <Variable x:TypeArguments="ui:Image" Name="s62" />
+                    <Variable x:TypeArguments="ui:Image" Name="s63" />
+                    <Variable x:TypeArguments="ui:Image" Name="s64" />
+                    <Variable x:TypeArguments="ui:Image" Name="s65" />
+                    <Variable x:TypeArguments="ui:Image" Name="s66" />
+                    <Variable x:TypeArguments="ui:Image" Name="s67" />
+                    <Variable x:TypeArguments="x:String" Name="Taxable" />
+                    <Variable x:TypeArguments="x:String" Name="ZeroTax" />
+                    <Variable x:TypeArguments="x:String" Name="DutyFree" />
+                    <Variable x:TypeArguments="x:String" Name="ChineseTotal" />
+                  </Sequence.Variables>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Sales Screenshot 61" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_28" Screenshot="[s61]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="acd572fe-0e83-47e3-802b-db68cb466e05" InformativeScreenshot="e33d0b84f4425110434f8f2bebc827b0" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="274, 235, 101, 21" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 61" FileName="Screenshot\s61.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_28" Image="[s61]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 61" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_19" Image="[s61]" Text="[Sales]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Tax type &quot;Taxable&quot; Screenshot 62" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_29" Screenshot="[s62]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="be5277cc-36f7-4548-98d2-08281f281e7e" InformativeScreenshot="11038fa3e9872d2997cbeef1ae8c191e" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="126, 269, 51, 14" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 62" FileName="Screenshot\s62.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_29" Image="[s62]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 62" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_17" Image="[s62]" Text="[Taxable]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Tax type &quot;Zero tax&quot; Screenshot 63" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_30" Screenshot="[s63]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="adae3813-bb9a-45ee-95d9-9b96a3f513eb" InformativeScreenshot="37f2c29b9642f2436dea29bed2e05ed5" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="177, 268, 49, 16" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 63" FileName="Screenshot\s63.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_30" Image="[s63]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 63" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_18" Image="[s63]" Text="[ZeroTax]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Tax type &quot;Tax Free&quot; Screenshot 64" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_31" Screenshot="[s64]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="55b9056f-7496-4381-9d94-bcb2cf76a015" InformativeScreenshot="2c0afaf723923ffc21ad56681299302d" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="227, 269, 47, 14" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 64" FileName="Screenshot\s64.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_31" Image="[s64]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 64" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_20" Image="[s64]" Text="[DutyFree]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Tax Screenshot 65" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_32" Screenshot="[s65]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="e447a8e1-c103-42df-981e-74043e6d9be1" InformativeScreenshot="8b100090dec436376bea9a716ec5711e" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="273, 257, 103, 28" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 65" FileName="Screenshot\s65.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_32" Image="[s65]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 65" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_22" Image="[s65]" Text="[Tax]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Total Screenshot 66" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_33" Screenshot="[s66]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="6930089d-0699-4b03-8c07-2dd4f55c093b" InformativeScreenshot="69c72a5477d9a055dba393a0dc290729" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="273, 283, 102, 20" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 66" FileName="Screenshot\s66.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_33" Image="[s66]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 66" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_21" Image="[s66]" Text="[Total]" />
+                  <ui:TakeScreenshot WaitBefore="{x:Null}" DisplayName="Take Total &quot;Chinese&quot; Screenshot 67" sap:VirtualizedContainerService.HintSize="388,107" sap2010:WorkflowViewState.IdRef="TakeScreenshot_34" Screenshot="[s67]">
+                    <ui:TakeScreenshot.Target>
+                      <ui:Target Element="{x:Null}" Id="b6b90d44-0d0d-4131-9d59-ad3156b31b52" InformativeScreenshot="2a2241fdd1fe6bcb209e556bc6458848" Selector="&lt;wnd app='acrobat.exe' cls='AcrobatSDIWindow' title='Demo.pdf - Adobe Acrobat Pro DC (32-bit)' /&gt;&lt;wnd aaname='文件窗格' cls='AVL_AVView' title='AVScrolledPageView' /&gt;&lt;wnd cls='AVL_AVView' title='AVPageView' /&gt;&lt;ctrl role='document' /&gt;">
+                        <ui:Target.ClippingRegion>
+                          <ui:Region Rectangle="68, 304, 307, 24" />
+                        </ui:Target.ClippingRegion>
+                        <ui:Target.TimeoutMS>
+                          <InArgument x:TypeArguments="x:Int32" />
+                        </ui:Target.TimeoutMS>
+                        <ui:Target.WaitForReady>
+                          <InArgument x:TypeArguments="ui:WaitForReady" />
+                        </ui:Target.WaitForReady>
+                      </ui:Target>
+                    </ui:TakeScreenshot.Target>
+                  </ui:TakeScreenshot>
+                  <ui:SaveImage DisplayName="Save Image 67" FileName="Screenshot\s67.png" sap:VirtualizedContainerService.HintSize="388,133" sap2010:WorkflowViewState.IdRef="SaveImage_34" Image="[s67]" />
+                  <ui:MicrosoftAzureComputerVisionOCR FilterRegion="{x:Null}" Language="{x:Null}" Output="{x:Null}" PredictionId="{x:Null}" Profile="{x:Null}" Scale="{x:Null}" ApiKey="1f0d81e7a5d84549a89cdde5aa618d3c" ComputeSkewAngle="False" DisplayName="Azure OCR 67" Endpoint="https://microsofcvinuipath.cognitiveservices.azure.com/" ExtractWords="False" HandwritingRecognition="False" sap:VirtualizedContainerService.HintSize="388,25" sap2010:WorkflowViewState.IdRef="MicrosoftAzureComputerVisionOCR_23" Image="[s67]" Text="[ChineseTotal]" />
+                </Sequence>
+                <Assign sap:VirtualizedContainerService.HintSize="1207,82" sap2010:WorkflowViewState.IdRef="Assign_2">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">True</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Flowchart sap:VirtualizedContainerService.HintSize="1207,1105" sap2010:WorkflowViewState.IdRef="Flowchart_1">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+                      <av:Point x:Key="ShapeLocation">270,2.5</av:Point>
+                      <av:Size x:Key="ShapeSize">60,75</av:Size>
+                      <av:PointCollection x:Key="ConnectorLocation">300,77.5 300,136.5</av:PointCollection>
+                      <x:Double x:Key="Width">1172.544757033248</x:Double>
+                      <x:Double x:Key="Height">1068.0079999999975</x:Double>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <Flowchart.StartNode>
+                    <x:Reference>__ReferenceID13</x:Reference>
+                  </Flowchart.StartNode>
+                  <FlowDecision x:Name="__ReferenceID13" Condition="[Convert.ToInt32(Amount1)*Convert.ToInt32(UnitPrice1)=Convert.ToInt32(Sum1)]" DisplayName="Product1 Decision" sap:VirtualizedContainerService.HintSize="108,87" sap2010:WorkflowViewState.IdRef="FlowDecision_1">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                        <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                        <av:Point x:Key="ShapeLocation">246,136.5</av:Point>
+                        <av:Size x:Key="ShapeSize">108,87</av:Size>
+                        <av:PointCollection x:Key="FalseConnector">355,180 413,180</av:PointCollection>
+                        <av:PointCollection x:Key="TrueConnector">246,180 222.5,180 222.5,226.5 312.5,226.5 312.5,256.5</av:PointCollection>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                    <FlowDecision.True>
+                      <FlowDecision x:Name="__ReferenceID1" Condition="[Convert.ToInt32(Amount2)*Convert.ToInt32(UnitPrice2)=Convert.ToInt32(Sum2)]" DisplayName="Product2 Decision" sap:VirtualizedContainerService.HintSize="108,87" sap2010:WorkflowViewState.IdRef="FlowDecision_2">
+                        <sap:WorkflowViewStateService.ViewState>
+                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                            <av:Point x:Key="ShapeLocation">258.5,256.5</av:Point>
+                            <av:Size x:Key="ShapeSize">108,87</av:Size>
+                            <av:PointCollection x:Key="TrueConnector">258.5,300 228.5,300 228.5,346.5 310,346.5 310,376.5</av:PointCollection>
+                            <av:PointCollection x:Key="FalseConnector">367.5,300 403,300</av:PointCollection>
+                          </scg:Dictionary>
+                        </sap:WorkflowViewStateService.ViewState>
+                        <FlowDecision.True>
+                          <FlowDecision x:Name="__ReferenceID2" Condition="[Convert.ToInt32(Amount3)*Convert.ToInt32(UnitPrice3)=Convert.ToInt32(Sum3)]" DisplayName="Product3 Decision" sap:VirtualizedContainerService.HintSize="108,87" sap2010:WorkflowViewState.IdRef="FlowDecision_3">
+                            <sap:WorkflowViewStateService.ViewState>
+                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                                <av:Point x:Key="ShapeLocation">256,376.5</av:Point>
+                                <av:Size x:Key="ShapeSize">108,87</av:Size>
+                                <av:PointCollection x:Key="TrueConnector">256,420 226,420 226,466.5 310,466.5 310,496.5</av:PointCollection>
+                                <av:PointCollection x:Key="FalseConnector">365,420 403,420</av:PointCollection>
+                              </scg:Dictionary>
+                            </sap:WorkflowViewStateService.ViewState>
+                            <FlowDecision.True>
+                              <FlowDecision x:Name="__ReferenceID3" Condition="[Convert.ToInt32(Amount4)*Convert.ToInt32(UnitPrice4)=Convert.ToInt32(Sum4)]" DisplayName="Product4 Decision" sap:VirtualizedContainerService.HintSize="108,87" sap2010:WorkflowViewState.IdRef="FlowDecision_4">
+                                <sap:WorkflowViewStateService.ViewState>
+                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                    <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                                    <av:Point x:Key="ShapeLocation">256,496.5</av:Point>
+                                    <av:Size x:Key="ShapeSize">108,87</av:Size>
+                                    <av:PointCollection x:Key="FalseConnector">365,540 403,540</av:PointCollection>
+                                    <av:PointCollection x:Key="TrueConnector">256,540 240,540 240,586.5 300,586.5 300,616.5</av:PointCollection>
+                                  </scg:Dictionary>
+                                </sap:WorkflowViewStateService.ViewState>
+                                <FlowDecision.True>
+                                  <FlowDecision x:Name="__ReferenceID7" Condition="[Convert.ToInt32(Amount5)*Convert.ToInt32(UnitPrice5)=Convert.ToInt32(Sum5)]" DisplayName="Product5 Decision" sap:VirtualizedContainerService.HintSize="108,87" sap2010:WorkflowViewState.IdRef="FlowDecision_5">
+                                    <sap:WorkflowViewStateService.ViewState>
+                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                        <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                                        <av:Point x:Key="ShapeLocation">246,616.5</av:Point>
+                                        <av:Size x:Key="ShapeSize">108,87</av:Size>
+                                        <av:PointCollection x:Key="FalseConnector">354,660 393,660</av:PointCollection>
+                                        <av:PointCollection x:Key="TrueConnector">246,660 216,660 216,706.5 300,706.5 300,736.5</av:PointCollection>
+                                      </scg:Dictionary>
+                                    </sap:WorkflowViewStateService.ViewState>
+                                    <FlowDecision.True>
+                                      <FlowDecision x:Name="__ReferenceID10" Condition="[Convert.ToInt32(Sum1)+Convert.ToInt32(Sum2)+Convert.ToInt32(Sum3)+Convert.ToInt32(Sum4)+Convert.ToInt32(Sum5)=Convert.ToInt32(Sales)]" DisplayName="Sales Decision" sap:VirtualizedContainerService.HintSize="86,87" sap2010:WorkflowViewState.IdRef="FlowDecision_7">
+                                        <sap:WorkflowViewStateService.ViewState>
+                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                                            <av:Point x:Key="ShapeLocation">257,736.5</av:Point>
+                                            <av:Size x:Key="ShapeSize">86,87</av:Size>
+                                            <av:PointCollection x:Key="FalseConnector">343,780 383.00000000000006,780</av:PointCollection>
+                                            <av:PointCollection x:Key="TrueConnector">257,780 240,780 240,826.5 300,826.5 300,856.5</av:PointCollection>
+                                          </scg:Dictionary>
+                                        </sap:WorkflowViewStateService.ViewState>
+                                        <FlowDecision.True>
+                                          <FlowDecision x:Name="__ReferenceID9" Condition="[Convert.ToInt32(Sales)+Convert.ToInt32(Tax)=Convert.ToInt32(Total)]" DisplayName="Total  Decision" sap:VirtualizedContainerService.HintSize="89,87" sap2010:WorkflowViewState.IdRef="FlowDecision_6">
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                                                <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                                                <av:Point x:Key="ShapeLocation">255.5,856.5</av:Point>
+                                                <av:Size x:Key="ShapeSize">89,87</av:Size>
+                                                <av:PointCollection x:Key="FalseConnector">344.5,900 393,900</av:PointCollection>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                            <FlowDecision.False>
+                                              <FlowStep x:Name="__ReferenceID12">
+                                                <sap:WorkflowViewStateService.ViewState>
+                                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                    <av:Point x:Key="ShapeLocation">393,859</av:Point>
+                                                    <av:Size x:Key="ShapeSize">434,82</av:Size>
+                                                  </scg:Dictionary>
+                                                </sap:WorkflowViewStateService.ViewState>
+                                                <Assign sap:VirtualizedContainerService.HintSize="434,82" sap2010:WorkflowViewState.IdRef="Assign_9">
+                                                  <Assign.To>
+                                                    <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                                                  </Assign.To>
+                                                  <Assign.Value>
+                                                    <InArgument x:TypeArguments="x:String">False</InArgument>
+                                                  </Assign.Value>
+                                                </Assign>
+                                              </FlowStep>
+                                            </FlowDecision.False>
+                                          </FlowDecision>
+                                        </FlowDecision.True>
+                                        <FlowDecision.False>
+                                          <FlowStep x:Name="__ReferenceID11">
+                                            <sap:WorkflowViewStateService.ViewState>
+                                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                                <av:Point x:Key="ShapeLocation">383.00000000000006,739</av:Point>
+                                                <av:Size x:Key="ShapeSize">434,82</av:Size>
+                                              </scg:Dictionary>
+                                            </sap:WorkflowViewStateService.ViewState>
+                                            <Assign sap:VirtualizedContainerService.HintSize="434,82" sap2010:WorkflowViewState.IdRef="Assign_8">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">False</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                          </FlowStep>
+                                        </FlowDecision.False>
+                                      </FlowDecision>
+                                    </FlowDecision.True>
+                                    <FlowDecision.False>
+                                      <FlowStep x:Name="__ReferenceID8">
+                                        <sap:WorkflowViewStateService.ViewState>
+                                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                            <av:Point x:Key="ShapeLocation">393,619</av:Point>
+                                            <av:Size x:Key="ShapeSize">434,82</av:Size>
+                                          </scg:Dictionary>
+                                        </sap:WorkflowViewStateService.ViewState>
+                                        <Assign sap:VirtualizedContainerService.HintSize="434,82" sap2010:WorkflowViewState.IdRef="Assign_7">
+                                          <Assign.To>
+                                            <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                                          </Assign.To>
+                                          <Assign.Value>
+                                            <InArgument x:TypeArguments="x:String">False</InArgument>
+                                          </Assign.Value>
+                                        </Assign>
+                                      </FlowStep>
+                                    </FlowDecision.False>
+                                  </FlowDecision>
+                                </FlowDecision.True>
+                                <FlowDecision.False>
+                                  <FlowStep x:Name="__ReferenceID6">
+                                    <sap:WorkflowViewStateService.ViewState>
+                                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                        <av:Point x:Key="ShapeLocation">403,499</av:Point>
+                                        <av:Size x:Key="ShapeSize">434,82</av:Size>
+                                      </scg:Dictionary>
+                                    </sap:WorkflowViewStateService.ViewState>
+                                    <Assign sap:VirtualizedContainerService.HintSize="434,82" sap2010:WorkflowViewState.IdRef="Assign_6">
+                                      <Assign.To>
+                                        <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                                      </Assign.To>
+                                      <Assign.Value>
+                                        <InArgument x:TypeArguments="x:String">False</InArgument>
+                                      </Assign.Value>
+                                    </Assign>
+                                  </FlowStep>
+                                </FlowDecision.False>
+                              </FlowDecision>
+                            </FlowDecision.True>
+                            <FlowDecision.False>
+                              <FlowStep x:Name="__ReferenceID5">
+                                <sap:WorkflowViewStateService.ViewState>
+                                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                    <av:Point x:Key="ShapeLocation">403,379</av:Point>
+                                    <av:Size x:Key="ShapeSize">434,82</av:Size>
+                                  </scg:Dictionary>
+                                </sap:WorkflowViewStateService.ViewState>
+                                <Assign sap:VirtualizedContainerService.HintSize="434,82" sap2010:WorkflowViewState.IdRef="Assign_5">
+                                  <Assign.To>
+                                    <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                                  </Assign.To>
+                                  <Assign.Value>
+                                    <InArgument x:TypeArguments="x:String">False</InArgument>
+                                  </Assign.Value>
+                                </Assign>
+                              </FlowStep>
+                            </FlowDecision.False>
+                          </FlowDecision>
+                        </FlowDecision.True>
+                        <FlowDecision.False>
+                          <FlowStep x:Name="__ReferenceID4">
+                            <sap:WorkflowViewStateService.ViewState>
+                              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                                <av:Point x:Key="ShapeLocation">403,259</av:Point>
+                                <av:Size x:Key="ShapeSize">434,82</av:Size>
+                              </scg:Dictionary>
+                            </sap:WorkflowViewStateService.ViewState>
+                            <Assign sap:VirtualizedContainerService.HintSize="434,82" sap2010:WorkflowViewState.IdRef="Assign_4">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:String">False</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                          </FlowStep>
+                        </FlowDecision.False>
+                      </FlowDecision>
+                    </FlowDecision.True>
+                    <FlowDecision.False>
+                      <FlowStep x:Name="__ReferenceID0">
+                        <sap:WorkflowViewStateService.ViewState>
+                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                            <av:Point x:Key="ShapeLocation">413,139</av:Point>
+                            <av:Size x:Key="ShapeSize">434,82</av:Size>
+                          </scg:Dictionary>
+                        </sap:WorkflowViewStateService.ViewState>
+                        <Assign sap:VirtualizedContainerService.HintSize="434,82" sap2010:WorkflowViewState.IdRef="Assign_3">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[ReceiptCondition]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">False</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                      </FlowStep>
+                    </FlowDecision.False>
+                  </FlowDecision>
+                  <x:Reference>__ReferenceID0</x:Reference>
+                  <x:Reference>__ReferenceID1</x:Reference>
+                  <x:Reference>__ReferenceID2</x:Reference>
+                  <x:Reference>__ReferenceID3</x:Reference>
+                  <x:Reference>__ReferenceID4</x:Reference>
+                  <x:Reference>__ReferenceID5</x:Reference>
+                  <x:Reference>__ReferenceID6</x:Reference>
+                  <x:Reference>__ReferenceID7</x:Reference>
+                  <x:Reference>__ReferenceID8</x:Reference>
+                  <x:Reference>__ReferenceID9</x:Reference>
+                  <x:Reference>__ReferenceID10</x:Reference>
+                  <FlowDecision DisplayName="Unitfoarm Number Decision" sap:VirtualizedContainerService.HintSize="160,87" sap2010:WorkflowViewState.IdRef="FlowDecision_8">
+                    <sap:WorkflowViewStateService.ViewState>
+                      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                        <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                        <av:Point x:Key="ShapeLocation">230,976.5</av:Point>
+                        <av:Size x:Key="ShapeSize">160,87</av:Size>
+                      </scg:Dictionary>
+                    </sap:WorkflowViewStateService.ViewState>
+                  </FlowDecision>
+                  <x:Reference>__ReferenceID11</x:Reference>
+                  <x:Reference>__ReferenceID12</x:Reference>
+                </Flowchart>
+              </Sequence>
+            </Sequence>
+          </ActivityAction>
+        </ui:ForEach.Body>
+      </ui:ForEach>
+    </Sequence>
+  </Sequence>
+</Activity>
