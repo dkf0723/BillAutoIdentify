@@ -1,0 +1,49 @@
+.table-right-border{
+
+    border-collapse:collapse;
+    border: 1px solid black;
+    text-align:right;
+}
+.table-left-border{
+
+    border-collapse:collapse;
+    border: 1px solid black;
+    text-align:left;
+}
+.table-inside{
+    text-align:center; 
+}
+.table-right{
+    text-align:right; 
+
+}
+.table-left{
+    text-align:left;
+     
+}
+.border{
+    border-collapse:collapse;
+    border: 1px solid black;
+}
+.container{
+    margin:0 auto;
+    width: 600px;
+}
+
+.textright{
+    text-align: right;
+}
+.textrightred ::placeholder{
+    color: red;
+}
+
+/*去除 input type=number外上下箭頭*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button { 
+    -webkit-appearance: none; 
+}
+.color-red{
+    color: red;
+}
+
+
