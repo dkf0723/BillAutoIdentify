@@ -1,0 +1,11 @@
+.container{
+    margin:0 auto;
+    width: 600px;
+}
+.border{
+    border-collapse:collapse;
+    border: 1px solid black;
+}
+.table-inside{
+    text-align:center; 
+}
