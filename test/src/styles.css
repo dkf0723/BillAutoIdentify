@@ -1,30 +1,141 @@
 .App {
-    font-family: sans-serif;
-    text-align: center;
-  }
-  
-  .show_loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    background-color: rgba(255, 255, 255, 0.8);
-    z-index: 10000000;
-  }
-  
-  .banner_button{
-    display: inline;
-    margin: 5px;
-    
-  }
-  .container{
-    margin:0 auto;
-    width: 600px;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.show_loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10000000;
+}
+
+.banner_button {
+  display: inline;
+  margin: 5px;
+
+}
+
+.container {
+  margin: 0 auto;
+  width: 600px;
+}
+
+.App {
+  /*不知道是啥*/
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.show_loading {
+  /*不知道是啥*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  background-color: blueviolet;
+  z-index: 10000000;
+}
+
+div.banner_button {
+  background-color: antiquewhite;
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  margin-bottom: -20px;
+}
+
+a {
+  /*Botton link 的置中分散*/
+  margin: 0 100px;
+
+}
+
+.abc {
+  font-size: 22px;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  transition: all .3s linear;
+  text-decoration: none;
+  border-radius: 100px 100px 100px 100px;
+}
+
+.abc:hover {
+  color: #fff;
+  background-color: tan;
+}
+
+.container {
+  /*表格顏色*/
+  margin: 0 auto;
+  width: 600px;
+  background-image: "report\image\piggy-bank.jpg";
+}
+
+a :hover {
+  color: rgb(247, 242, 242);
+  /*按鈕字的顏色*/
+  background-color: blueviolet;
+  /*按鈕字的背景顏色*/
+}
+
+div.container {
+  width: 80%;
+  /*讓下方版面置中*/
+}
+
+h1 {
+  color: goldenrod;
+  padding-top: 45px;
+  vertical-align: middle;
+  height: 100px;
+  text-align: center;
+  background-color: blanchedalmond;
+  font-size: 50px;
+}
+
+div {
+  /*大背景*/
+  background-color: white;
+}
+
+div.mar {
+  /*跑馬燈*/
+  background-color: burlywood;
+}
+
+div.foot {
+  padding-top: 50px;
+  background-color: antiquewhite;
+  height: 150px;
+  text-align: center;
+
+}
+
+body {
+  background-image: url("../image/piggy-bank.jpg");
+}
+.logo{
+  background:url("../image/標題.png") no-repeat;
+  text-indent: 101%;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-left: 40%;
 }
