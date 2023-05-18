@@ -167,8 +167,6 @@ export function OutAndReviseTable() {
 
     
     return downj.s, <div>
-        {pageload}<br/>
-        {resData.total}<br/>
         <table>
             <tr>
                 <td>發票號碼：</td>
