@@ -18,7 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +70,19 @@ public class MyController {
     @PostMapping("/check")
     public BillBean checkPost(@RequestBody BillBean billBean) {
         return billService.findMistakeBill(billBean.getPage());
+    }
+
+    @PostMapping("/upload")
+    public String uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            String fileName = file.getOriginalFilename();
+            File destination = new File("C:\\Users\\user\\Desktop\\file\\" + fileName);
+            file.transferTo(destination);
+            return "File uploaded successfully!";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "File upload failed.";
+        }
     }
 
 }
