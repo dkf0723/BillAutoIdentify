@@ -1,12 +1,12 @@
 package com.example.demo.model.service;
 
 import com.example.demo.model.bean.BillBean;
-import com.example.demo.model.entity.Bill;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface BillService {
-   BillBean findMistakeBill(int skip);
+   BillBean findMistakeBill(int page);
    BillBean findMistakeBill();
+   BillBean findCorrectBill();
+   BillBean findCorrectBill(int page);
+   String updateFile(MultipartFile file);
 }

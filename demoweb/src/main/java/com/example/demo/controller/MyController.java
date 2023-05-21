@@ -74,15 +74,14 @@ public class MyController {
 
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            String fileName = file.getOriginalFilename();
-            File destination = new File("C:\\Users\\user\\Desktop\\file\\" + fileName);
-            file.transferTo(destination);
-            return "File uploaded successfully!";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "File upload failed.";
-        }
+        return billService.updateFile(file);
     }
-
+    @GetMapping("/searchCorrectBill")
+    public BillBean searchCorrectBill() {
+        return billService.findCorrectBill();
+    }
+    @PostMapping("/searchCorrectBill")
+    public BillBean searchCorrectBillByPage(@RequestBody BillBean billBean) {
+        return billService.findCorrectBill(billBean.getPage());
+    }
 }
