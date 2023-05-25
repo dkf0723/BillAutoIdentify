@@ -7,11 +7,11 @@ import { setup } from './setup';
 
 export function OutAndReviseTable() {
     //-----------
-    
+
     const [resData, setResData] = useState([]);//陣列-api json in
     const [value1, setValue1] = useState('this')//取得下拉選單的值(稅別)
     const [value2, setValue2] = useState('this')//取得下拉選單的值(建檔與否)
-    const [pageload,setPageload] = useState(global.pages);
+    const [pageload, setPageload] = useState(global.pages);
     const [, updateState] = useState("");
     //----------------
     const [datetime, setDatetime] = useState("");//日期
@@ -25,7 +25,7 @@ export function OutAndReviseTable() {
     const [invoicetype, setInvoicetype] = useState("")//發票二三聯
     const [daterange, setDaterange] = useState("");//發票期間
     const [number, setNumber] = useState("")//統一編號
-    
+
     const [buyer, setBuyer] = useState("");//買受人
     const [address, setAddress] = useState("")//地址
 
@@ -56,19 +56,19 @@ export function OutAndReviseTable() {
     const [totalmini, setTotalmini] = useState("")//合計
     const [tax, setTax] = useState("")//稅額
     const [totalall, setTotalall] = useState("")//總計 
-    
+
     const [insidepage, setInsidepage] = useState("")//目前張數
 
-   
+
     //if(page!== global.pages){OutAndReviseTable()}
     useEffect(() => {
         pageset();
         Checkdata();
-    }, []);
-    
-    const pageset = () =>{
+    }, [resData.billNumber]);
+
+    const pageset = () => {
         var page = global.pages;
-        var s = {page};
+        var s = { page };
         const invoicen = "http://127.0.0.1:8080/bill-auto-identify/bill/check";//Account info link
         fetch(invoicen, {
             /*method: "GET",
@@ -77,10 +77,10 @@ export function OutAndReviseTable() {
                 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json',
             },*/
-            method:"post",//選擇POST發送
+            method: "post",//選擇POST發送
             headers: {
                 'Accept': 'application/json',
-                'Access-Control-Allow-Origin': '*' ,
+                'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json',//轉換json檔
             },
             body: JSON.stringify(s)
@@ -93,19 +93,26 @@ export function OutAndReviseTable() {
                 return response.json();
             })
             .then(info => {
+                /*if(info["billDetailList"].length<5){
+                    const i =  5-info["billDetailList"].length;
+                    for(i;i){
+
+                    }
+                    info["billDetailList"].push("{number: 'MK56758388', column: 1, productName: '文件匣', price: 80, amount: 10, …}")
+                }*/
                 setResData(info);
                 setValue1(info["taxType"]);
                 console.log(info);
                 //日期格式
-                
+
                 var date = info["dateTime"]
                 setDatetime(date[0] + "年 " + date[1] + "月 " + date[2] + "日");
-                
+
                 setDaterevise(info["includeDateTime"].substr(0, 4) + "年 " +
                     info["includeDateTime"].substr(5, 2) +
                     "月 " + info["includeDateTime"].substr(8, 2) + "日 " +
                     info["includeDateTime"].substr(-10, 8));//日期
-                    Checkdata();     
+                Checkdata();
             })
             .catch(e => {
                 alert(e);
@@ -133,6 +140,7 @@ export function OutAndReviseTable() {
         setPageload(global.pages);
         setResData([]);
         pageset();
+
         //alert(global.pages)
         //alert(pageload);
         //setup();
@@ -156,6 +164,12 @@ export function OutAndReviseTable() {
 
     }
 
+    /*function normal(){
+        const totalid = ["checkinvoicenumber"];
+        for(const i=0; i<totalid.length; i++){
+            document.getElementById(totalall[i]).style.color="red";//文字原色
+        } 
+    }*/
     function giveupchange() {
         alert("放棄修改");
     }
@@ -165,28 +179,32 @@ export function OutAndReviseTable() {
         console.log(e.target.value)
     }
 
-    
+    function addnum() {
+
+    }
+
+
     return downj.s, <div>
         <table>
             <tr>
                 <td>發票號碼：</td>
-                <td><input type="text" defaultValue={resData.billNumber} onChange={(e) => handleInput(e)} placeholder="(2碼大寫英文8碼數字)" maxLength={10} id="checkinvoicenumber"></input></td>
+                <td><input type="text" Value={resData.billNumber} onChange={(e) => handleInput(e)} placeholder="(2碼大寫英文8碼數字)" maxLength={10} id="checkinvoicenumber"></input></td>
                 <td>發票二聯/三聯：</td>
-                <td><input type="text" defaultValue={resData.billType} onChange={(e) => handleInput(e)} placeholder="(2~4字元)" minLength={2} maxLength={4} id="checkinvoicetype"></input></td>
+                <td><input type="text" Value={resData.billType} onChange={(e) => handleInput(e)} placeholder="(2~4字元)" minLength={2} maxLength={4} id="checkinvoicetype"></input></td>
             </tr>
-           
+
             <tr>
                 <td>發票期間：</td>
                 <td><input type="text" defaultValue={resData.yearMonth} onChange={(e) => handleInput(e)} id="checkdaterange"></input></td>
             </tr>
-            
+
             <tr>
                 <td>統一編號：</td>
                 <td><input type="text" defaultValue={resData.taxIdNumber} onChange={(e) => handleInput(e)} placeholder="(8碼)" maxLength={8} id="checknumber"></input></td>
                 <td className='table-right'>日期：</td>
                 <td><input type="text" defaultValue={datetime} onChange={(e) => handleInput(e)} id="checkdatetime"></input></td>
             </tr>
-            
+
             <tr>
                 <td>買受人：</td>
                 <td><input type="text" defaultValue={resData.buyer} onChange={(e) => handleInput(e)} placeholder="(最低2字元)" minLength={2} id="checkbuyer"></input></td>
@@ -195,7 +213,7 @@ export function OutAndReviseTable() {
             <tr>
                 <td>地址：</td>
                 <td><input type="text" defaultValue={resData.address} onChange={(e) => handleInput(e)} colSpan={2} id="checkaddress"></input></td>
-            </tr> 
+            </tr>
         </table>
         <table className='border'>
             <tr className='table-inside'>
@@ -209,10 +227,10 @@ export function OutAndReviseTable() {
                 resData.billDetailList.map((data, index) =>
                     <tr className='table-inside' key={index}>
                         <td>{index + 1}</td>
-                        <td className='border'><input type="text" defaultValue={data.productName} onChange={(e) => handleInput(e)} placeholder="r1" id={"r1c"+index}></input></td>
-                        <td className='border'><input type="number" className='textright' defaultValue={data.amount} onChange={(e) => handleInput(e)} placeholder="r2" id={"r2c"+index} /></td>
-                        <td className='border'><input type="number" className='textright' defaultValue={data.price} onChange={(e) => handleInput(e)} placeholder="r3" id={"r3c"+index} /></td>
-                        <td className='border'><input type="number" className='textright' defaultValue={data.totalColumnPrice} onChange={(e) => handleInput(e)} placeholder="r4" id={"r4c"+index} /></td>
+                        <td className='border'><input type="text" defaultValue={data.productName} onChange={(e) => handleInput(e)} placeholder="r1" id={"r1c" + (index + 1)}></input></td>
+                        <td className='border'><input type="number" className='textright' defaultValue={data.amount} onChange={(e) => handleInput(e)} placeholder="r2" id={"r2c" + (index + 1)} /></td>
+                        <td className='border'><input type="number" className='textright' defaultValue={data.price} onChange={(e) => handleInput(e)} placeholder="r3" id={"r3c" + (index + 1)} /></td>
+                        <td className='border'><input type="number" className='textright' defaultValue={data.totalColumnPrice} onChange={(e) => handleInput(e)} placeholder="r4" id={"r4c" + (index + 1)} /></td>
                     </tr>
                 )
             }
@@ -326,7 +344,7 @@ export function OutAndReviseTable() {
 
             <tr>
                 <td>共{totalpage}張</td>
-                <td>第{resData.page+1}張</td>
+                <td>第{resData.page + 1}張</td>
             </tr>
         </table>
 

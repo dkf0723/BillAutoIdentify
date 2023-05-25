@@ -33,9 +33,9 @@ export   default function MediaUpload  (){
 
     return <div className="container">       
         <p>目前位置：MediaUpload</p>
-        <p>請選擇上傳要掃描的發票PDF檔案(可一次多檔)</p>
+        <p>請選擇上傳要掃描的發票PDF、PNG、JPG檔案(可一次多檔)</p>
         <form action="" enctype="multipart/form-data">
-            <input name="imgupload" type="file" id="file-input" accept=".pdf" multiple="multiple"></input>
+            <input name="imgupload" type="file" id="file-input" accept=".pdf,.png,.jpg" multiple="multiple"></input>
         </form>
         <div>
             <p><Link to="/Media"><input type={"button"} value="圖檔送出，繼續上傳" name="upload" onClick={upload}></input></Link></p>
