@@ -97,18 +97,21 @@ def handle_message(event):
     elif '訂單查詢' in msg:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='訂單查詢'))
     elif '營業資訊' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='營業資訊'))
-    elif '商品廠家' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='商品廠家'))
+        business_detail = business_information()
+        line_bot_api.reply_message(event.reply_token, business_detail)
+    elif '問題提問' in msg:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
+    elif '許願商品' in msg:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='許願商品'))
     #-------------------執行購買或預購----------------------
     elif '【立即購買】' in msg:
-        product['product'] = msg[6:]
+        product[user_id+'product'] = msg[6:]
         Order_buynow_text = Order_buynow()
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=Order_buynow_text))
+        line_bot_api.reply_message(event.reply_token, Order_buynow_text)
     elif '【手刀預購】' in msg:
-        product['product'] = msg[6:]
+        product[user_id+'product'] = msg[6:]
         Order_preorder_text = Order_preorder()
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=Order_preorder_text))
+        line_bot_api.reply_message(event.reply_token, Order_preorder_text)
     #-------------------檢查購買或預購數量----------------------
     elif user_state[user_id] != 'normal':
         check_text = product_check()

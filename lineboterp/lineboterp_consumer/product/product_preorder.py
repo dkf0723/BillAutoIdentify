@@ -1,7 +1,7 @@
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
-from linebot.models import FlexSendMessage, BubbleContainer, ImageComponent
+from linebot.models import *
 import lineboterp
 #-------------------預購清單----------------------
 def product_preorder_list():
@@ -129,10 +129,10 @@ def product_preorder_list():
 def Order_preorder():
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
-    product = lineboterp.product['product']
+    product = lineboterp.product[user_id+'product']
     if user_id not in user_state or user_state[user_id] == 'normal':
             # 若使用者尚未有狀態，則進行第一次回應
             user_state[user_id] = 'preorder'#從user_state轉換預購狀態
-            Order_preorder_text = ('商品名稱：%s\n=>請輸入預購數量：' %(product))
+            Order_preorder_text = TextSendMessage(text='商品名稱：%s\n=>請輸入預購數量：' %(product)),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
         # 傳送回應訊息給使用者
     return Order_preorder_text
