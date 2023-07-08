@@ -3,8 +3,8 @@ from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
 import lineboterp
-#-------------------使用者狀態檢查----------------------
 
+#-------------------使用者狀態檢查----------------------
 message_storage = {}
 def product_check():
     id = lineboterp.user_id
@@ -25,22 +25,22 @@ def orderandpreorder_check():
         if state[id] == 'ordering':
             message_storage[id+'num'] = '訂購數量：'+ message
             check_text = ('商品名稱：%s\n您輸入的訂購數量： %s' %(product,message))
-            check_text += '\n=>請接著輸入「電話號碼」\nex.0952000000'
+            check_text += '\n=>請接著，打字輸入「電話號碼」\nex.0952000000'
             check_text = TextSendMessage(text=check_text)
             state[id] = 'phonenum' #從user_state轉換輸入電話狀態
         elif state[id] == 'preorder':
             message_storage[id+'num'] = '預購數量：'+message
             check_text = ('商品名稱：%s\n您輸入的預購數量： %s' %(product,message))
-            check_text += '\n=>請接著，輸入「電話號碼」\n ex.0952000000'
+            check_text += '\n=>請接著，打字輸入「電話號碼」\n ex.0952000000'
             check_text = TextSendMessage(text=check_text)
             state[id] = 'phonenum' #從user_state轉換輸入電話狀態
         elif state[id] == 'phonenum':
             if message.isdigit():
                 if(len(message) < 10):
-                    check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請繼續輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                    check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
                 else:
                     if(message[:2] != '09'):
-                        check_text = TextSendMessage(text='輸入電話格式錯誤！(09碼)\n請繼續輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                        check_text = TextSendMessage(text='輸入電話格式錯誤！(09碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
                     else:
                         message_storage[id+'phonenum'] = '電話號碼：' + message
                         state[id] = 'end'#從user_state轉換確認狀態
@@ -105,3 +105,4 @@ def business_information():
     '\n地址：\n新北市中和區員山路325之4號2樓'
     ),Company_location()
     return business_detail
+
