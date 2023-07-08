@@ -128,9 +128,20 @@ def Order_buynow():
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
     product = lineboterp.product[user_id+'product']
+
+    #Quick Reply 按鈕數量範圍
+    quantity_option = []
+    for i in range(10):
+        quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
+    #------------------------
     if user_id not in user_state or user_state[user_id] == 'normal':
             # 若使用者尚未有狀態，則進行第一次回應
             user_state[user_id] = 'ordering'#從user_state轉換訂購狀態
-            Order_buynow_text = TextSendMessage(text='商品名稱：%s\n=>請輸入訂購數量：' %(product)),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+            # 建立 Quick Reply 按鈕
+            quick_reply_message = TextSendMessage(
+                text='商品名稱：%s\n=>請輸入訂購數量：' %(product),
+                quick_reply=QuickReply(items=quantity_option)
+            )
+            Order_buynow_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
         # 傳送回應訊息給使用者
     return Order_buynow_text
