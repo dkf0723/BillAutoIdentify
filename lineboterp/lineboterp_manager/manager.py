@@ -9,7 +9,7 @@ from linebot.exceptions import (
 from linebot.models import *
 
 #======這裡是呼叫的檔案內容=====
-
+from inventory import *
 
 #======python的函數庫==========
 import tempfile, os
@@ -48,6 +48,8 @@ global user_state
 user_state = {}
 global product
 product = {}
+global dict_data
+dict_data = {}
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -65,15 +67,54 @@ def handle_message(event):
     elif '報表管理' in msg:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
     elif '顧客QA' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顧客QA'))
-    elif '庫存管理' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='庫存管理'))  
-    elif '許願商品' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='許願商品'))
+        line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+        alt_text='ConfirmTemplate',
+        template=ConfirmTemplate(
+                text='請選擇查詢顧客QA回覆狀態：\n【已回覆】或是【未回覆】',
+                actions=[
+                    MessageAction(
+                        label='【已回覆】',
+                        text='【QA】已回覆',
+                    ),
+                    MessageAction(
+                        label='【未回覆】',
+                        text='【QA】未回覆'
+                    )
+                ]
+            )
+        ))
+    elif '【QA】' in msg:
+        if msg[4:] == '已回覆':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='已回覆'))
+        elif msg[4:] == '未回覆':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未回覆'))
+    elif '庫存管理' in msg: 
+        message = TextSendMessage(text='請點選以下操作功能',
+                            quick_reply=QuickReply(items=[
+                            QuickReplyButton(action=MessageAction(label="新增商品", text="新增商品")),
+                            QuickReplyButton(action=MessageAction(label="出售商品", text="出售商品")),
+                            QuickReplyButton(action=MessageAction(label="查詢個別商品資訊", text="查詢個別商品資訊")),
+                            QuickReplyButton(action=MessageAction(label="查詢所有商品資訊", text="查詢所有商品資訊")),
+                    ]))
+        line_bot_api.reply_message(event.reply_token, message)
+    elif '新增商品' in msg:
+        message = add_goods()
+        line_bot_api.reply_message(event.reply_token, message)
+    elif '出售商品' in msg:
+        message = sell_goods()
+        line_bot_api.reply_message(event.reply_token, message)
+    elif '查詢個別商品資訊' in msg:
+        message = select_goods()
+        line_bot_api.reply_message(event.reply_token, message)
+    elif '查詢所有商品資訊' in msg:
+        message = select_all_goods()
+        line_bot_api.reply_message(event.reply_token, message)
+
     #-------------------非上方功能的所有回覆----------------------
     else:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的回覆：「'+msg+'」\n不在功能編號中！\n請重新輸入。'))
     #return user_id,user_state
+
 
 @handler.add(PostbackEvent)
 def handle_message(event):
