@@ -9,7 +9,7 @@ from linebot.exceptions import (
 from linebot.models import *
 
 #======這裡是呼叫的檔案內容=====
-from inventory import *
+from inventory_management import *
 
 #======python的函數庫==========
 import tempfile, os
@@ -59,16 +59,56 @@ def handle_message(event):
     user_id = event.source.user_id 
 
     if '顧客取貨' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顧客取貨'))
+        line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+        alt_text='取貨選擇',
+        template=ConfirmTemplate(
+                text='請選擇取貨方式：\n【手機後三碼】或是【訂單編號】',
+                actions=[
+                    MessageAction(
+                        label='【後三碼】',
+                        text='【取貨】手機後三碼',
+                    ),
+                    MessageAction(
+                        label='【訂單編號】',
+                        text='【取貨】訂單編號'
+                    )
+                ]
+            )
+        ))
+    elif '【取貨】' in msg:
+        if msg[4:] == '手機後三碼':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
+        elif msg[4:] == '訂單編號':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
     elif '商品管理' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='商品管理'))
+        line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+        alt_text='商品選擇',
+        template=ConfirmTemplate(
+                text='請選擇商品狀態：\n【已到貨】或是【未到貨】',
+                actions=[
+                    MessageAction(
+                        label='【已到貨】',
+                        text='【商品】已到貨',
+                    ),
+                    MessageAction(
+                        label='【未到貨】',
+                        text='【商品】未到貨'
+                    )
+                ]
+            )
+        ))
+    elif '【商品】' in msg:
+        if msg[4:] == '已到貨':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示已到貨商品選單'))
+        elif msg[4:] == '未到貨':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示未到貨商品選單'))
     elif '未取名單' in msg:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
     elif '報表管理' in msg:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
     elif '顧客QA' in msg:
         line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-        alt_text='ConfirmTemplate',
+        alt_text='QA選擇',
         template=ConfirmTemplate(
                 text='請選擇查詢顧客QA回覆狀態：\n【已回覆】或是【未回覆】',
                 actions=[
@@ -85,9 +125,9 @@ def handle_message(event):
         ))
     elif '【QA】' in msg:
         if msg[4:] == '已回覆':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='已回覆'))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出未回覆者問題'))
         elif msg[4:] == '未回覆':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未回覆'))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出歷史問答記錄'))
     elif '庫存管理' in msg: 
         message = TextSendMessage(text='請點選以下操作功能',
                             quick_reply=QuickReply(items=[
