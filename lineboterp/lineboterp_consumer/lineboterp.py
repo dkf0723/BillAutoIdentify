@@ -12,7 +12,7 @@ from linebot.models import *
 from product.product_preorder import *
 from product.buy_now import *
 from product.check import *
-
+from database import *
 #======python的函數庫==========
 import tempfile, os
 import datetime
@@ -56,11 +56,13 @@ def handle_message(event):
     global user_id
     global msg
     msg = event.message.text
-    user_id = event.source.user_id 
+    user_id = event.source.user_id
+    if user_id not in user_state:
+        user_state[user_id] = 'normal'
     #-------------------團購商品及2種商品列表----------------------
     if '團購商品' in msg:
         line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-        alt_text='ConfirmTemplate',
+        alt_text='商品狀態選擇',
         template=ConfirmTemplate(
                 text='請選擇商品狀態：\n【預購商品】或是【現購商品】',
                 actions=[
@@ -120,6 +122,13 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【加入購物車】'))
     elif '查看購物車' in msg:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查看購物車'))
+    #-------------------資料庫連線測試----------------------
+    elif '資料庫' in msg:
+        databasetest_msg = databasetest()['databasetest_msg']
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
+    elif '測試' in msg:
+        datasearch = test_datasearch()
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
     #-------------------非上方功能的所有回覆----------------------
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
