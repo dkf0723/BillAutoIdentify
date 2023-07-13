@@ -10,7 +10,7 @@ from linebot.models import *
 
 #======這裡是呼叫的檔案內容=====
 from inventory_management import *
-
+from database import *
 #======python的函數庫==========
 import tempfile, os
 import datetime
@@ -149,7 +149,13 @@ def handle_message(event):
     elif '查詢所有商品資訊' in msg:
         message = select_all_goods()
         line_bot_api.reply_message(event.reply_token, message)
-
+    #-------------------資料庫測試----------------------
+    elif '資料庫' in msg:
+        databasetest_msg = databasetest()['databasetest_msg']
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
+    elif '測試' in msg:
+        datasearch = test_datasearch()
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
     #-------------------非上方功能的所有回覆----------------------
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的回覆：「'+msg+'」\n不在功能編號中！\n請重新輸入。'))
