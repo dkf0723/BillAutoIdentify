@@ -130,20 +130,20 @@ def Order_preorder():
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
     product = lineboterp.product[user_id+'product']
-
+    product_order_preorder = lineboterp.product_order_preorder
+    product_order_preorder[user_id] = '預購'
     #Quick Reply 按鈕數量範圍
     quantity_option = []
     for i in range(10):
         quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
     #------------------------
-    if user_id not in user_state or user_state[user_id] == 'normal':
-            # 若使用者尚未有狀態，則進行第一次回應
-            user_state[user_id] = 'preorder'#從user_state轉換預購狀態
-            # 建立 Quick Reply 按鈕
-            quick_reply_message = TextSendMessage(
-                text='商品名稱：%s\n=>請輸入預購數量：' %(product),
-                quick_reply=QuickReply(items=quantity_option)
-            )    
-            Order_preorder_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
+    
+    user_state[user_id] = 'preorder'#從user_state轉換預購狀態
+    # 建立 Quick Reply 按鈕
+    quick_reply_message = TextSendMessage(
+        text='商品名稱：%s\n=>請輸入預購數量：' %(product),
+        quick_reply=QuickReply(items=quantity_option)
+    )    
+    Order_preorder_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
         # 傳送回應訊息給使用者
     return Order_preorder_text

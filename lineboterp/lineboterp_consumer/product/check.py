@@ -2,6 +2,8 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
+from product.buy_now import *
+from product.product_preorder import *
 import lineboterp
 
 #-------------------使用者狀態檢查----------------------
@@ -20,19 +22,24 @@ def orderandpreorder_check():
     state = lineboterp.user_state
     message = lineboterp.msg
     product = lineboterp.product[id+'product']
+    product_order_preorder = lineboterp.product_order_preorder
+    duplicate_save = lineboterp.duplicate_save
     if message.isdigit():
                 # 處理完問題後，結束等待回覆狀態
         if state[id] == 'ordering':
             message_storage[id+'num'] = '訂購數量：'+ message
             check_text = ('商品名稱：%s\n您輸入的訂購數量： %s' %(product,message))
             check_text += '\n=>請接著，打字輸入「電話號碼」\nex.0952000000'
+            duplicate_save[id] = check_text
             check_text = TextSendMessage(text=check_text)
+            duplicate_save[id] = check_text
             state[id] = 'phonenum' #從user_state轉換輸入電話狀態
         elif state[id] == 'preorder':
             message_storage[id+'num'] = '預購數量：'+message
             check_text = ('商品名稱：%s\n您輸入的預購數量： %s' %(product,message))
             check_text += '\n=>請接著，打字輸入「電話號碼」\n ex.0952000000'
             check_text = TextSendMessage(text=check_text)
+            duplicate_save[id] = check_text
             state[id] = 'phonenum' #從user_state轉換輸入電話狀態
         elif state[id] == 'phonenum':
             if message.isdigit():
@@ -45,7 +52,7 @@ def orderandpreorder_check():
                         message_storage[id+'phonenum'] = '電話號碼：' + message
                         state[id] = 'end'#從user_state轉換確認狀態
                         check_text =TemplateSendMessage(
-                            alt_text='ConfirmTemplate',
+                            alt_text='訂單確認',
                             template=ConfirmTemplate(
                                 text=('==訂單資料確認==\n商品名稱：%s\n%s\n%s' % (product,message_storage[id+'num'],message_storage[id+'phonenum'])),
                                     actions=[
@@ -69,6 +76,12 @@ def orderandpreorder_check():
                 elif numtype[:2] == '預購':
                     check_text = ('您的商品：%s\n已完成預購囉！\n注意：將於「預購結單日」傳送您是否預購成功呦～' %(product))
                     check_text = TextSendMessage(text=check_text)
+                state[id] = 'normal' #從user_state轉換普通狀態
+                #下方重置
+                message_storage[id+'num'] = 'NaN'
+                message_storage[id+'phonenum'] = 'NaN'
+                product = 'NaN'
+                product_order_preorder[id] = 'NaN'
             elif message == '2':
                 check_text = '您的商品訂/預購流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text)
@@ -82,9 +95,35 @@ def orderandpreorder_check():
             message_storage[id+'num'] = 'NaN'
             message_storage[id+'phonenum'] = 'NaN'
             product = 'NaN'
+            product_order_preorder[id] = 'NaN'
+        elif state[id] in ['ordering','preorder']:
+            if state[id] == 'ordering':
+                check_text = Order_buynow()
+            elif state[id] == 'preorder':
+                check_text = Order_preorder()
+        elif state[id] =='phonenum':
+            check_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),duplicate_save[id]
+        elif state[id] =='end':
+            check_text = TemplateSendMessage(
+                            alt_text='訂單確認',
+                            template=ConfirmTemplate(
+                                text=('==訂單資料確認==\n商品名稱：%s\n%s\n%s' % (product,message_storage[id+'num'],message_storage[id+'phonenum'])),
+                                    actions=[
+                                        MessageAction(
+                                            label='【1.確認】',
+                                            text='1'
+                                        ),
+                                        MessageAction(
+                                            label='【2.取消】',
+                                            text='2'
+                                        )
+                                    ]
+                                )
+                            )
         else:
-            check_text = '您輸入的 "' + message + '" 不是數字！\n請重新輸入，謝謝～'
-            check_text = TextSendMessage(text=check_text)    
+            #非數字
+            check_text = '您還在訂/預購中喔！\n輸入的 "' + message + '" 不是此流程的填寫！\n請重新輸入，謝謝～'
+            check_text = TextSendMessage(text=check_text),TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "')    
     return check_text
 
 #-------------------商家地址----------------------

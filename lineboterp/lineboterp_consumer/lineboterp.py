@@ -13,6 +13,7 @@ from product.product_preorder import *
 from product.buy_now import *
 from product.check import *
 from database import *
+from relevant_information import linebotinfo
 #======python的函數庫==========
 import tempfile, os
 import datetime
@@ -23,10 +24,11 @@ import requests
 
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+linebotdata = linebotinfo()
 # Channel Access Token
-line_bot_api = LineBotApi('2+5H1PGPxcuiHvmd4OJ6aa9w0//wo1Q1XhXX9dx/AT9I3e+u4nEUedXpclarLzV2k3kQ6uoqjfGUnZ+rqCGgt8yrcMUw58r9DREQslLPxWvb03oxdf2AseFYzpdCeWRykWIfjpbcBB2o8LrTzP2LTQdB04t89/1O/w1cDnyilFU=')
+line_bot_api = LineBotApi(linebotdata['LineBotApidata'])
 # Channel Secret
-handler = WebhookHandler('cc36511a908df2f50e98845cbd8216aa')
+handler = WebhookHandler(linebotdata['WebhookHandlerdata'])
 
 
 # 監聽所有來自 /callback 的 Post Request
@@ -50,6 +52,10 @@ global user_state
 user_state = {}
 global product
 product = {}
+global product_order_preorder
+product_order_preorder = {}
+global duplicate_save
+duplicate_save = {}
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -57,82 +63,86 @@ def handle_message(event):
     global msg
     msg = event.message.text
     user_id = event.source.user_id
+    #-------------------確認擊出使使用者狀態----------------------
     if user_id not in user_state:
         user_state[user_id] = 'normal'
-    #-------------------團購商品及2種商品列表----------------------
-    if '團購商品' in msg:
-        line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-        alt_text='商品狀態選擇',
-        template=ConfirmTemplate(
-                text='請選擇商品狀態：\n【預購商品】或是【現購商品】',
-                actions=[
-                    MessageAction(
-                        label='【預購商品】',
-                        text='【預購商品】列表'
-                    ),
-                    MessageAction(
-                        label='【現購商品】',
-                        text='【現購商品】列表'
-                    )
-                ]
-            )
-        ))
-    elif '【預購商品】列表' in msg:
-        product_show = product_preorder_list()
-        line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-        alt_text='【預購商品】列表',
-        contents={
-            "type": "carousel",
-            "contents": product_show      
-            } 
-        ))
-    elif '【現購商品】列表' in msg:
-        product_show = product_buynow_list()
-        line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-        alt_text='【現購商品】列表',
-        contents={
-            "type": "carousel",
-            "contents": product_show      
-            } 
-        ))
-    #-------------------0----------------------
-    elif '訂單查詢' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='訂單查詢'))
-    elif '營業資訊' in msg:
-        business_detail = business_information()
-        line_bot_api.reply_message(event.reply_token, business_detail)
-    elif '問題提問' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
-    elif '許願商品' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='許願商品'))
-    #-------------------執行購買或預購----------------------
-    elif '【立即購買】' in msg:
-        product[user_id+'product'] = msg[6:]
-        Order_buynow_text = Order_buynow()
-        line_bot_api.reply_message(event.reply_token, Order_buynow_text)
-    elif '【手刀預購】' in msg:
-        product[user_id+'product'] = msg[6:]
-        Order_preorder_text = Order_preorder()
-        line_bot_api.reply_message(event.reply_token, Order_preorder_text)
-    #-------------------檢查購買或預購數量----------------------
-    elif user_state[user_id] != 'normal':
+    #-------------------確認使用者狀態進行處理----------------------
+    #使用者狀態不屬於normal，不允許進行其他動作
+    if user_state[user_id] != 'normal':
         check_text = product_check()
         line_bot_api.reply_message(event.reply_token, check_text)
-    elif '【加入購物車】' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【加入購物車】'))
-    elif '查看購物車' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查看購物車'))
-    #-------------------資料庫連線測試----------------------
-    elif '資料庫' in msg:
-        databasetest_msg = databasetest()['databasetest_msg']
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
-    elif '測試' in msg:
-        datasearch = test_datasearch()
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
-    #-------------------非上方功能的所有回覆----------------------
     else:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
-    #return user_id,user_state
+        #-------------------團購商品及2種商品列表----------------------
+        if '團購商品' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='商品狀態選擇',
+            template=ConfirmTemplate(
+                    text='請選擇商品狀態：\n【預購商品】或是【現購商品】',
+                    actions=[
+                        MessageAction(
+                            label='【預購商品】',
+                            text='【預購商品】列表'
+                        ),
+                        MessageAction(
+                            label='【現購商品】',
+                            text='【現購商品】列表'
+                        )
+                    ]
+                )
+            ))
+        elif '【預購商品】列表' in msg:
+            product_show = product_preorder_list()
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+            alt_text='【預購商品】列表',
+            contents={
+                "type": "carousel",
+                "contents": product_show      
+                } 
+            ))
+        elif '【現購商品】列表' in msg:
+            product_show = product_buynow_list()
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+            alt_text='【現購商品】列表',
+            contents={
+                "type": "carousel",
+                "contents": product_show      
+                } 
+            ))
+        #-------------------查詢、訂單、購物車----------------------
+        elif '訂單查詢' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='訂單查詢'))
+        elif '營業資訊' in msg:
+            business_detail = business_information()
+            line_bot_api.reply_message(event.reply_token, business_detail)
+        elif '【加入購物車】' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【加入購物車】'))
+        elif '查看購物車' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查看購物車'))
+        #-------------------提問及許願----------------------
+        elif '問題提問' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
+        elif '許願商品' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='許願商品'))
+        #-------------------執行購買或預購----------------------
+        elif '【立即購買】' in msg:
+            product[user_id+'product'] = msg[6:]
+            Order_buynow_text = Order_buynow()
+            line_bot_api.reply_message(event.reply_token, Order_buynow_text)
+        elif '【手刀預購】' in msg:
+            product[user_id+'product'] = msg[6:]
+            Order_preorder_text = Order_preorder()
+            line_bot_api.reply_message(event.reply_token, Order_preorder_text)
+        #-------------------資料庫連線測試----------------------
+        elif '資料庫' in msg:
+            databasetest_msg = databasetest()['databasetest_msg']
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
+        elif '測試' in msg:
+            datasearch = test_datasearch()
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
+        #-------------------非上方功能的所有回覆----------------------
+        else:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
+        #return user_id,user_state
 
 @handler.add(PostbackEvent)
 def handle_message(event):
