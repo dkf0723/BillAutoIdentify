@@ -5,6 +5,8 @@ from linebot.models import *
 from product.buy_now import *
 from product.product_preorder import *
 import lineboterp
+from ask_wishes.ask import *
+from ask_wishes.wishes import *
 
 #-------------------使用者狀態檢查----------------------
 message_storage = {}
@@ -13,6 +15,10 @@ def product_check():
     state = lineboterp.user_state
     if state[id] in ['ordering','preorder','phonenum','end']: #判斷user狀態
         check_text = orderandpreorder_check()
+    elif state[id] == 'ask':
+        check_text = ask()
+    elif state[id] == 'wishes':
+        check_text = wishes()
     return check_text
 
 #-------------------訂單檢查----------------------
@@ -144,4 +150,3 @@ def business_information():
     '\n地址：\n新北市中和區員山路325之4號2樓'
     ),Company_location()
     return business_detail
-
