@@ -13,6 +13,8 @@ from product.product_preorder import *
 from product.buy_now import *
 from product.check import *
 from database import *
+from ask_wishes.ask import *
+from ask_wishes.wishes import *
 from relevant_information import linebotinfo
 #======python的函數庫==========
 import tempfile, os
@@ -139,6 +141,10 @@ def handle_message(event):
         elif '測試' in msg:
             datasearch = test_datasearch()
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
+        #資料庫圖片測試
+        elif '圖片' in msg:
+            imgsend = imagesent()
+            line_bot_api.reply_message(event.reply_token, imgsend)
         #-------------------非上方功能的所有回覆----------------------
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
