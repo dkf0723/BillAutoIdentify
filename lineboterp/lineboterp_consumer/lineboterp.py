@@ -54,6 +54,8 @@ global user_state
 user_state = {}
 global product
 product = {}
+global list_page
+list_page = {}
 global product_order_preorder
 product_order_preorder = {}
 global duplicate_save

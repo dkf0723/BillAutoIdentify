@@ -11,6 +11,7 @@ import os, io, pyimgur, glob
 #安裝Python 的 pyimgur套件> pip install pyimgur
 # Obtain connection string information from the portal
 
+#-------------------資料庫連線----------------------
 def databasetest():
   #取得資料庫資訊
   dbdata = dbinfo()  
@@ -34,7 +35,45 @@ def databasetest():
   else:
     cursor = conn.cursor()
   return {'databasetest_msg': databasetest_msg, 'conn':conn, 'cursor':cursor, 'config':config}
-
+#-------------------查詢預購商品列表----------------------
+def preorder_list():
+  implement = databasetest()
+  conn = implement['conn']
+  cursor = implement['cursor']
+  query = """
+          SELECT 商品ID, 商品名稱, 現預購商品, 商品圖片, 商品簡介, 
+                商品單位, 售出單價, 售出單價2, 預購數量限制_倍數, 
+                預購截止時間 
+          FROM Product_information 
+          WHERE 現預購商品='預購';"""
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result is not None:
+    listbuynow = result
+  else:
+    listbuynow = "找不到符合條件的資料。"
+  cursor.close()
+  conn.close()
+  return listbuynow
+#-------------------查詢現購商品列表----------------------
+def buynow_list():
+  implement = databasetest()
+  conn = implement['conn']
+  cursor = implement['cursor']
+  query = """
+          SELECT 商品ID,商品名稱,現預購商品,商品圖片,商品簡介,
+                  商品單位,售出單價,售出單價2,庫存數量 
+          FROM Product_information 
+          WHERE 現預購商品='現購';"""
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result is not None:
+    listpreorder = result
+  else:
+    listpreorder = "找不到符合條件的資料。"
+  cursor.close()
+  conn.close()
+  return listpreorder
 #查詢資料SELECT
 def test_datasearch():
   #測試讀取資料庫願望清單(所有)
@@ -123,7 +162,7 @@ def imagetolink():
   for file in image_files:
     # 獲取檔案名稱及副檔名
     filename, file_extension = os.path.splitext(file)
-    filename = filename+file_extension# 檔名加副檔名
+    filename = filename+file_extension# 檔案位置加副檔名
     image_storage.append(filename)
 
   #執行轉換連結
