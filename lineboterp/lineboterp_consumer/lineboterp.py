@@ -67,7 +67,7 @@ def handle_message(event):
     global msg
     msg = event.message.text
     user_id = event.source.user_id
-    #-------------------確認擊出使使用者狀態----------------------
+    #-------------------確認及給予初始使用者狀態----------------------
     if user_id not in user_state:
         user_state[user_id] = 'normal'
     #-------------------確認使用者狀態進行處理----------------------
@@ -95,6 +95,8 @@ def handle_message(event):
                 )
             ))
         elif '【預購商品】列表' in msg:
+            list_page[user_id+'預購min'] = 0
+            list_page[user_id+'預購max'] = 9
             product_show = product_preorder_list()
             line_bot_api.reply_message(event.reply_token, FlexSendMessage(
             alt_text='【預購商品】列表',
@@ -104,6 +106,8 @@ def handle_message(event):
                 } 
             ))
         elif '【現購商品】列表' in msg:
+            list_page[user_id+'現購min'] = 0
+            list_page[user_id+'現購max'] = 9
             product_show = product_buynow_list()
             line_bot_api.reply_message(event.reply_token, FlexSendMessage(
             alt_text='【現購商品】列表',
@@ -136,6 +140,53 @@ def handle_message(event):
             product[user_id+'product'] = msg[6:]
             Order_preorder_text = Order_preorder()
             line_bot_api.reply_message(event.reply_token, Order_preorder_text)
+        #-------------------現購、預購下一頁----------------------
+        elif '【現購列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【現購列表下一頁】"的位置
+            start_index = original_string.find("【預購列表下一頁】")
+            if start_index != -1:
+                # 從"【現購列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【預購列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'現購min'] = min-1
+            list_page[user_id+'現購max'] = max
+            buynowpage = product_buynow_list()
+            if 'TextSendMessage' in buynowpage:
+                line_bot_api.reply_message(event.reply_token,buynowpage)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【現購商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": buynowpage      
+                    } 
+                ))
+        elif '【預購列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【現購列表下一頁】"的位置
+            start_index = original_string.find("【預購列表下一頁】")
+            if start_index != -1:
+                # 從"【現購列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【預購列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'預購min'] = min-1
+            list_page[user_id+'預購max'] = max
+            preorderpage = product_preorder_list()
+            if 'TextSendMessage' in preorderpage:
+                line_bot_api.reply_message(event.reply_token,buynowpage)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【現購商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": preorderpage      
+                    } 
+                ))
         #-------------------資料庫連線測試----------------------
         elif '資料庫' in msg:
             databasetest_msg = databasetest()['databasetest_msg']
