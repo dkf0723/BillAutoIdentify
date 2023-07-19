@@ -64,7 +64,7 @@ def buynow_list():
           SELECT 商品ID,商品名稱,現預購商品,商品圖片,商品簡介,
                   商品單位,售出單價,售出單價2,庫存數量 
           FROM Product_information 
-          WHERE 現預購商品='現購';"""
+          WHERE 現預購商品='現購' and 庫存數量>0;"""
   cursor.execute(query)
   result = cursor.fetchall()
   if result is not None:
