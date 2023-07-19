@@ -9,8 +9,9 @@ from linebot.exceptions import (
 from linebot.models import *
 
 #======這裡是呼叫的檔案內容=====
-from inventory_management import *
 from database import *
+from test_check import *
+from relevant_information import *
 #======python的函數庫==========
 import tempfile, os
 import datetime
@@ -21,10 +22,11 @@ import requests
 
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+linebotdata = linebotinfo()
 # Channel Access Token
-line_bot_api = LineBotApi('J7jADxRSi/3p4vlG5H9lqvFqZgKcdU5aceIQMGAuNF8oemiPxX1JgpBYi1Js8KXci2NfFnT2DuXzyHFFPS5/3OQaWZYVbxFMqjDTBDc4dAieb4Q3bvvLQn3B45bCYZfSEm/2ozasOtrDTcsV5hrcDAdB04t89/1O/w1cDnyilFU=')
+line_bot_api = LineBotApi(linebotdata['LineBotApidata'])
 # Channel Secret
-handler = WebhookHandler('7bba6e253457f394cb56d7e4b7adfc39')
+handler = WebhookHandler(linebotdata['WebhookHandlerdata'])
 
 
 # 監聽所有來自 /callback 的 Post Request
@@ -46,10 +48,10 @@ def callback():
 #-------------------儲存使用者狀態----------------------
 global user_state
 user_state = {}
+global user_state1
+user_state1 = {}
 global product
 product = {}
-global dict_data
-dict_data = {}
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -57,109 +59,119 @@ def handle_message(event):
     global msg
     msg = event.message.text
     user_id = event.source.user_id 
-
-    if '顧客取貨' in msg:
-        line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-        alt_text='取貨選擇',
-        template=ConfirmTemplate(
-                text='請選擇取貨方式：\n【手機後三碼】或是【訂單編號】',
-                actions=[
-                    MessageAction(
-                        label='【後三碼】',
-                        text='【取貨】手機後三碼',
-                    ),
-                    MessageAction(
-                        label='【訂單編號】',
-                        text='【取貨】訂單編號'
-                    )
-                ]
-            )
-        ))
-    elif '【取貨】' in msg:
-        if msg[4:] == '手機後三碼':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
-        elif msg[4:] == '訂單編號':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
-    elif '商品管理' in msg:
-        line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-        alt_text='商品選擇',
-        template=ConfirmTemplate(
-                text='請選擇商品狀態：\n【已到貨】或是【未到貨】',
-                actions=[
-                    MessageAction(
-                        label='【已到貨】',
-                        text='【商品】已到貨',
-                    ),
-                    MessageAction(
-                        label='【未到貨】',
-                        text='【商品】未到貨'
-                    )
-                ]
-            )
-        ))
-    elif '【商品】' in msg:
-        if msg[4:] == '已到貨':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示已到貨商品選單'))
-        elif msg[4:] == '未到貨':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示未到貨商品選單'))
-    elif '未取名單' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
-    elif '報表管理' in msg:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
-    elif '顧客QA' in msg:
-        line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-        alt_text='QA選擇',
-        template=ConfirmTemplate(
-                text='請選擇查詢顧客QA回覆狀態：\n【已回覆】或是【未回覆】',
-                actions=[
-                    MessageAction(
-                        label='【已回覆】',
-                        text='【QA】已回覆',
-                    ),
-                    MessageAction(
-                        label='【未回覆】',
-                        text='【QA】未回覆'
-                    )
-                ]
-            )
-        ))
-    elif '【QA】' in msg:
-        if msg[4:] == '已回覆':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出未回覆者問題'))
-        elif msg[4:] == '未回覆':
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出歷史問答記錄'))
-    elif '庫存管理' in msg: 
-        message = TextSendMessage(text='請點選以下操作功能',
-                            quick_reply=QuickReply(items=[
-                            QuickReplyButton(action=MessageAction(label="新增商品", text="新增商品")),
-                            QuickReplyButton(action=MessageAction(label="出售商品", text="出售商品")),
-                            QuickReplyButton(action=MessageAction(label="查詢個別商品資訊", text="查詢個別商品資訊")),
-                            QuickReplyButton(action=MessageAction(label="查詢所有商品資訊", text="查詢所有商品資訊")),
-                    ]))
-        line_bot_api.reply_message(event.reply_token, message)
-    elif '新增商品' in msg:
-        message = add_goods()
-        line_bot_api.reply_message(event.reply_token, message)
-    elif '出售商品' in msg:
-        message = sell_goods()
-        line_bot_api.reply_message(event.reply_token, message)
-    elif '查詢個別商品資訊' in msg:
-        message = select_goods()
-        line_bot_api.reply_message(event.reply_token, message)
-    elif '查詢所有商品資訊' in msg:
-        message = select_all_goods()
-        line_bot_api.reply_message(event.reply_token, message)
-    #-------------------資料庫測試----------------------
-    elif '資料庫' in msg:
-        databasetest_msg = databasetest()['databasetest_msg']
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
-    elif '測試' in msg:
-        datasearch = test_datasearch()
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
-    #-------------------非上方功能的所有回覆----------------------
+    if user_id not in user_state:
+        user_state[user_id] = 'normal'
+    #-------------------確認使用者狀態進行處理----------------------
+    #使用者狀態不屬於normal，不允許進行其他動作
+    if user_state[user_id] != 'normal':
+        check_text = inventory_check()
+        line_bot_api.reply_message(event.reply_token, check_text)
     else:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的回覆：「'+msg+'」\n不在功能編號中！\n請重新輸入。'))
-    #return user_id,user_state
+        #-------------------顧客取貨及2種取貨方式列表----------------------
+        if '顧客取貨' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+                alt_text='取貨選擇',
+                template=ConfirmTemplate(
+                    text='請選擇取貨方式：\n【手機後三碼】或是【訂單編號】',
+                    actions=[
+                        MessageAction(
+                            label='【後三碼】',
+                            text='【取貨】手機後三碼',
+                        ),
+                        MessageAction(
+                            label='【訂單編號】',
+                            text='【取貨】訂單編號'
+                        )
+                    ]
+                )
+            ))
+        elif '【取貨】' in msg:
+            if msg[4:] == '手機後三碼':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
+            elif msg[4:] == '訂單編號':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
+            #-------------------商品管理及2種商品狀態列表----------------------
+        elif '商品管理' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='商品選擇',
+            template=ConfirmTemplate(
+                    text='請選擇商品狀態：\n【已到貨】或是【未到貨】',
+                    actions=[
+                        MessageAction(
+                            label='【已到貨】',
+                            text='【商品】已到貨',
+                        ),
+                        MessageAction(
+                            label='【未到貨】',
+                            text='【商品】未到貨'
+                        )
+                    ]
+                )
+            ))
+        elif '【商品】' in msg:
+            if msg[4:] == '已到貨':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示已到貨商品選單'))
+            elif msg[4:] == '未到貨':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示未到貨商品選單'))
+            #-------------------未取名單----------------------
+        elif '未取名單' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
+            #-------------------報表管理----------------------
+        elif '報表管理' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
+            #-------------------顧客QA及2種回覆狀態列表----------------------
+        elif '顧客QA' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='QA選擇',
+            template=ConfirmTemplate(
+                    text='請選擇查詢顧客QA回覆狀態：\n【已回覆】或是【未回覆】',
+                    actions=[
+                        MessageAction(
+                            label='【已回覆】',
+                            text='【QA】已回覆',
+                        ),
+                        MessageAction(
+                            label='【未回覆】',
+                            text='【QA】未回覆'
+                        )
+                    ]
+                )
+            ))
+        elif '【QA】' in msg:
+            if msg[4:] == '已回覆':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出未回覆者問題'))
+        elif msg[4:] == '未回覆':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出歷史問答記錄'))
+            #-------------------庫存管理及功能選擇按鈕----------------------
+        elif '庫存管理' in msg: 
+            message = TextSendMessage(text='請點選以下操作功能',
+                                quick_reply=QuickReply(items=[
+                                QuickReplyButton(action=MessageAction(label="新增商品", text="新增商品")),
+                                QuickReplyButton(action=MessageAction(label="查詢個別商品資訊", text="查詢個別商品資訊")),
+                                QuickReplyButton(action=MessageAction(label="查詢所有商品資訊", text="查詢所有商品資訊"))
+                        ]))
+            line_bot_api.reply_message(event.reply_token, message)
+        elif '新增商品' in msg:
+            user_state[user_id] = 'adding'
+            user_state1[user_id] = 'name'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入品名：'))
+        elif '查詢個別商品資訊' in msg:
+            user_state[user_id] = 'searching_oneinf'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入要查詢庫存之品名：'))
+        elif '查詢所有商品資訊' in msg:
+            message = select_all_goods()
+            line_bot_api.reply_message(event.reply_token, message)
+            #-------------------資料庫測試----------------------
+        elif '資料庫' in msg:
+            databasetest_msg = databasetest()['databasetest_msg']
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
+        elif '測試' in msg:
+            datasearch = test_datasearch()
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
+            #-------------------非上方功能的所有回覆----------------------
+        else:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的回覆：「'+msg+'」\n不在功能中！\n請重新輸入。'))
+        #return user_id,user_state
 
 
 @handler.add(PostbackEvent)
