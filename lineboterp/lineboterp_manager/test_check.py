@@ -13,8 +13,8 @@ def inventory_check():
         check_text = add_goods()
     '''if state[id] in 'searching_single': #判斷user狀態
         check_text = search_inf()'''
-    '''if state[id] in 'checking_all': #判斷user狀態
-        check_text = select_all_goods()
+    '''if state[id] in 'searching_all': #判斷user狀態
+        check_text = search_allinf()
     if state[id] in 'end': #判斷user狀態
         check_text = end_stop()'''
     return check_text
@@ -27,41 +27,42 @@ def add_goods():
     state1 = manager.user_state1
     message = manager.msg
     product = manager.product
-    if state[id] == 'adding':
-            if state1[id] == 'name':
-                message_storage[id+'pname'] = '品名：'+ str(message)
-                product[id] = message
-                check_text = ('您輸入的品名： %s' %(message))
-                check_text += '\n=>請接著輸入「進貨數量」'
-                check_text = TextSendMessage(text=check_text)
-                state1[id] = 'checking_one'
-            elif state1[id] == 'checking_one':
-                message_storage[id+'num'] = '進貨數量：' + str(message)
-                check_text = ('%s\n進貨數量： %s' %(message_storage[id+'pname'],message_storage[id+'num']))
-                check_text += '\n=>請接著輸入「進貨成本」'
-                check_text = TextSendMessage(text=check_text)
-                state1[id] = 'checking_two'
-            elif state1[id] == 'checking_two':
-                message_storage[id+'cost'] = '進貨成本：' + str(message)
-                check_text = ('%s\n%s\n進貨成本： %s' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost']))
-                check_text += '\n=>請接著輸入「廠商名」'
-                check_text = TextSendMessage(text=check_text)
-                state1[id] = 'checking_three'
-            elif state1[id] == 'checking_three':
-                message_storage[id+'fname'] = '廠商名：' + message
-                check_text = ('%s\n%s\n%s\n進貨成本： %s' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost'],message_storage[id+'fname']))
-                check_text += '\n=>請接著輸入「商品有效期限」\nex:2024.07.24'
-                check_text = TextSendMessage(text=check_text)
-                state1[id] = 'checking_four'
-            elif state1[id] == 'checking_four':
-                message_storage[id+'exp'] = '商品有效期限：' + message
-                check_text = ('%s\n%s\n%s\n%s\n進貨成本： %s' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost'],message_storage[id+'fname'],message_storage[id+'exp']))
-                check_text = TextSendMessage(text=check_text)
-                state1[id] = 'end'
-            elif state1[id] == 'end':
-                state[id] = 'normal'
-                state1[id] = 'NaN'
-                check_text = ('您的商品：%s\n已新增成功！' %(product[id])) 
+    
+    if state1[id] == 'name':
+        message_storage[id+'pname'] = '品名：'+ message
+        product[id] = message
+        check_text = ('您輸入的品名： %s' %(message))
+        check_text += '\n=>請接著輸入「進貨數量」'
+        check_text = TextSendMessage(text=check_text)
+        state1[id] = 'one'
+    elif state1[id] == 'one':
+        message_storage[id+'num'] = '進貨數量：' + message
+        check_text = ('%s\n進貨數量： %s' %(message_storage[id+'pname'],message_storage[id+'num']))
+        check_text += '\n=>請接著輸入「進貨成本」'
+        check_text = TextSendMessage(text=check_text)
+        state1[id] = 'two'
+    elif state1[id] == 'two':
+        message_storage[id+'cost'] = '進貨成本：' + message
+        check_text = ('%s\n%s\n進貨成本：%s' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost']))
+        check_text += '\n=>請接著輸入「廠商名」'
+        check_text = TextSendMessage(text=check_text)
+        state1[id] = 'three'
+    elif state1[id] == 'three':
+        message_storage[id+'fname'] = '廠商名：' + message
+        check_text = ('%s\n%s\n%s\n進貨成本： %s' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost'],message_storage[id+'fname']))
+        check_text += '\n=>請接著輸入「商品有效期限」\nex:2023/07/24'
+        check_text = TextSendMessage(text=check_text)
+        state1[id] = 'four'
+    elif state1[id] == 'four':
+        message_storage[id+'exp'] = '商品有效期限：' + message
+        check_text = ('%s\n%s\n%s\n%s\n%s\n請輸入確認' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost'],message_storage[id+'fname'],message_storage[id+'exp']))
+        check_text = TextSendMessage(text=check_text)
+        state1[id] = 'end'
+    elif state1[id] == 'end':
+        state[id] = 'normal'
+        state1[id] = 'NaN'
+        check_text = ('您的商品：%s\n已新增成功！' %(product[id]))
+        check_text = TextSendMessage(text=check_text)
     return check_text
 
 '''def search_inf():
@@ -80,7 +81,7 @@ def add_goods():
 
     return check_text
      
-def select_all_goods():
+def search_allinf():
      return check_text
 
 def end_stop():

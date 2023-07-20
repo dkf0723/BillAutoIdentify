@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for happylinebot on 2023-07-07T23:23:18+08:00
+# fly.toml app configuration file generated for enlinebot on 2023-07-20T16:31:13+08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "happylinebot"
+app = "enlinebot"
 primary_region = "nrt"
 kill_signal = "SIGINT"
 kill_timeout = 5
@@ -25,22 +25,22 @@ processes = []
   processes = ["app"]
   protocol = "tcp"
   script_checks = []
-[services.concurrency]
-  hard_limit = 25
-  soft_limit = 20
-  type = "connections"
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
 
-[[services.ports]]
-  force_https = true
-  handlers = ["http"]
-  port = 80
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
 
-[[services.ports]]
-  handlers = ["tls", "http"]
-  port = 443
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
 
-[[services.tcp_checks]]
-  grace_period = "60s"
-  interval = "15s"
-  restart_limit = 0
-  timeout = "2s"
+  [[services.tcp_checks]]
+    grace_period = "60s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"

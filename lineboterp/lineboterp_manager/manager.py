@@ -1,5 +1,4 @@
 from flask import Flask, request, abort
-
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -140,7 +139,7 @@ def handle_message(event):
         elif '【QA】' in msg:
             if msg[4:] == '已回覆':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出未回覆者問題'))
-        elif msg[4:] == '未回覆':
+            elif msg[4:] == '未回覆':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出歷史問答記錄'))
             #-------------------庫存管理及功能選擇按鈕----------------------
         elif '庫存管理' in msg: 
@@ -156,10 +155,11 @@ def handle_message(event):
             user_state1[user_id] = 'name'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入品名：'))
         elif '查詢個別商品資訊' in msg:
-            user_state[user_id] = 'searching_oneinf'
+            #user_state[user_id] = 'searching_oneinf'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入要查詢庫存之品名：'))
         elif '查詢所有商品資訊' in msg:
-            message = select_all_goods()
+            #message = select_all_goods()
+            message = TextSendMessage(text='查詢所有商品資訊')
             line_bot_api.reply_message(event.reply_token, message)
             #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
