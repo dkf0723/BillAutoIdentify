@@ -27,6 +27,7 @@ def orderandpreorder_check():
     id = lineboterp.user_id
     state = lineboterp.user_state
     message = lineboterp.msg
+    product_id = lineboterp.product[id+'product_id']
     product = lineboterp.product[id+'product']
     product_order_preorder = lineboterp.product_order_preorder
     duplicate_save = lineboterp.duplicate_save
@@ -60,7 +61,7 @@ def orderandpreorder_check():
                         check_text =TemplateSendMessage(
                             alt_text='訂單確認',
                             template=ConfirmTemplate(
-                                text=('==訂單資料確認==\n商品名稱：%s\n%s\n%s' % (product,message_storage[id+'num'],message_storage[id+'phonenum'])),
+                                text=('==訂單資料確認==\n商品ID：%s\n商品名稱：%s\n%s\n%s' % (product_id,product,message_storage[id+'num'],message_storage[id+'phonenum'])),
                                     actions=[
                                         MessageAction(
                                             label='【1.確認】',
@@ -86,6 +87,7 @@ def orderandpreorder_check():
                 #下方重置
                 message_storage[id+'num'] = 'NaN'
                 message_storage[id+'phonenum'] = 'NaN'
+                product_id = 'NaN'
                 product = 'NaN'
                 product_order_preorder[id] = 'NaN'
             elif message == '2':
@@ -100,6 +102,7 @@ def orderandpreorder_check():
             #下方重置
             message_storage[id+'num'] = 'NaN'
             message_storage[id+'phonenum'] = 'NaN'
+            product_id = 'NaN'
             product = 'NaN'
             product_order_preorder[id] = 'NaN'
         elif state[id] in ['ordering','preorder']:

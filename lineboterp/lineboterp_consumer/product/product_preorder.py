@@ -184,7 +184,7 @@ def product_preorder_list():
                         "action": {
                             "type": "message",
                             "label": "手刀預購",
-                            "text": "【手刀預購】"+product_name[i]
+                            "text": "【手刀預購】"+product_id[i]+"_"+product_name[i]
                         }
                     },
                     {
@@ -194,7 +194,7 @@ def product_preorder_list():
                         "action": {
                             "type": "message",
                             "label": "加入購物車",
-                            "text": "【加入購物車】"+product_name[i]
+                            "text": "【加入購物車】"+product_id[i]+"_"+product_name[i]
                         }
                     },
                     {
@@ -266,6 +266,7 @@ def product_preorder_list():
 def Order_preorder():
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
+    product_id = lineboterp.product[user_id+'product_id']
     product = lineboterp.product[user_id+'product']
     product_order_preorder = lineboterp.product_order_preorder
     product_order_preorder[user_id] = '預購'
@@ -278,7 +279,7 @@ def Order_preorder():
     user_state[user_id] = 'preorder'#從user_state轉換預購狀態
     # 建立 Quick Reply 按鈕
     quick_reply_message = TextSendMessage(
-        text='商品名稱：%s\n=>請輸入預購數量：' %(product),
+        text='商品ID：%s\n商品名稱：%s\n=>請輸入預購數量：' %(product_id,product),
         quick_reply=QuickReply(items=quantity_option)
     )    
     Order_preorder_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),quick_reply_message

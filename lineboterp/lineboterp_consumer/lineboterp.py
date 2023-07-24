@@ -133,21 +133,41 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='許願商品'))
         #-------------------執行購買或預購----------------------
         elif '【立即購買】' in msg:
-            product[user_id+'product'] = msg[6:]
+            original_string = msg
+            # 找到"【立即購買】"的位置
+            start_index = original_string.find("【立即購買】")
+            if start_index != -1:
+                # 從"【現購列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【立即購買】"):]
+                # 切割取得前後文字
+                product_id = substr.split("_")[0].strip() # 取出～前面的字並去除空白字元
+                product_name = substr.split("_")[1].strip() # 取出～後面的字並去除空白字元
+            product[user_id+'product_id'] = product_id
+            product[user_id+'product'] = product_name
             Order_buynow_text = Order_buynow()
             line_bot_api.reply_message(event.reply_token, Order_buynow_text)
         elif '【手刀預購】' in msg:
-            product[user_id+'product'] = msg[6:]
+            original_string = msg
+            # 找到"【手刀預購】"的位置
+            start_index = original_string.find("【手刀預購】")
+            if start_index != -1:
+                # 從"【現購列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【手刀預購】"):]
+                # 切割取得前後文字
+                product_id = substr.split("_")[0].strip() # 取出～前面的字並去除空白字元
+                product_name = substr.split("_")[1].strip() # 取出～後面的字並去除空白字元
+            product[user_id+'product_id'] = product_id
+            product[user_id+'product'] = product_name
             Order_preorder_text = Order_preorder()
             line_bot_api.reply_message(event.reply_token, Order_preorder_text)
         #-------------------現購、預購下一頁----------------------
         elif '【現購列表下一頁】' in msg:
             original_string = msg
             # 找到"【現購列表下一頁】"的位置
-            start_index = original_string.find("【預購列表下一頁】")
+            start_index = original_string.find("【現購列表下一頁】")
             if start_index != -1:
                 # 從"【現購列表下一頁】"後面開始切割字串
-                substr = original_string[start_index + len("【預購列表下一頁】"):]
+                substr = original_string[start_index + len("【現購列表下一頁】"):]
                 # 切割取得前後文字
                 min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
                 max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
@@ -166,10 +186,10 @@ def handle_message(event):
                 ))
         elif '【預購列表下一頁】' in msg:
             original_string = msg
-            # 找到"【現購列表下一頁】"的位置
+            # 找到"【預購列表下一頁】"的位置
             start_index = original_string.find("【預購列表下一頁】")
             if start_index != -1:
-                # 從"【現購列表下一頁】"後面開始切割字串
+                # 從"【預購列表下一頁】"後面開始切割字串
                 substr = original_string[start_index + len("【預購列表下一頁】"):]
                 # 切割取得前後文字
                 min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
@@ -202,6 +222,7 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
         #return user_id,user_state
+    member_profile(user_id)#執行會員資料確認
 
 @handler.add(PostbackEvent)
 def handle_message(event):
@@ -210,11 +231,11 @@ def handle_message(event):
 @handler.add(MemberJoinedEvent)
 def welcome(event):
     uid = event.joined.members[0].user_id
-    gid = event.source.group_id
-    profile = line_bot_api.get_group_member_profile(gid, uid)
+    profile = line_bot_api.get_group_member_profile(uid)
     name = profile.display_name
     message = TextSendMessage(text=f'{name}歡迎加入')
     line_bot_api.reply_message(event.reply_token, message)
+    member_profile(user_id)#執行會員資料確認
         
         
 import os
