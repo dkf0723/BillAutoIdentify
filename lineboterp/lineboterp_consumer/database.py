@@ -14,11 +14,13 @@ import lineboterp
 # Obtain connection string information from the portal
 
 #-------------------取得現在時間----------------------
-current_datetime = datetime.now()# 取得當前的日期和時間
-modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
-formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')# 格式化日期和時間，不包含毫秒部分
-formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
-order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
+def time():
+  current_datetime = datetime.now()# 取得當前的日期和時間
+  modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
+  formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')# 格式化日期和時間，不包含毫秒部分
+  formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
+  order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
+  return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date}
 #-------------------資料庫連線----------------------
 def databasetest():
   #取得資料庫資訊
@@ -48,23 +50,27 @@ def member_profile(userid):
   implement = databasetest()
   conn = implement['conn']
   cursor = implement['cursor']
+  timeget = time()
+  formatted_datetimeget = timeget['formatted_datetime']
+  order_dateget = timeget['order_date']
   query = """SELECT 會員_LINE_ID FROM member_profile;""" #會員資料檢查
   cursor.execute(query)
   member_result = cursor.fetchall()
   query1 = f"""
           SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
           FROM Order_information 
-          WHERE 訂單編號 like'cart%' and 訂單成立時間 <= '{formatted_datetime}'
+          WHERE 訂單編號 like'cart%' and 訂單成立時間 <= '{formatted_datetimeget}'
           ORDER BY 訂單成立時間 DESC;
           """#購物車資料檢查(DESC遞減取得最新)
   cursor.execute(query1)
   Order_result = cursor.fetchall()
   storagememberlist = []#存放查詢到的所有會員列表
   storagecartlist = []#存放查詢到的所有購物車會員列表
+
   if member_result == []:
     query3 = f"""
         INSERT INTO member_profile (會員_LINE_ID,會員信賴度_取貨率退貨率,加入時間,身分別)
-        VALUES ( '{userid}','0.80', '{formatted_datetime}','消費者');
+        VALUES ( '{userid}','0.80', '{formatted_datetimeget}','消費者');
         """
     cursor.execute(query3)
     conn.commit()
@@ -75,7 +81,7 @@ def member_profile(userid):
     if userid not in storagememberlist:
       query3 = f"""
         INSERT INTO member_profile (會員_LINE_ID,會員信賴度_取貨率退貨率,加入時間,身分別)
-        VALUES ( '{userid}','0.80', '{formatted_datetime}','消費者');
+        VALUES ( '{userid}','0.80', '{formatted_datetimeget}','消費者');
         """
       cursor.execute(query3)
       conn.commit()
@@ -84,23 +90,26 @@ def member_profile(userid):
     serial_number = '000001'
     query4 = f"""
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
-          VALUES ( 'cart{order_date}{str(serial_number)}','{userid}','add','dd' ,'{formatted_datetime}');
+          VALUES ( 'cart{order_dateget}{str(serial_number)}','{userid}','add','dd' ,'{formatted_datetimeget}');
           """
     cursor.execute(query4)
     conn.commit()
   else:
-    checkaddtime = Order_result[0][2]#取得最新一筆購物車序號
+    checkaddtime = Order_result[0][0]#取得最新一筆購物車序號
     for row1 in Order_result:
       cartlist = row1[1]
       storagecartlist.append(cartlist)
     if userid not in storagecartlist:#最新一筆購物車序號
-      if checkaddtime[4:12] == formatted_date:
+      if checkaddtime[4:12] == f"{str(order_dateget)}":
         serial_number = int(checkaddtime[12:])+1
+        serial_number = '00000'+str(serial_number)
+        if len(serial_number) != 6:
+          serial_number = serial_number[-6:]
       else:
         serial_number = '000001'
       query4 = f"""
         INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
-        VALUES ( 'cart{order_date}{str(serial_number)}','{userid}','add','dd' ,'{formatted_datetime}');
+        VALUES ( 'cart{order_dateget}{serial_number}','{userid}','add','dd' ,'{formatted_datetimeget}');
         """
       cursor.execute(query4)
       conn.commit()
