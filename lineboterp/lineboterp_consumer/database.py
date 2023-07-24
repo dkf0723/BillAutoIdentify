@@ -1,5 +1,6 @@
 import mysql.connector
 import requests
+from datetime import datetime, timedelta
 from mysql.connector import errorcode
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import (InvalidSignatureError)
@@ -7,10 +8,17 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from relevant_information import dbinfo,imgurinfo
 import os, io, pyimgur, glob
+import lineboterp
 #安裝 Python 的 MySQL 連接器及其相依性>pip install mysql-connector-python
 #安裝Python 的 pyimgur套件> pip install pyimgur
 # Obtain connection string information from the portal
 
+#-------------------取得現在時間----------------------
+current_datetime = datetime.now()# 取得當前的日期和時間
+modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
+formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')# 格式化日期和時間，不包含毫秒部分
+formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
+order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
 #-------------------資料庫連線----------------------
 def databasetest():
   #取得資料庫資訊
@@ -35,6 +43,70 @@ def databasetest():
   else:
     cursor = conn.cursor()
   return {'databasetest_msg': databasetest_msg, 'conn':conn, 'cursor':cursor, 'config':config}
+#-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
+def member_profile(userid):
+  implement = databasetest()
+  conn = implement['conn']
+  cursor = implement['cursor']
+  query = """SELECT 會員_LINE_ID FROM member_profile;""" #會員資料檢查
+  cursor.execute(query)
+  member_result = cursor.fetchall()
+  query1 = f"""
+          SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
+          FROM Order_information 
+          WHERE 訂單編號 like'cart%' and 訂單成立時間 <= '{formatted_datetime}'
+          ORDER BY 訂單成立時間 DESC;
+          """#購物車資料檢查(DESC遞減取得最新)
+  cursor.execute(query1)
+  Order_result = cursor.fetchall()
+  storagememberlist = []#存放查詢到的所有會員列表
+  storagecartlist = []#存放查詢到的所有購物車會員列表
+  if member_result == []:
+    query3 = f"""
+        INSERT INTO member_profile (會員_LINE_ID,會員信賴度_取貨率退貨率,加入時間,身分別)
+        VALUES ( '{userid}','0.80', '{formatted_datetime}','消費者');
+        """
+    cursor.execute(query3)
+    conn.commit()
+  else:
+    for row in member_result:
+      memberlist = row[0]
+      storagememberlist.append(memberlist)
+    if userid not in storagememberlist:
+      query3 = f"""
+        INSERT INTO member_profile (會員_LINE_ID,會員信賴度_取貨率退貨率,加入時間,身分別)
+        VALUES ( '{userid}','0.80', '{formatted_datetime}','消費者');
+        """
+      cursor.execute(query3)
+      conn.commit()
+
+  if Order_result == []:
+    serial_number = '000001'
+    query4 = f"""
+          INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
+          VALUES ( 'cart{order_date}{str(serial_number)}','{userid}','add','dd' ,'{formatted_datetime}');
+          """
+    cursor.execute(query4)
+    conn.commit()
+  else:
+    checkaddtime = Order_result[0][2]#取得最新一筆購物車序號
+    for row1 in Order_result:
+      cartlist = row1[1]
+      storagecartlist.append(cartlist)
+    if userid not in storagecartlist:#最新一筆購物車序號
+      if checkaddtime[4:12] == formatted_date:
+        serial_number = int(checkaddtime[12:])+1
+      else:
+        serial_number = '000001'
+      query4 = f"""
+        INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
+        VALUES ( 'cart{order_date}{str(serial_number)}','{userid}','add','dd' ,'{formatted_datetime}');
+        """
+      cursor.execute(query4)
+      conn.commit()
+  cursor.close()
+  conn.close()
+
 #-------------------查詢預購商品列表----------------------
 def preorder_list():
   implement = databasetest()
@@ -48,7 +120,7 @@ def preorder_list():
           WHERE 現預購商品='預購';"""
   cursor.execute(query)
   result = cursor.fetchall()
-  if result is not None:
+  if result != []:
     listbuynow = result
   else:
     listbuynow = "找不到符合條件的資料。"
@@ -67,7 +139,7 @@ def buynow_list():
           WHERE 現預購商品='現購' and 庫存數量>0;"""
   cursor.execute(query)
   result = cursor.fetchall()
-  if result is not None:
+  if result != []:
     listpreorder = result
   else:
     listpreorder = "找不到符合條件的資料。"
@@ -119,7 +191,7 @@ def imagesent():
     cursor.execute(query)
     result = cursor.fetchall()
     
-    if result is not None:
+    if result != []:
         for row in result:
             productname = row[0] # 圖片商品名稱
             output_path = row[1] # 圖片連結
