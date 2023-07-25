@@ -16,6 +16,8 @@ from database import *
 from ask_wishes.ask import *
 from ask_wishes.wishes import *
 from relevant_information import linebotinfo
+from product.cartlist import *
+from product.orderlist import *
 #======python的函數庫==========
 import tempfile, os
 import datetime
@@ -117,15 +119,50 @@ def handle_message(event):
                 } 
             ))
         #-------------------查詢、訂單、購物車----------------------
+        elif '訂單/購物車查詢' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='訂單/購物車查詢選擇',
+            template=ConfirmTemplate(
+                    text='請選擇查詢項目：\n【訂單列表】或是【購物車】',
+                    actions=[
+                        MessageAction(
+                            label='【訂單列表】',
+                            text='訂單查詢'
+                        ),
+                        MessageAction(
+                            label='【購物車】',
+                            text='查看購物車'
+                        )
+                    ]
+                )
+            ))
         elif '訂單查詢' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='訂單查詢'))
+            order = order_list()
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+            alt_text='訂單查詢',
+            contents={
+                "type": "carousel",
+                "contents": order      
+                } 
+            ))
         elif '營業資訊' in msg:
             business_detail = business_information()
             line_bot_api.reply_message(event.reply_token, business_detail)
         elif '【加入購物車】' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【加入購物車】'))
         elif '查看購物車' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查看購物車'))
+            cart = cart_list()
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+            alt_text='我的購物車',
+            contents={
+                "type": "carousel",
+                "contents": cart      
+                } 
+            ))
+        elif '【送出購物車訂單】' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='送出購物車訂單'))
+        elif '【修改購物車清單】' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='修改購物車清單'))
         #-------------------提問及許願----------------------
         elif '問題提問' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
@@ -235,7 +272,7 @@ def welcome(event):
     name = profile.display_name
     message = TextSendMessage(text=f'{name}歡迎加入')
     line_bot_api.reply_message(event.reply_token, message)
-    member_profile(user_id)#執行會員資料確認
+    member_profile(uid)#執行會員資料確認
         
         
 import os
