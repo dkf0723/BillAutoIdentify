@@ -48,14 +48,15 @@ def product_buynow_list():
 
         for i in range(len(product_id)):
             if product_price2[i] is None:
-                price2 = '--'
+                price2 = '暫無其他優惠'
             else:
-                price2 = "2"+ product_unit[i] + "起每包$" + str(product_price2[i])
+                price2 = f"2{product_unit[i]}起每{product_unit[i]}{str(product_price2[i])}元"
             product_show.append({
-            "type": "bubble",
-            "hero": {
+                "type": "bubble",
+                "size": "mega",
+                "direction": "ltr",
+                "hero": {
                 "type": "image",
-                "url": product_img[i],
                 "size": "full",
                 "aspectRatio": "20:13",
                 "aspectMode": "cover",
@@ -63,158 +64,144 @@ def product_buynow_list():
                     "type": "message",
                     "label": "action",
                     "text": "【商品簡介】"+('\n%s\n%s\n'%(product_name[i],product_description[i]))
-                }
-            },
-            "body": {
+                },
+                "url": product_img[i]
+                },
+                "body": {
                 "type": "box",
                 "layout": "vertical",
                 "contents": [
                     {
-                        "type": "text",
-                        "text": product_name[i],
-                        "weight": "bold",
-                        "size": "lg",
-                        "wrap": True
+                    "type": "text",
+                    "text": product_name[i],
+                    "weight": "bold",
+                    "size": "lg"
                     },
                     {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                        {
                         "type": "box",
                         "layout": "baseline",
-                        "margin": "md",
-                        "contents": [
-                            {
-                                "type": "icon",
-                                "size": "sm",
-                                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                            },
-                            {
-                                "type": "icon",
-                                "size": "sm",
-                                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                            },
-                            {
-                                "type": "icon",
-                                "size": "sm",
-                                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                            },
-                            {
-                                "type": "icon",
-                                "size": "sm",
-                                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                            },
-                            {
-                                "type": "icon",
-                                "size": "sm",
-                                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-                            },
-                            {
-                                "type": "text",
-                                "text": "4.0",
-                                "size": "sm",
-                                "color": "#999999",
-                                "margin": "md",
-                                "flex": 0
-                            }
-                        ]
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "lg",
                         "spacing": "sm",
                         "contents": [
                             {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "※",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 1
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": "商品庫存："+ str(product_stock_quantity[i]),
-                                        "wrap": True,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 15
-                                    }
-                                ]
+                            "type": "text",
+                            "text": "※",
+                            "color": "#aaaaaa",
+                            "size": "sm",
+                            "flex": 1
                             },
                             {
-                                "type": "box",
-                                "layout": "vertical",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "1"+ product_unit[i] + "$" + str(product_price[i]),
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 1
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": price2,
-                                        "wrap": True,
-                                        "color": "#FF1212",
-                                        "size": "sm",
-                                        "flex": 5
-                                    }
-                                ]
+                            "type": "text",
+                            "text": f"【商品剩餘數量 {str(product_stock_quantity[i])}】",
+                            "wrap": True,
+                            "color": "#FF0000",
+                            "size": "sm",
+                            "flex": 15
                             }
                         ]
+                        },
+                        {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                            {
+                            "type": "text",
+                            "text": "※",
+                            "color": "#aaaaaa",
+                            "size": "sm",
+                            "flex": 1
+                            },
+                            {
+                            "type": "text",
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm",
+                            "text": "完成訂購流程即可前往店面取貨呦～",
+                            "flex": 15
+                            }
+                        ]
+                        },
+                        {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "spacing": "sm",
+                        "contents": [
+                            {
+                            "type": "text",
+                            "text": f"1{product_unit[i]}{str(product_price[i])}元",
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm",
+                            "flex": 15
+                            }
+                        ],
+                        "flex": 20
+                        },
+                        {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "spacing": "sm",
+                        "contents": [
+                            {
+                            "type": "text",
+                            "text": price2,
+                            "wrap": True,
+                            "size": "md",
+                            "flex": 15,
+                            "color": "#FF0000"
+                            }
+                        ],
+                        "flex": 20
+                        }
+                    ]
                     }
                 ]
-            },
-            "footer": {
+                },
+                "footer": {
                 "type": "box",
                 "layout": "vertical",
                 "spacing": "sm",
                 "contents": [
                     {
-                        "type": "button",
-                        "style": "link",
-                        "height": "sm",
-                        "action": {
-                            "type": "message",
-                            "label": "立即購買",
-                            "text": "【立即購買】"+product_id[i]+"_"+product_name[i]
-                        }
+                    "type": "button",
+                    "style": "link",
+                    "height": "sm",
+                    "action": {
+                        "type": "message",
+                        "label": "立即購買",
+                        "text": "【立即購買】"+product_id[i]+"_"+product_name[i]
+                    }
                     },
                     {
-                        "type": "button",
-                        "style": "link",
-                        "height": "sm",
-                        "action": {
-                            "type": "message",
-                            "label": "加入購物車",
-                            "text": "【加入購物車】"+product_id[i]+"_"+product_name[i]
-                        }
+                    "type": "button",
+                    "style": "link",
+                    "height": "sm",
+                    "action": {
+                        "type": "message",
+                        "label": "加入購物車",
+                        "text": "【加入購物車】"+product_id[i]+"_"+product_name[i]
+                    }
                     },
                     {
-                        "type": "button",
-                        "style": "link",
-                        "height": "sm",
-                        "action": {
-                            "type": "message",
-                            "label": "查看購物車",
-                            "text": "查看購物車"
-                        }
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [],
-                        "margin": "sm"
+                    "type": "button",
+                    "style": "link",
+                    "height": "sm",
+                    "action": {
+                        "type": "message",
+                        "label": "查看購物車",
+                        "text": "查看購物車"
+                    }
                     }
                 ],
                 "flex": 0,
                 "cornerRadius": "sm"
-            }
+                }
         })
         if len(product_show) >= 9:
             product_show.append({
