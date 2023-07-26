@@ -54,6 +54,8 @@ def callback():
 #-------------------儲存使用者狀態----------------------
 global user_state
 user_state = {}
+global member
+member = {}
 global product
 product = {}
 global list_page
@@ -62,6 +64,10 @@ global product_order_preorder
 product_order_preorder = {}
 global duplicate_save
 duplicate_save = {}
+global storage
+storage = {}
+global orderall
+orderall = {}
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -69,6 +75,9 @@ def handle_message(event):
     global msg
     msg = event.message.text
     user_id = event.source.user_id
+    #-------------------檢查是否有在會員名單並且有自己的購物車----------------------
+    if user_id not in member:
+        member_profile(user_id)#執行會員資料確認
     #-------------------確認及給予初始使用者狀態----------------------
     if user_id not in user_state:
         user_state[user_id] = 'normal'
@@ -259,7 +268,7 @@ def handle_message(event):
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
         #return user_id,user_state
-    member_profile(user_id)#執行會員資料確認
+
 
 @handler.add(PostbackEvent)
 def handle_message(event):

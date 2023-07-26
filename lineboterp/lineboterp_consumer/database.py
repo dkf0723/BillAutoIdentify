@@ -47,6 +47,7 @@ def databasetest():
   return {'databasetest_msg': databasetest_msg, 'conn':conn, 'cursor':cursor, 'config':config}
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
 def member_profile(userid):
+  member = lineboterp.member
   implement = databasetest()
   conn = implement['conn']
   cursor = implement['cursor']
@@ -60,10 +61,10 @@ def member_profile(userid):
           SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
           FROM Order_information 
           WHERE 訂單編號 like'cart%' and 訂單成立時間 <= '{formatted_datetimeget}'
-          ORDER BY 訂單成立時間 DESC;
+          ORDER BY 訂單成立時間 DESC,訂單編號 DESC;
           """#購物車資料檢查(DESC遞減取得最新)
   cursor.execute(query1)
-  Order_result = cursor.fetchall()
+  cart_result = cursor.fetchall()
   storagememberlist = []#存放查詢到的所有會員列表
   storagecartlist = []#存放查詢到的所有購物車會員列表
 
@@ -86,7 +87,7 @@ def member_profile(userid):
       cursor.execute(query3)
       conn.commit()
 
-  if Order_result == []:
+  if cart_result == []:
     serial_number = '000001'
     query4 = f"""
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
@@ -95,8 +96,8 @@ def member_profile(userid):
     cursor.execute(query4)
     conn.commit()
   else:
-    checkaddtime = Order_result[0][0]#取得最新一筆購物車序號
-    for row1 in Order_result:
+    checkaddtime = cart_result[0][0]#取得最新一筆購物車序號
+    for row1 in cart_result:
       cartlist = row1[1]
       storagecartlist.append(cartlist)
     if userid not in storagecartlist:#最新一筆購物車序號
@@ -115,6 +116,8 @@ def member_profile(userid):
       conn.commit()
   cursor.close()
   conn.close()
+  member[userid] = 'yy'
+
 
 #-------------------查詢預購商品列表----------------------
 def preorder_list():
@@ -183,10 +186,141 @@ def test_datasearch():
   cursor.close()
   conn.close()
   return testmsg
+#-------------------查詢現購商品列表----------------------
+def order_create():
+  userid = lineboterp.user_id
+  orderall = lineboterp.orderall[userid]
+  phonenum = lineboterp.storage[userid+'phonenum']
+  implement = databasetest()
+  conn = implement['conn']
+  cursor = implement['cursor']
+  timeget = time()
+  formatted_datetimeget = timeget['formatted_datetime']
+  order_dateget = timeget['order_date']
+  establishment_message = '' #訂單檢查回傳訊息
 
-#修改資料UPDATE
+  query2 = f"""
+          SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
+          FROM Order_information 
+          WHERE 訂單編號 like'order%' and 訂單成立時間 <= '{formatted_datetimeget}'
+          ORDER BY 訂單成立時間 DESC , 訂單編號 DESC;""" #訂單資料檢查
+  cursor.execute(query2)
+  order_result = cursor.fetchall()
+
+  if order_result == []:
+    serial_number = '00001'
+    order_details = order_detail(serial_number,conn,cursor)
+    query3_1 = f"""
+          INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
+          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+          """
+    cursor.execute(query3_1)
+    conn.commit()
+    query3_2 = f"""
+          INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+          VALUES {order_details};
+          """
+    cursor.execute(query3_2)
+    conn.commit()
+    query3_3 = f"""
+          UPDATE Order_information
+          SET 總額 = (
+              SELECT SUM(訂購數量 * 商品小計) AS 小計
+              FROM order_details
+              WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
+          )
+          WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
+          """
+    cursor.execute(query3_3)
+    conn.commit()
+  else:
+    checkaddtime = order_result[0][0]#取得最新一筆訂單序號
+    if checkaddtime[5:13] == f"{str(order_dateget)}":
+      serial_number = int(checkaddtime[13:])+1
+      serial_number = '0000'+str(serial_number)
+      if len(serial_number) != 5:
+        serial_number = serial_number[-5:]
+    else:
+      serial_number = '00001'
+    order_details = order_detail(serial_number,conn,cursor)
+    addorder = f"""
+          INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
+          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+          """
+    cursor.execute(addorder)
+    conn.commit()
+    addorderdetails = f"""
+          INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+          VALUES {order_details};
+          """
+    cursor.execute(addorderdetails)
+    conn.commit()
+    addtotalcost = f"""
+          UPDATE Order_information
+          SET 總額 = (
+              SELECT SUM(訂購數量 * 商品小計) AS 小計
+              FROM order_details
+              WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
+          )
+          WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
+          """
+    cursor.execute(addtotalcost)
+    conn.commit()
+  cursor.close()
+  conn.close()
+  establishment_message = 'ok'
+  
+
+
+def order_detail(serial_number,conn,cursor):
+  userid = lineboterp.user_id
+  orderall = lineboterp.orderall[userid]
+  timeget = time()
+  order_dateget = timeget['order_date']
+  order_details = ''
+  establishment_message = ''
+  
+  query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{orderall[0]}'"
+  cursor.execute(query)
+  inventory_result = cursor.fetchall()
+  if inventory_result != []:
+    for row in inventory_result:
+      sort = row[0] #現預購商品
+      inventory = row[1] #庫存數量
+      price2 = row[2] #售出單價2
+      if sort != '預購':
+        if int(orderall[1])<= int(inventory):#庫存檢查
+          if int(orderall[1]) >= 2:
+            if price2 is not None:
+              order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價2 from Product_information where 商品ID = '{orderall[0]}'))"
+            else:
+              order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}'))"
+          else:
+            order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}'))"
+        else:
+          establishment_message += f"商品id：{orderall[0]},訂購數量：{str(orderall[1])},庫存剩餘數量不足！"
+        query1 =f"""
+                UPDATE Product_information
+                SET 庫存數量 = '{str(int(inventory)-int(orderall[1]))}'
+                WHERE 商品ID = '{orderall[0]}'
+                """
+        cursor.execute(query1)
+        conn.commit()
+      else:
+        if int(orderall[1]) >= 2:
+          if price2 is not None:
+            order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價2 from Product_information where 商品ID = '{orderall[0]}'))"
+          else:
+            order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}'))"
+        else: 
+          order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}'))"
+  else:
+    establishment_message = '資料庫查無所有商品資料'
+  return order_details
+
+#-------------------修改資料UPDATE----------------------
 def test_dataUPDATE():
-  return
+  return 
 
 #-------------------圖片取得並發送----------------------
 def imagesent():
