@@ -82,14 +82,14 @@ def orderandpreorder_check():
             if message == '1':
                 numtype = message_storage[id+'ordertype']
                 orderall[id] = [product_id,message_storage[id+'num']]#商品紀錄以便存入資料庫
-                order_create()#資料庫訂單建立
- 
-                '''if ordercheck == 'ok':
+                orderinfo, establishment_message = order_create()#資料庫訂單建立
+                orderinfo = orderinfo[0]
+                if establishment_message == 'ok':
                     if numtype == '訂購':
-                        check_text = ('您的商品：%s\n已完成訂購囉！\n可以前往「店面取貨」囉～' %(product))
+                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}\n總額：{str(orderinfo[4])}元\n已經可以前往「店面取貨」囉～"
                         check_text = TextSendMessage(text=check_text),Company_location()
                     elif numtype == '預購':
-                        check_text = ('您的商品：%s\n已完成預購囉！\n注意：將於「預購結單日」傳送您是否預購成功呦～' %(product))
+                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}\n總額：{str(orderinfo[4])}元\n注意：將於「預購結單日」傳送您是否預購成功呦～"
                         check_text = TextSendMessage(text=check_text)
                     state[id] = 'normal' #從user_state轉換普通狀態
                     #下方重置
@@ -100,21 +100,7 @@ def orderandpreorder_check():
                     product_order_preorder[id] = 'NaN'
                     message_storage[id+'ordertype'] = 'NaN'
                 else:
-                    check_text = ordercheck'''
-                if numtype == '訂購':
-                    check_text = ('您的商品：%s\n已完成訂購囉！\n可以前往「店面取貨」囉～' %(product))
-                    check_text = TextSendMessage(text=check_text),Company_location()
-                elif numtype == '預購':
-                    check_text = ('您的商品：%s\n已完成預購囉！\n注意：將於「預購結單日」傳送您是否預購成功呦～' %(product))
-                    check_text = TextSendMessage(text=check_text)
-                state[id] = 'normal' #從user_state轉換普通狀態
-                #下方重置
-                message_storage[id+'num'] = 'NaN'
-                message_storage[id+'phonenum'] = 'NaN'
-                product_id = 'NaN'
-                product = 'NaN'
-                product_order_preorder[id] = 'NaN'
-                message_storage[id+'ordertype'] = 'NaN'
+                    check_text = TextSendMessage(text=establishment_message)
             elif message == '2':
                 check_text = '您的商品訂/預購流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text)

@@ -4,10 +4,11 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import lineboterp
 
-def order_list():
-    order_show = []#發送全部
-    order_list = []#11筆資料
-    for i in range(1, 12):
+#-------------------未取列表----------------------
+def ordernottaken_list():
+    ordernottaken_show = []#發送全部
+    ordernottaken_list = []#10筆資料
+    for i in range(1, 11):
         button = {
             "type": "button",
             "action": {
@@ -16,9 +17,9 @@ def order_list():
                 "text": str(i)
             }
         }
-        order_list.append(button)
+        ordernottaken_list.append(button)
 
-    order_show.append({
+    ordernottaken_show.append({
             "type": "bubble",
             "body": {
             "type": "box",
@@ -33,7 +34,7 @@ def order_list():
                 },
                 {
                 "type": "text",
-                "text": "訂單查詢",
+                "text": "未取訂單查詢",
                 "weight": "bold",
                 "size": "xxl",
                 "margin": "md"
@@ -46,7 +47,7 @@ def order_list():
                 "type": "box",
                 "layout": "vertical",
                 "margin": "md",
-                "contents": order_list
+                "contents": ordernottaken_list
                 }
             ]
             },
@@ -56,4 +57,59 @@ def order_list():
             }
             }
         })
-    return order_show
+    return ordernottaken_show
+
+#-------------------已取列表----------------------
+def orderhastaken_list():
+    orderhastaken_show = []#發送全部
+    orderhastaken_list = []#10筆資料
+    for i in range(1, 11):
+        button = {
+            "type": "button",
+            "action": {
+                "type": "message",
+                "label": str(i),
+                "text": str(i)
+            }
+        }
+        orderhastaken_list.append(button)
+
+    orderhastaken_show.append({
+            "type": "bubble",
+            "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+                {
+                "type": "text",
+                "text": "高逸嚴選",
+                "weight": "bold",
+                "color": "#1DB446",
+                "size": "sm"
+                },
+                {
+                "type": "text",
+                "text": "歷史(已取)訂單查詢",
+                "weight": "bold",
+                "size": "xxl",
+                "margin": "md"
+                },
+                {
+                "type": "separator",
+                "margin": "xxl"
+                },
+                {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "md",
+                "contents": orderhastaken_list
+                }
+            ]
+            },
+            "styles": {
+            "footer": {
+                "separator": True
+            }
+            }
+        })
+    return orderhastaken_show
