@@ -21,9 +21,11 @@ from product.orderlist import *
 #======python的函數庫==========
 import tempfile, os
 import datetime
+import schedule #排程
+import threading #排程執行緒
 import time
 import requests
-
+#安裝schedule套件=> pip install schedule
 #======python的函數庫==========
 
 app = Flask(__name__)
@@ -51,7 +53,7 @@ def callback():
     return 'OK'
 
 
-#-------------------儲存使用者狀態----------------------
+#-------------------儲存各種狀態----------------------
 global user_state
 user_state = {}
 global member
@@ -68,6 +70,12 @@ global storage
 storage = {}
 global orderall
 orderall = {}
+global db
+db = {}
+
+#首次資料庫連線，最底下有排程設定
+databasetest()
+
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -109,33 +117,21 @@ def handle_message(event):
             list_page[user_id+'預購min'] = 0
             list_page[user_id+'預購max'] = 9
             product_show = product_preorder_list()
-            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-            alt_text='【預購商品】列表',
-            contents={
-                "type": "carousel",
-                "contents": product_show      
-                } 
-            ))
+            line_bot_api.reply_message(event.reply_token, product_show)
         elif '【現購商品】列表' in msg:
             list_page[user_id+'現購min'] = 0
             list_page[user_id+'現購max'] = 9
             product_show = product_buynow_list()
-            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-            alt_text='【現購商品】列表',
-            contents={
-                "type": "carousel",
-                "contents": product_show      
-                } 
-            ))
+            line_bot_api.reply_message(event.reply_token, product_show)
         #-------------------查詢、訂單、購物車----------------------
         elif '訂單/購物車查詢' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='訂單/購物車查詢選擇',
+            alt_text='訂單/購物車 查詢選擇',
             template=ConfirmTemplate(
-                    text='請選擇查詢項目：\n【訂單列表】或是【購物車】',
+                    text='請選擇查詢項目：\n【訂單】或是【購物車】',
                     actions=[
                         MessageAction(
-                            label='【訂單列表】',
+                            label='【訂單】',
                             text='訂單查詢'
                         ),
                         MessageAction(
@@ -146,14 +142,30 @@ def handle_message(event):
                 )
             ))
         elif '訂單查詢' in msg:
-            order = order_list()
-            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-            alt_text='訂單查詢',
-            contents={
-                "type": "carousel",
-                "contents": order      
-                } 
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='未取訂單/歷史訂單 查詢選擇',
+            template=ConfirmTemplate(
+                    text='請選擇查詢項目：\n【未取訂單】或是【歷史訂單】',
+                    actions=[
+                        MessageAction(
+                            label='【未取訂單】',
+                            text='未取訂單列表'
+                        ),
+                        MessageAction(
+                            label='【歷史訂單】',
+                            text='歷史訂單列表'
+                        )
+                    ]
+                )
             ))
+        elif '未取訂單列表' in msg:
+            ordernottaken = ordernottaken_list()
+            line_bot_api.reply_message(event.reply_token, ordernottaken)
+        elif '歷史訂單列表' in msg:
+            history = orderhastaken_list()
+            line_bot_api.reply_message(event.reply_token, history)
+        elif '【訂單詳細】' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【訂單詳細】'))
         elif '營業資訊' in msg:
             business_detail = business_information()
             line_bot_api.reply_message(event.reply_token, business_detail)
@@ -206,7 +218,7 @@ def handle_message(event):
             product[user_id+'product'] = product_name
             Order_preorder_text = Order_preorder()
             line_bot_api.reply_message(event.reply_token, Order_preorder_text)
-        #-------------------現購、預購下一頁----------------------
+        #-------------------現/預購、訂單下一頁----------------------
         elif '【現購列表下一頁】' in msg:
             original_string = msg
             # 找到"【現購列表下一頁】"的位置
@@ -283,8 +295,26 @@ def welcome(event):
     line_bot_api.reply_message(event.reply_token, message)
     member_profile(uid)#執行會員資料確認
         
-        
+#-------------------排程設定----------------------
+#資料庫重新連線
+def dbconnect_job():
+    db['conn'].close()
+    db['cursor'].close()
+    databasetest()
+
+# 建立新的執行緒來運行排程函式
+def run_schedule():
+    while True:
+        dbconnect_job()
+        schedule.run_pending()
+        time.sleep(180)  # 秒
+
+# 啟動排程執行緒
+schedule_thread = threading.Thread(target=run_schedule)
+schedule_thread.start()
+#-----------------------------------------
 import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+

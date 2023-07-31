@@ -13,7 +13,7 @@ def product_buynow_list():
     else:
         pagemin = lineboterp.list_page[lineboterp.user_id+'現購min']
         pagemax = lineboterp.list_page[lineboterp.user_id+'現購max']#9
-        db_preorder = db_buynow_list[pagemin:pagemax] #最多九個+1more
+        db_buynow = db_buynow_list[pagemin:pagemax] #最多九個+1more
         product_show =[]#輸出全部
         product_id = []#商品ID
         product_name = []#商品名稱
@@ -23,7 +23,7 @@ def product_buynow_list():
         product_price = []#售出單價
         product_price2 = []#售出單價2
         product_stock_quantity = []#庫存數量
-        for db_preorder_list in db_preorder:
+        for db_preorder_list in db_buynow:
             if db_preorder_list[0] is None:
                 break
             else:
@@ -245,6 +245,13 @@ def product_buynow_list():
                     ]
                 }
             })
+    product_show = FlexSendMessage(
+            alt_text='【現購商品】列表',
+            contents={
+                "type": "carousel",
+                "contents": product_show      
+                } 
+            )
     return product_show
 #-------------------現購訂單----------------------
 def Order_buynow():

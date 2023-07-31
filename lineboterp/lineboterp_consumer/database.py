@@ -322,7 +322,40 @@ def order_detail(serial_number,conn,cursor):
   else:
     establishment_message = '資料庫查無此商品資料'
   return order_details,establishment_message
-
+#-------------------未取訂單查詢(100筆)----------------------
+def ordertoplist():
+  userid = lineboterp.user_id
+  conn = lineboterp.db['conn']
+  cursor = lineboterp.db['cursor']
+  query = f"""
+    select 訂單編號,總額,訂單成立時間
+    from `Order_information` 
+    where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 = '未取'
+    order by 訂單成立時間 desc
+    limit 100 offset 0
+    """#下一頁加100改offset(目前暫無考慮)
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    result = '找不到符合條件的資料。'
+  return result
+#-------------------歷史訂單查詢(100筆)----------------------
+def ordertopalllist():
+  userid = lineboterp.user_id
+  conn = lineboterp.db['conn']
+  cursor = lineboterp.db['cursor']
+  query = f"""
+        select 訂單編號,總額,訂單成立時間,訂單狀態未取已取,取貨完成時間
+        from `Order_information`
+        where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 <> '未取' and 訂單編號 not like 'cart%'
+        order by 訂單成立時間 desc
+        limit 100 offset 0
+        """#下一頁加100改offset(目前暫無考慮)
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    result = '找不到符合條件的資料。'
+  return result
 #-------------------修改資料UPDATE----------------------
 def test_dataUPDATE():
   return 
