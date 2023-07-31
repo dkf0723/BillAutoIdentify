@@ -248,6 +248,13 @@ def product_preorder_list():
                     ]
                 }
             })
+    product_show = FlexSendMessage(
+            alt_text='【預購商品】列表',
+            contents={
+                "type": "carousel",
+                "contents": product_show      
+                } 
+            )
     return product_show
 #-------------------預購訂單----------------------
 def Order_preorder():
