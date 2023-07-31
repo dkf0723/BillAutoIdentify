@@ -141,3 +141,40 @@ def imagetolink():
     #delete_images()#刪除images檔案圖片
   return {'imagetitle':imagetitle,'imagelink':imagelink}
 
+#-------------------取出未取名單---------------------------------
+
+def order_details():
+  OrderId = []
+  LineId = []
+  PhoneNumber = []
+  OrderTime = []
+  PickuptTime = []
+  amount = []
+  count = 0
+  #讀取訂單資料(所有)
+  implement = databasetest()
+  conn = implement['conn']
+  cursor = implement['cursor']
+  query = "SELECT * FROM Order_information;"
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result is not None:
+    testmsg = "願望清單讀取內容：\n"
+    for row in result:
+      if row[5] == "未取":
+        # 透過欄位名稱獲取資料
+        OrderId.append(row[0])#'訂單編號'
+        LineId.append(row[1])#'LineId'
+        PhoneNumber.append(row[2])#電話
+        OrderTime.append(row[3])#'下定時間'
+        PickuptTime.append(row[4])#'取貨完成時間'
+        amount.append(row[10])#'總額'
+        # 在這裡進行資料處理或其他操作
+        testmsg += ('共%s筆未取訂單\n---\n' %(count))
+  else:
+    testmsg = "找不到符合條件的資料。"
+  # 關閉游標與連線
+  testmsg += "(end)"
+  cursor.close()
+  conn.close()
+  return testmsg
