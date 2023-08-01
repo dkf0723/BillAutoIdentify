@@ -117,12 +117,24 @@ def handle_message(event):
             list_page[user_id+'預購min'] = 0
             list_page[user_id+'預購max'] = 9
             product_show = product_preorder_list()
-            line_bot_api.reply_message(event.reply_token, product_show)
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【預購商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": product_show      
+                    } 
+                ))
         elif '【現購商品】列表' in msg:
             list_page[user_id+'現購min'] = 0
             list_page[user_id+'現購max'] = 9
             product_show = product_buynow_list()
-            line_bot_api.reply_message(event.reply_token, product_show)
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【現購商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": product_show      
+                    } 
+                ))
         #-------------------查詢、訂單、購物車----------------------
         elif '訂單/購物車查詢' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -165,7 +177,10 @@ def handle_message(event):
             history = orderhastaken_list()
             line_bot_api.reply_message(event.reply_token, history)
         elif '【訂單詳細】' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【訂單詳細】'))
+            msg = str(msg)
+            orderall[user_id+'dt'] = msg[-18:]
+            searchresult = orderdtsearch()
+            line_bot_api.reply_message(event.reply_token, searchresult)
         elif '營業資訊' in msg:
             business_detail = business_information()
             line_bot_api.reply_message(event.reply_token, business_detail)
