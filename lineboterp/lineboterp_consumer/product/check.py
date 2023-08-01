@@ -86,10 +86,10 @@ def orderandpreorder_check():
                 orderinfo = orderinfo[0]
                 if establishment_message == 'ok':
                     if numtype == '訂購':
-                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}\n總額：{str(orderinfo[4])}元\n已經可以前往「店面取貨」囉～"
+                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：{str(orderinfo[4])}元\n已經可以前往「店面取貨」囉～"
                         check_text = TextSendMessage(text=check_text),Company_location()
                     elif numtype == '預購':
-                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}\n總額：{str(orderinfo[4])}元\n注意：將於「預購結單日」傳送您是否預購成功呦～"
+                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：{str(orderinfo[4])}元\n注意：將於「預購結單日」傳送您是否預購成功呦～"
                         check_text = TextSendMessage(text=check_text)
                     state[id] = 'normal' #從user_state轉換普通狀態
                     #下方重置

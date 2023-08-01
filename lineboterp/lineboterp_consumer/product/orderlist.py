@@ -164,3 +164,37 @@ def orderhastaken_list():
                 } 
             )
     return orderhastaken_show
+
+#-------------------訂單詳細資料----------------------
+def orderdtsearch():
+    db_orderdt = orderdt()
+    if db_orderdt=='找不到符合條件的資料。':
+        show = TextSendMessage(text=db_orderdt)
+    else:
+        '''訂單編號,電話,訂單狀態未取已取,商品ID,商品名稱,商品單位,訂購數量,商品小計,總額,訂單成立時間,取貨完成時間'''
+        if db_orderdt[0][10] is None:
+            pickup = '<無>'
+        else:
+            pickup = str(db_orderdt[0][10])
+        show = f"""===訂單詳細資料===
+*訂單編號：\n   {str(db_orderdt[0][0])}
+*訂單成立時間：\n   {str(db_orderdt[0][9])}
+*取貨完成或訂單取消時間：\n   {pickup}
+*狀態：{db_orderdt[0][2]}
+*電話號碼：{str(db_orderdt[0][1])}
+"""
+        showlater = f"""訂單總額：NT${db_orderdt[0][8]}"""     
+        num = 1
+        while len(db_orderdt) > 0:
+            dt = f"""=>商品{num}
+品名：{db_orderdt[0][4]}
+數量：{db_orderdt[0][6]}{db_orderdt[0][5]}
+小計：{db_orderdt[0][7]}
+----------------------------
+"""
+            show += dt
+            num += 1
+            db_orderdt = db_orderdt[1:]  # 移除已取得的元素
+        show += showlater
+        show = TextSendMessage(text=show)
+    return show

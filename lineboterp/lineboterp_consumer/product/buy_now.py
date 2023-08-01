@@ -7,6 +7,7 @@ from database import buynow_list
 
 #-------------------現購清單----------------------
 def product_buynow_list():
+    product_show = ''
     db_buynow_list = buynow_list()
     if db_buynow_list == "找不到符合條件的資料。":
         product_show = TextSendMessage(text=db_buynow_list)
@@ -245,13 +246,6 @@ def product_buynow_list():
                     ]
                 }
             })
-    product_show = FlexSendMessage(
-            alt_text='【現購商品】列表',
-            contents={
-                "type": "carousel",
-                "contents": product_show      
-                } 
-            )
     return product_show
 #-------------------現購訂單----------------------
 def Order_buynow():

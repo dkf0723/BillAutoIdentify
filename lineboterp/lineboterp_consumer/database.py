@@ -177,7 +177,7 @@ def test_datasearch():
     testmsg = "找不到符合條件的資料。"
   testmsg += "(end)"
   return testmsg
-#-------------------查詢現購商品列表----------------------
+#-------------------訂單成立----------------------
 def order_create():
   userid = lineboterp.user_id
   orderall = lineboterp.orderall[userid]
@@ -226,9 +226,8 @@ def order_create():
     conn.commit()
     establishment_message = 'ok'
     query4_1 = f"""
-              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計  
-              FROM order_details 
-              Natural Join Product_information 
+              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
+              FROM order_details Natural Join Product_information 
               Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
     cursor.execute(query4_1)
     orderinfo = cursor.fetchall()
@@ -268,9 +267,8 @@ def order_create():
     conn.commit()
     establishment_message = 'ok'
     query4_2 = f"""
-              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計  
-              FROM order_details 
-              Natural Join Product_information 
+              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
+              FROM order_details Natural Join Product_information 
               Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
     cursor.execute(query4_2)
     orderinfo = cursor.fetchall()
@@ -351,6 +349,38 @@ def ordertopalllist():
         order by 訂單成立時間 desc
         limit 100 offset 0
         """#下一頁加100改offset(目前暫無考慮)
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    result = '找不到符合條件的資料。'
+  return result
+#-------------------訂單詳細資料------------------------
+def orderdt():
+  userid = lineboterp.user_id
+  ordersearch = lineboterp.orderall[userid+'dt']
+  conn = lineboterp.db['conn']
+  cursor = lineboterp.db['cursor']
+  query = f"""
+          SELECT
+            Order_information.訂單編號,
+            Order_information.電話,
+            Order_information.訂單狀態未取已取,
+            Product_information.商品ID,
+            Product_information.商品名稱,
+            Product_information.商品單位,
+            order_details.訂購數量,
+            order_details.商品小計,
+            Order_information.總額,
+            Order_information.訂單成立時間,
+            Order_information.取貨完成時間
+          FROM
+            Order_information
+          JOIN
+            order_details ON Order_information.訂單編號 = order_details.訂單編號
+          JOIN
+            Product_information ON order_details.商品ID = Product_information.商品ID
+          WHERE Order_information.訂單編號 = '{ordersearch}' ;
+          """
   cursor.execute(query)
   result = cursor.fetchall()
   if result == []:

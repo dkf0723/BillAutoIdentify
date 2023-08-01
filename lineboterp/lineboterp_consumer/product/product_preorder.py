@@ -6,6 +6,7 @@ import lineboterp
 from database import preorder_list
 #-------------------預購清單----------------------
 def product_preorder_list():
+    product_show = ''
     db_preorder_list = preorder_list()
     if db_preorder_list == "找不到符合條件的資料。":
         product_show = TextSendMessage(text=db_preorder_list)
@@ -248,13 +249,6 @@ def product_preorder_list():
                     ]
                 }
             })
-    product_show = FlexSendMessage(
-            alt_text='【預購商品】列表',
-            contents={
-                "type": "carousel",
-                "contents": product_show      
-                } 
-            )
     return product_show
 #-------------------預購訂單----------------------
 def Order_preorder():
