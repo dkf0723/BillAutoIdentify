@@ -188,13 +188,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【加入購物車】'))
         elif '查看購物車' in msg:
             cart = cart_list()
-            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-            alt_text='我的購物車',
-            contents={
-                "type": "carousel",
-                "contents": cart      
-                } 
-            ))
+            line_bot_api.reply_message(event.reply_token, cart)
         elif '【送出購物車訂單】' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='送出購物車訂單'))
         elif '【修改購物車清單】' in msg:

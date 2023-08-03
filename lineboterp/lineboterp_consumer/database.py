@@ -420,6 +420,23 @@ def orderdt():
   if result == []:
     result = '找不到符合條件的資料。'
   return result
+#-------------------購物車資料查詢----------------------
+def cartsearch():
+  userid = lineboterp.user_id
+  cursor = lineboterp.db['cursor']
+  query = f"""
+    select 訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
+    from order_details natural join Product_information
+    where 訂單編號 = (
+    select 訂單編號
+    from Order_information
+    where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%')
+    """#下一頁加100改offset(目前暫無考慮)
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    result = '資料庫搜尋不到'
+  return result
 #-------------------修改資料UPDATE----------------------
 def test_dataUPDATE():
   return 
