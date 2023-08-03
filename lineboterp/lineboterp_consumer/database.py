@@ -320,6 +320,40 @@ def order_detail(serial_number,conn,cursor):
   else:
     establishment_message = '資料庫查無此商品資料'
   return order_details,establishment_message
+
+#預購倍數查詢
+def multiplesearch(product_id):
+  cursor = lineboterp.db['cursor']
+  query = f"""
+    select 預購數量限制_倍數 
+    from Product_information 
+    where 現預購商品 = '預購' and 商品ID = '{product_id}'
+    """
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    multiple = 1 #預設倍數
+  else:
+    for i in result:
+      multiple = int(i[0]) #查詢倍數
+  return multiple
+
+#商品單位查詢
+def unitsearch(product_id):
+  cursor = lineboterp.db['cursor']
+  query = f"""
+    select 商品單位 
+    from Product_information 
+    where 商品ID = '{product_id}'
+    """
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    unit = '無'
+  else:
+    for i in result:
+      unit = i[0] #單位
+  return unit
 #-------------------未取訂單查詢(100筆)----------------------
 def ordertoplist():
   userid = lineboterp.user_id

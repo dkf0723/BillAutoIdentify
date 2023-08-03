@@ -3,7 +3,7 @@ from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
 import lineboterp
-from database import preorder_list
+from database import preorder_list,multiplesearch,unitsearch
 #-------------------預購清單----------------------
 def product_preorder_list():
     product_show = ''
@@ -180,26 +180,6 @@ def product_preorder_list():
                         "label": "手刀預購",
                         "text": "【手刀預購】"+product_id[i]+"_"+product_name[i]
                     }
-                    },
-                    {
-                    "type": "button",
-                    "style": "link",
-                    "height": "sm",
-                    "action": {
-                        "type": "message",
-                        "label": "加入購物車",
-                        "text": "【加入購物車】"+product_id[i]+"_"+product_name[i]
-                    }
-                    },
-                    {
-                    "type": "button",
-                    "style": "link",
-                    "height": "sm",
-                    "action": {
-                        "type": "message",
-                        "label": "查看購物車",
-                        "text": "查看購物車"
-                    }
                     }
                 ],
                 "flex": 0,
@@ -260,8 +240,15 @@ def Order_preorder():
     product_order_preorder[user_id] = '預購'
     #Quick Reply 按鈕數量範圍
     quantity_option = []
+    multiple = multiplesearch(product_id)
+    unit = unitsearch(product_id)
     for i in range(10):
-        quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
+        if unit != '無':
+            if (i+1) % multiple == 0:
+                quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1)+unit, text=str(i+1))))
+        else:
+            if (i+1) % multiple == 0:
+                quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
     #------------------------
     
     user_state[user_id] = 'preorder'#從user_state轉換預購狀態
