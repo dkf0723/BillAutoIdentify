@@ -182,6 +182,7 @@ def orderdtsearch():
 *取貨完成或訂單取消時間：\n   {pickup}
 *狀態：{db_orderdt[0][2]}
 *電話號碼：{str(db_orderdt[0][1])}
+
 """
         showlater = f"""訂單總額：NT${db_orderdt[0][8]}"""     
         num = 1

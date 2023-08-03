@@ -3,7 +3,7 @@ from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
 import lineboterp
-from database import buynow_list
+from database import buynow_list,unitsearch
 
 #-------------------現購清單----------------------
 def product_buynow_list():
@@ -257,8 +257,12 @@ def Order_buynow():
     product_order_preorder[user_id] = '訂購'
     #Quick Reply 按鈕數量範圍
     quantity_option = []
+    unit = unitsearch(product_id)
     for i in range(10):
-        quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
+        if unit == '無':
+            quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
+        else:
+            quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1)+unit, text=str(i+1))))
     #------------------------
 
     user_state[user_id] = 'ordering'#從user_state轉換訂購狀態
