@@ -3,8 +3,9 @@ from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
 import lineboterp
-from database import cartsearch
+from database import cartsearch,unitsearch
 
+#-------------------購物車資料查詢----------------------
 def cart_list():
     db_cartshow = cartsearch()
     if db_cartshow=='資料庫搜尋不到':
@@ -13,7 +14,7 @@ def cart_list():
         cart_show = []
         buttons = []  #模塊中5筆資料
         num = 1
-        '訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計'
+        #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
         for totallist in db_cartshow:
             text ={
                 "type": "text",
@@ -126,3 +127,43 @@ def cart_list():
                     } 
                 )
     return cart_show
+
+#-------------------購物車商品新增----------------------
+def addcart():
+    user_id = lineboterp.user_id
+    user_state = lineboterp.user_state
+    product_id = lineboterp.product[user_id+'cartproduct_id']
+    product = lineboterp.product[user_id+'cartproduct']
+
+    #購物車清單數量確認最大5筆
+    db_cartcheck = cartsearch()
+    #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
+    cartproductid = []#存放購物車中已有的商品ID
+    if db_cartcheck!='資料庫搜尋不到':
+        for productcartid in db_cartcheck:
+            cartproductid.append(productcartid[1])
+    if isinstance(db_cartcheck, str) or len(db_cartcheck) < 5:#等於字串或小於5
+        #檢查現在想加入的商品有沒有在購物車中
+        if product_id in cartproductid:
+            cart = TextSendMessage(text='您的購物車清單中已存在此商品囉～')
+        else:
+            #Quick Reply 按鈕數量範圍
+            quantity_option = []
+            unit = unitsearch(product_id)
+            for i in range(10):
+                if unit == '無':
+                    quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
+                else:
+                    quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1)+unit, text=str(i+1))))
+            #------------------------
+            user_state[user_id] = 'cartnum'#從user_state轉換輸入購物車數量狀態
+            # 建立 Quick Reply 按鈕
+            quick_reply_message = TextSendMessage(
+                text='商品ID：%s\n商品名稱：%s\n=>請點選此商品加入購物車的數量：' %(product_id,product),
+                quick_reply=QuickReply(items=quantity_option)
+            )
+            cart = TextSendMessage(text='加入購物車流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
+                # 傳送回應訊息給使用者
+    else:
+        cart = TextSendMessage(text='您的購物車清單筆數已達5個商品上限！無法再新增商品至購物車！')
+    return cart
