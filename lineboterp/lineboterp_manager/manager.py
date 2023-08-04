@@ -9,13 +9,14 @@ from linebot.models import *
 
 #======這裡是呼叫的檔案內容=====
 from database import *
-from test_check import *
+#from test_check import *
 from relevant_information import *
 #======python的函數庫==========
 import tempfile, os
 import datetime
 import time
 import requests
+import datetime
 
 #======python的函數庫==========
 
@@ -51,6 +52,8 @@ global user_state1
 user_state1 = {}
 global product
 product = {}
+global duplicate_save
+duplicate_save = {}
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -66,7 +69,6 @@ def handle_message(event):
         check_text = inventory_check()
         line_bot_api.reply_message(event.reply_token, check_text)
     else:
-        #-------------------顧客取貨及2種取貨方式列表----------------------
         if '顧客取貨' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='取貨選擇',
@@ -89,78 +91,101 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
             elif msg[4:] == '訂單編號':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
-            #-------------------商品管理及2種商品狀態列表----------------------
         elif '商品管理' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='商品選擇',
-            template=ConfirmTemplate(
-                    text='請選擇商品狀態：\n【已到貨】或是【未到貨】',
-                    actions=[
-                        MessageAction(
-                            label='【已到貨】',
-                            text='【商品】已到貨',
-                        ),
-                        MessageAction(
-                            label='【未到貨】',
-                            text='【商品】未到貨'
-                        )
-                    ]
-                )
-            ))
-        elif '【商品】' in msg:
-            if msg[4:] == '已到貨':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示已到貨商品選單'))
-            elif msg[4:] == '未到貨':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示未到貨商品選單'))
-            #-------------------未取名單----------------------
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='商品管理'))
         elif '未取名單' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
-            #-------------------報表管理----------------------
         elif '報表管理' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
-            #-------------------顧客QA及2種回覆狀態列表----------------------
-        elif '顧客QA' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='QA選擇',
-            template=ConfirmTemplate(
-                    text='請選擇查詢顧客QA回覆狀態：\n【已回覆】或是【未回覆】',
-                    actions=[
-                        MessageAction(
-                            label='【已回覆】',
-                            text='【QA】已回覆',
-                        ),
-                        MessageAction(
-                            label='【未回覆】',
-                            text='【QA】未回覆'
-                        )
-                    ]
-                )
-            ))
-        elif '【QA】' in msg:
-            if msg[4:] == '已回覆':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出未回覆者問題'))
-            elif msg[4:] == '未回覆':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出歷史問答記錄'))
-            #-------------------庫存管理及功能選擇按鈕----------------------
+        elif '廠商管理' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='廠商管理'))
+               #-------------------庫存管理及功能選擇按鈕----------------------
         elif '庫存管理' in msg: 
             message = TextSendMessage(text='請點選以下操作功能',
                                 quick_reply=QuickReply(items=[
-                                QuickReplyButton(action=MessageAction(label="新增商品", text="新增商品")),
-                                QuickReplyButton(action=MessageAction(label="查詢個別商品資訊", text="查詢個別商品資訊")),
-                                QuickReplyButton(action=MessageAction(label="查詢所有商品資訊", text="查詢所有商品資訊"))
+                                QuickReplyButton(action=MessageAction(label="新增進貨商品", text="新增進貨商品")),
+                                QuickReplyButton(action=MessageAction(label="查詢商品庫存", text="查詢商品庫存")),
                         ]))
             line_bot_api.reply_message(event.reply_token, message)
-        elif '新增商品' in msg:
-            user_state[user_id] = 'adding'
+        elif '新增進貨商品' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='商品查詢選擇',
+            template=ConfirmTemplate(
+                    text='請選擇商品查詢方式：\n【類別】或是【廠商】',
+                    actions=[
+                        MessageAction(
+                            label='【依類別】',
+                            text='【商品查詢】類別',
+                        ),
+                        MessageAction(
+                            label='【依廠商】',
+                            text='【商品查詢】廠商'
+                        )
+                    ]
+                )
+            ))
+        elif '【商品查詢】' in msg:
+            if msg[6:] == '類別':
+                    message = TextSendMessage(text='請點選查詢類別',
+                                quick_reply=QuickReply(items=[
+                                QuickReplyButton(action=MessageAction(label="冷凍食品", text="frozen")),
+                                QuickReplyButton(action=MessageAction(label="日常用品", text="dailyuse")),
+                                QuickReplyButton(action=MessageAction(label="甜點", text="dessert")),
+                                QuickReplyButton(action=MessageAction(label="地方特產", text="local")),
+                                QuickReplyButton(action=MessageAction(label="主食", text="staplefood")),
+                                QuickReplyButton(action=MessageAction(label="常溫食品", text="generally")),
+                                QuickReplyButton(action=MessageAction(label="美妝保養", text="beauty")),
+                                QuickReplyButton(action=MessageAction(label="零食", text="snack")),
+                                QuickReplyButton(action=MessageAction(label="保健食品", text="healthy")),
+                                QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),
+                        ]))
+            line_bot_api.reply_message(event.reply_token, message)
+        elif msg[6:] == '廠商':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
+            #第二分支-----------------------------------------------------
+        elif '查詢商品庫存' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='商品查詢選擇',
+            template=ConfirmTemplate(
+                    text='請選擇商品查詢方式：\n【類別】或是【廠商】',
+                    actions=[
+                        MessageAction(
+                            label='【依類別】',
+                            text='【商品查詢】類別',
+                        ),
+                        MessageAction(
+                            label='【依廠商】',
+                            text='【商品查詢】廠商'
+                        )
+                    ]
+                )
+            ))
+        elif '【商品查詢】' in msg:
+            if msg[6:] == '類別':
+                    message = TextSendMessage(text='請點選查詢類別',
+                                quick_reply=QuickReply(items=[
+                                QuickReplyButton(action=MessageAction(label="冷凍食品", text="frozen")),
+                                QuickReplyButton(action=MessageAction(label="日常用品", text="dailyuse")),
+                                QuickReplyButton(action=MessageAction(label="甜點", text="dessert")),
+                                QuickReplyButton(action=MessageAction(label="地方特產", text="local")),
+                                QuickReplyButton(action=MessageAction(label="主食", text="staplefood")),
+                                QuickReplyButton(action=MessageAction(label="常溫食品", text="generally")),
+                                QuickReplyButton(action=MessageAction(label="美妝保養", text="beauty")),
+                                QuickReplyButton(action=MessageAction(label="零食", text="snack")),
+                                QuickReplyButton(action=MessageAction(label="保健食品", text="healthy")),
+                                QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),
+                        ]))
+            line_bot_api.reply_message(event.reply_token, message)
+        elif msg[6:] == '廠商':
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
+            '''user_state[user_id] = 'adding'
             user_state1[user_id] = 'name'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入品名：'))
-        elif '查詢個別商品資訊' in msg:
-            #user_state[user_id] = 'searching_oneinf'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入要查詢庫存之品名：'))
-        elif '查詢所有商品資訊' in msg:
-            #message = select_all_goods()
-            message = TextSendMessage(text='查詢所有商品資訊')
-            line_bot_api.reply_message(event.reply_token, message)
+            elif '查詢商品庫存' in msg:
+            user_state[user_id] = 'searching_single'
+            #user_state1[user_id] = 'name'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入想查詢之品名：'))'''
+       
             #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
             databasetest_msg = databasetest()['databasetest_msg']
@@ -186,8 +211,44 @@ def welcome(event):
     name = profile.display_name
     message = TextSendMessage(text=f'{name}歡迎加入')
     line_bot_api.reply_message(event.reply_token, message)
-        
-        
+
+'''@handler.add(PostbackEvent)
+def handle_postback(event):
+    # 處理用戶點擊按鈕的回應
+    user_id = event.source.user_id
+    data = event.postback.data
+
+    # 根據按鈕資料（data）判斷用戶的選擇
+    if data == 'confirm':
+        # 用戶點擊了「確認」按鈕，進行相應處理
+        # ... 處理確認選項 ...
+        success_message = '您已成功新增商品！'
+        line_bot_api.reply_message(event.reply_token,TextMessage(text=success_message))
+
+    elif data == 'cancel':
+        # 用戶點擊了「取消」按鈕，進行相應處理
+        # ... 處理取消選項 ...
+        failed_message = '您已取消新增商品！'
+        line_bot_api.reply_message(event.reply_token,TextMessage(text=failed_message))
+
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    if event.postback.data == "selected_date":
+        selected_date = event.postback.params['date']
+
+        # 在这里添加逻辑，保存用户选择的日期信息到 message_storage 或数据库等等
+        message_storage[id + 'exp'] = '商品有效期限：' + selected_date
+
+        # 给用户返回确认消息
+        reply_text = f'您選擇的商品有效期限是：{selected_date}'
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
+
+# 处理文字消息
+@handler.add(MessageEvent, message=TextMessage)
+def handle_text_message(event):
+    user_id = event.source.user_id'''
+
 import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
