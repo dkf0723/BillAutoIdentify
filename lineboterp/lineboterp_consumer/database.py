@@ -437,6 +437,39 @@ def cartsearch():
   if result == []:
     result = '資料庫搜尋不到'
   return result
+#-------------------購物車資料新增----------------------
+def cartadd(id,product_id,num):
+  conn = lineboterp.db['conn']
+  cursor = lineboterp.db['cursor']
+  query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
+  cursor.execute(query)
+  inventory_result = cursor.fetchall()
+  if inventory_result != []:
+    if inventory_result[0][2] is not None:
+      if num >= 2 :
+        query1 =f"""
+                INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+                VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
+                '{product_id}','{num}',(select 售出單價2 from Product_information where 商品ID = '{product_id}')*{num});
+                """
+      else:
+        query1 =f"""
+                INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+                VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
+                '{product_id}','{num}',(select 售出單價 from Product_information where 商品ID = '{product_id}')*{num});
+                """
+    else:
+      query1 =f"""
+                INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+                VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
+                '{product_id}','{num}',(select 售出單價 from Product_information where 商品ID = '{product_id}')*{num});
+                """
+    cursor.execute(query1)
+    conn.commit()
+    text = 'ok'
+  else:
+    text = 'Null'
+  return text
 #-------------------修改資料UPDATE----------------------
 def test_dataUPDATE():
   return 

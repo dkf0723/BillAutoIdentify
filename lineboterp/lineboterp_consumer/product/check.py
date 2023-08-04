@@ -8,16 +8,20 @@ import lineboterp
 from ask_wishes.ask import *
 from ask_wishes.wishes import *
 from database import *
+from product.cartlist import addcart
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
     id = lineboterp.user_id
     state = lineboterp.user_state
-    if state[id] in ['ordering','preorder','phonenum','end']: #判斷user狀態
+     #判斷user狀態
+    if state[id] in ['ordering','preorder','phonenum','end']: #單筆訂預購
         check_text = orderandpreorder_check()
-    elif state[id] == 'ask':
+    elif state[id] == 'cartnum':#新增購物車
+        check_text = cartnum()
+    elif state[id] == 'ask':#QA
         check_text = ask()
-    elif state[id] == 'wishes':
+    elif state[id] == 'wishes':#願望清單
         check_text = wishes()
     return check_text
 
@@ -147,6 +151,30 @@ def orderandpreorder_check():
             check_text = TextSendMessage(text=check_text),TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "')    
     return check_text
 
+def cartnum():
+    id = lineboterp.user_id
+    state = lineboterp.user_state
+    message = lineboterp.msg
+    product_id = lineboterp.product[id+'cartproduct_id']
+    product = lineboterp.product[id+'cartproduct']
+    if message.isdigit():#是數字
+        text = cartadd(id,product_id,int(message))
+        if text == 'ok':
+            unit = unitsearch(product_id)
+            check_text = ('==商品成功加入購物車==\n商品名稱：%s\n加入數量： %s %s' %(product,message,unit))
+            check_text = TextSendMessage(text=check_text)
+            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+        else:
+            check_text = TextSendMessage(text='購物車加入失敗！請稍後再試。')
+            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+    else:
+        if(message == "取消"):
+            check_text = '您的商品加入購物車流程\n已經取消囉～'
+            check_text = TextSendMessage(text=check_text)
+            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+        else:
+            check_text = addcart()
+    return check_text
 #-------------------商家地址----------------------
 def Company_location():
     location = LocationSendMessage(

@@ -95,8 +95,11 @@ def handle_message(event):
         check_text = product_check()
         line_bot_api.reply_message(event.reply_token, check_text)
     else:
+        if '營業資訊' in msg:
+            business_detail = business_information()
+            line_bot_api.reply_message(event.reply_token, business_detail)
         #-------------------團購商品及2種商品列表----------------------
-        if '團購商品' in msg:
+        elif '團購商品' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
             alt_text='商品狀態選擇',
             template=ConfirmTemplate(
@@ -181,11 +184,20 @@ def handle_message(event):
             orderall[user_id+'dt'] = msg[-18:]
             searchresult = orderdtsearch()
             line_bot_api.reply_message(event.reply_token, searchresult)
-        elif '營業資訊' in msg:
-            business_detail = business_information()
-            line_bot_api.reply_message(event.reply_token, business_detail)
         elif '【加入購物車】' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【加入購物車】'))
+            original_string = msg
+            # 找到"【加入購物車】"的位置
+            start_index = original_string.find("【加入購物車】")
+            if start_index != -1:
+                # 從"【加入購物車】"後面開始切割字串
+                substr = original_string[start_index + len("【加入購物車】"):]
+                # 切割取得前後文字
+                product_id = substr.split("_")[0].strip() # 取出～前面的字並去除空白字元
+                product_name = substr.split("_")[1].strip() # 取出～後面的字並去除空白字元
+            product[user_id+'cartproduct_id'] = product_id
+            product[user_id+'cartproduct'] = product_name
+            cartadd = addcart()
+            line_bot_api.reply_message(event.reply_token, cartadd)
         elif '查看購物車' in msg:
             cart = cart_list()
             line_bot_api.reply_message(event.reply_token, cart)
@@ -204,7 +216,7 @@ def handle_message(event):
             # 找到"【立即購買】"的位置
             start_index = original_string.find("【立即購買】")
             if start_index != -1:
-                # 從"【現購列表下一頁】"後面開始切割字串
+                # 從"【立即購買】"後面開始切割字串
                 substr = original_string[start_index + len("【立即購買】"):]
                 # 切割取得前後文字
                 product_id = substr.split("_")[0].strip() # 取出～前面的字並去除空白字元
@@ -218,7 +230,7 @@ def handle_message(event):
             # 找到"【手刀預購】"的位置
             start_index = original_string.find("【手刀預購】")
             if start_index != -1:
-                # 從"【現購列表下一頁】"後面開始切割字串
+                # 從"【手刀預購】"後面開始切割字串
                 substr = original_string[start_index + len("【手刀預購】"):]
                 # 切割取得前後文字
                 product_id = substr.split("_")[0].strip() # 取出～前面的字並去除空白字元
