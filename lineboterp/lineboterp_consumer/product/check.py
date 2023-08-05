@@ -8,7 +8,7 @@ import lineboterp
 from ask_wishes.ask import *
 from ask_wishes.wishes import *
 from database import *
-from product.cartlist import addcart
+from product.cartlist import cart_list,addcart,cartrevise
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
@@ -19,6 +19,8 @@ def product_check():
         check_text = orderandpreorder_check()
     elif state[id] == 'cartnum':#新增購物車
         check_text = cartnum()
+    elif state[id] == 'cartrevise':#修改購物車單項商品數量
+        check_text = cartrpnum()
     elif state[id] == 'ask':#QA
         check_text = ask()
     elif state[id] == 'wishes':#願望清單
@@ -174,6 +176,31 @@ def cartnum():
             state[id] = 'normal' #結束流程將user_state轉換預設狀態
         else:
             check_text = addcart()
+    return check_text
+
+def cartrpnum():
+    id = lineboterp.user_id
+    state = lineboterp.user_state
+    message = lineboterp.msg
+    product_id = lineboterp.product[id+'cartreviseproduct_id']
+    product = lineboterp.product[id+'cartreviseproduct_name']
+    if message.isdigit():#是數字
+        text = revise(id,product_id,int(message))
+        if text == 'ok':
+            unit = unitsearch(product_id)
+            check_text = ('==購物車商品成功修改數量==\n商品名稱：%s\n修改後數量： %s %s' %(product,message,unit))
+            check_text = TextSendMessage(text=check_text),cart_list()
+            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+        else:
+            check_text = TextSendMessage(text='購物車商品數量修改失敗！請稍後再試。')
+            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+    else:
+        if(message == "取消"):
+            check_text = '您的購物車商品數量修改流程\n已經取消囉～'
+            check_text = TextSendMessage(text=check_text),cart_list()
+            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+        else:
+            check_text = cartrevise()
     return check_text
 #-------------------商家地址----------------------
 def Company_location():
