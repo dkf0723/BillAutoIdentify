@@ -73,6 +73,7 @@ orderall = {}
 global db
 db = {}
 
+
 #首次資料庫連線，最底下有排程設定
 databasetest()
 
@@ -201,6 +202,41 @@ def handle_message(event):
         elif '查看購物車' in msg:
             cart = cart_list()
             line_bot_api.reply_message(event.reply_token, cart)
+        elif '【修改數量】' in msg:
+            original_string = msg
+            # 找到"【修改數量】"的位置
+            start_index = original_string.find("【修改數量】")
+            if start_index != -1:
+                # 從"【修改數量】"後面開始切割字串
+                substr = original_string[start_index + len("【修改數量】"):]
+                # 切割取得前後文字
+                product_id = substr.split("_")[0].strip() # 取出_前面的字並去除空白字元
+                product_name = substr.split("_")[1].strip() # 取出_後面的字並去除空白字元
+            product[user_id+'cartreviseproduct_id'] = product_id
+            product[user_id+'cartreviseproduct_name'] = product_name
+            cartr = cartrevise()
+            line_bot_api.reply_message(event.reply_token, cartr)
+        elif '修改購物車清單' in msg:
+            carted = editcart()
+            line_bot_api.reply_message(event.reply_token, carted)
+        elif '【清單移除商品】' in msg:
+            original_string = msg
+            # 找到"【清單移除商品】"的位置
+            start_index = original_string.find("【清單移除商品】")
+            if start_index != -1:
+                # 從"【清單移除商品】"後面開始切割字串
+                substr = original_string[start_index + len("【清單移除商品】"):]
+                # 切割取得前後文字
+                product_id = substr.split("_")[0].strip() # 取出_前面的字並去除空白字元
+                product_name = substr.split("_")[1].strip() # 取出_後面的字並去除空白字元
+            movecart = removecart(user_id, product_id)
+            if movecart == 'ok':
+                msgtxt = ('==購物車商品成功移除==\n移除商品名稱：%s' %(product_name))
+            else:
+                msgtxt = ('購物車商品移除失敗！請稍後再試。')
+            line_bot_api.reply_message(event.reply_token, (TextSendMessage(text=msgtxt),editcart()))
+        elif '取消修改清單' in msg:
+            line_bot_api.reply_message(event.reply_token, cart_list())
         elif '【送出購物車訂單】' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='送出購物車訂單'))
         elif '【修改購物車清單】' in msg:

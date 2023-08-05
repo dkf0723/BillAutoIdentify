@@ -470,6 +470,73 @@ def cartadd(id,product_id,num):
   else:
     text = 'Null'
   return text
+#-------------------購物車單商品數量修改----------------------
+def revise(id,product_id,num):
+  try:
+    conn = lineboterp.db['conn']
+    cursor = lineboterp.db['cursor']
+    query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
+    cursor.execute(query)
+    inventory_result = cursor.fetchall()
+    if inventory_result != []:
+      if inventory_result[0][2] is not None:
+        if num >= 2 :
+          query1 = f"""
+              UPDATE order_details
+              SET 訂購數量 = '{num}', 商品小計 = (select 售出單價2 from Product_information where 商品ID = '{product_id}')*{num}
+              WHERE 訂單編號 = (
+              select 訂單編號
+              from Order_information
+              where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
+              """
+        else:
+          query1 = f"""
+              UPDATE order_details
+              SET 訂購數量 = '{num}', 商品小計 = (select 售出單價 from Product_information where 商品ID = '{product_id}')*{num}
+              WHERE 訂單編號 = (
+              select 訂單編號
+              from Order_information
+              where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
+              """
+      else:
+        query1 = f"""
+              UPDATE order_details
+              SET 訂購數量 = '{num}', 商品小計 = (select 售出單價 from Product_information where 商品ID = '{product_id}')*{num}
+              WHERE 訂單編號 = (
+              select 訂單編號
+              from Order_information
+              where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
+              """
+      cursor.execute(query1)
+      conn.commit()
+      text = 'ok'
+    else:
+      text = 'Null'
+  except Exception as e: #例外處理
+      conn.rollback()  # 撤銷操作恢復到操作前的狀態
+      #text = f'Commit failed: {str(e)}'
+      text = 'no'
+  return text
+#-------------------購物車單商品數量修改----------------------
+def removecart(user_id, product_id):
+    try:
+      conn = lineboterp.db['conn']
+      cursor = lineboterp.db['cursor']
+      query = f"""
+              DELETE FROM order_details 
+              WHERE 訂單編號 = (
+              select 訂單編號
+              from Order_information
+              where 會員_LINE_ID = '{user_id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}'
+              """
+      cursor.execute(query)
+      conn.commit()
+      text = 'ok'
+    except Exception as e: #例外處理
+      conn.rollback()  # 撤銷操作恢復到操作前的狀態
+      #text = f'Commit failed: {str(e)}'
+      text = 'no'
+    return text
 #-------------------修改資料UPDATE----------------------
 def test_dataUPDATE():
   return 
