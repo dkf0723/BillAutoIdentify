@@ -62,28 +62,29 @@ def orderandpreorder_check():
             if message.isdigit():
                 if(len(message) < 10):
                     check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                elif (len(message) > 10):
+                    check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                elif(message[:2] != '09'):           
+                    check_text = TextSendMessage(text='輸入電話格式錯誤！(09碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
                 else:
-                    if(message[:2] != '09'):
-                        check_text = TextSendMessage(text='輸入電話格式錯誤！(09碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
-                    else:
-                        message_storage[id+'phonenum'] = message
-                        state[id] = 'end'#從user_state轉換確認狀態
-                        check_text =TemplateSendMessage(
-                            alt_text='訂單確認',
-                            template=ConfirmTemplate(
-                                text=('==訂單資料確認==\n商品ID：%s\n商品名稱：%s\n%s數量：%s\n電話號碼：%s' % (product_id,product,message_storage[id+'ordertype'],message_storage[id+'num'],message_storage[id+'phonenum'])),
-                                    actions=[
-                                        MessageAction(
-                                            label='【1.確認】',
-                                            text='1'
-                                        ),
-                                        MessageAction(
-                                            label='【2.取消】',
-                                            text='2'
-                                        )
-                                    ]
-                                )
-                            )   
+                    message_storage[id+'phonenum'] = message
+                    state[id] = 'end'#從user_state轉換確認狀態
+                    check_text =TemplateSendMessage(
+                        alt_text='訂單確認',
+                        template=ConfirmTemplate(
+                            text=('==訂單資料確認==\n商品ID：%s\n商品名稱：%s\n%s數量：%s\n電話號碼：%s' % (product_id,product,message_storage[id+'ordertype'],message_storage[id+'num'],message_storage[id+'phonenum'])),
+                                actions=[
+                                    MessageAction(
+                                        label='【1.確認】',
+                                        text='1'
+                                    ),
+                                    MessageAction(
+                                        label='【2.取消】',
+                                        text='2'
+                                    )
+                                ]
+                            )
+                        )   
         elif state[id] =='end':
             if message == '1':
                 numtype = message_storage[id+'ordertype']
