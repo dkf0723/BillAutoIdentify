@@ -21,6 +21,8 @@ def product_check():
         check_text = cartnum()
     elif state[id] == 'cartrevise':#修改購物車單項商品數量
         check_text = cartrpnum()
+    elif state[id] in ['cartorderphonenum','cartorderrun']:#購物車訂單
+        check_text = cartorder()
     elif state[id] == 'ask':#QA
         check_text = ask()
     elif state[id] == 'wishes':#願望清單
@@ -111,7 +113,7 @@ def orderandpreorder_check():
             elif message == '2':
                 check_text = '您的商品訂/預購流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text)
-            state[id] = 'normal' #從user_state轉換普通狀態
+                state[id] = 'normal' #從user_state轉換普通狀態
     else:
         if(message == "取消"):
             check_text = '您的商品訂/預購流程\n已經取消囉～'
@@ -149,7 +151,6 @@ def orderandpreorder_check():
                                 )
                             )
         else:
-            #非數字
             check_text = '您還在訂/預購中喔！\n輸入的 "' + message + '" 不是此流程的填寫！\n請重新輸入，謝謝～'
             check_text = TextSendMessage(text=check_text),TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "')    
     return check_text
@@ -206,6 +207,117 @@ def cartrpnum():
             state[id] = 'normal' #結束流程將user_state轉換預設狀態
         else:
             check_text = cartrevise()
+    return check_text
+
+#購物車訂單
+def cartorder():
+    id = lineboterp.user_id
+    state = lineboterp.user_state
+    message = lineboterp.msg
+    message_storage = lineboterp.storage
+    if message.isdigit():
+        if state[id] == 'cartorderphonenum':
+            if message.isdigit():
+                if(len(message) < 10):
+                    check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                elif (len(message) > 10):
+                    check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                elif(message[:2] != '09'):           
+                    check_text = TextSendMessage(text='輸入電話格式錯誤！(09碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                else:
+                    state[id] = 'cartorderrun'#從user_state轉換確認狀態
+                    db_cartshow = cartsearch()
+                    showp = f"==購物車訂單資料確認==\n電話號碼：{message}\n\n"
+                    num = 1
+                    tnum = 0#總額
+                    #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
+                    for totallist in db_cartshow:
+                        showp += f"<<商品{num}>>\n商品ID：{totallist[1]}\n商品名稱：{totallist[2]}\n數量：{totallist[3]}{totallist[4]}\n小計：{totallist[5]}\n---\n"
+                        num += 1
+                        tnum += totallist[5]
+                    showp += f"總額：NT${tnum}"
+                    message_storage[id+'showp'] = showp
+                    ##購物車列表
+                    check_text =TemplateSendMessage(
+                        alt_text='購物車訂單確認',
+                        template=ConfirmTemplate(
+                            text=(showp),
+                                actions=[
+                                    MessageAction(
+                                        label='【1.確認】',
+                                        text='1'
+                                    ),
+                                    MessageAction(
+                                        label='【2.取消】',
+                                        text='2'
+                                    )
+                                ]
+                            )
+                        )   
+        elif state[id] == 'cartorderrun':
+            if message == '1':
+                '''orderinfo, establishment_message = order_create()#資料庫訂單建立
+                orderinfo = orderinfo[0]
+                if establishment_message == 'ok':
+                    if numtype == '訂購':
+                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：{str(orderinfo[4])}元\n已經可以前往「店面取貨」囉～"
+                        check_text = TextSendMessage(text=check_text),Company_location()
+                    elif numtype == '預購':
+                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：{str(orderinfo[4])}元\n注意：將於「預購結單日」傳送您是否預購成功呦～"
+                        check_text = TextSendMessage(text=check_text)
+                    state[id] = 'normal' #從user_state轉換普通狀態
+                else:
+                    check_text = TextSendMessage(text=establishment_message)'''
+                check_text = f"您的訂單已成立！\n訂單編號：商品名稱：\n數量：\n總額：元\n已經可以前往「店面取貨」囉～"
+                check_text = TextSendMessage(text=check_text),Company_location()
+            elif message == '2':
+                check_text = '您的購物車訂單流程\n已經取消囉～'
+                check_text = TextSendMessage(text=check_text)
+                state[id] = 'normal' #從user_state轉換普通狀態
+            else:
+                check_text = TextSendMessage(text='購物車訂單流程中，如想取消請打字輸入" 取消 "'),TemplateSendMessage(
+                        alt_text='購物車訂單確認',
+                        template=ConfirmTemplate(
+                            text=(message_storage[id+'showp']),
+                                actions=[
+                                    MessageAction(
+                                        label='【1.確認】',
+                                        text='1'
+                                    ),
+                                    MessageAction(
+                                        label='【2.取消】',
+                                        text='2'
+                                    )
+                                ]
+                            )
+                        )
+    else:
+        if(message == "取消"):
+            check_text = '您的購物車訂單流程\n已經取消囉～'
+            check_text = TextSendMessage(text=check_text)
+            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+        elif state[id] == 'cartorderphonenum':
+            check_text = TextSendMessage(text='購物車訂單流程中，如想取消請打字輸入" 取消 "'),TextSendMessage(text='您還在購物車訂單流程\n=>請輸入手機號號碼：')
+        elif state[id] == 'cartorderrun':
+            check_text = TextSendMessage(text='購物車訂單流程中，如想取消請打字輸入" 取消 "'),TemplateSendMessage(
+                        alt_text='購物車訂單確認',
+                        template=ConfirmTemplate(
+                            text=(message_storage[id+'showp']),
+                                actions=[
+                                    MessageAction(
+                                        label='【1.確認】',
+                                        text='1'
+                                    ),
+                                    MessageAction(
+                                        label='【2.取消】',
+                                        text='2'
+                                    )
+                                ]
+                            )
+                        )
+        else:
+            check_text = '您還在購物車訂單中喔！\n輸入的 "' + message + '" 不是此流程的填寫！\n請重新輸入，謝謝～'
+            check_text = TextSendMessage(text=check_text),TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "') 
     return check_text
 #-------------------商家地址----------------------
 def Company_location():

@@ -238,9 +238,8 @@ def handle_message(event):
         elif '取消修改清單' in msg:
             line_bot_api.reply_message(event.reply_token, cart_list())
         elif '【送出購物車訂單】' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='送出購物車訂單'))
-        elif '【修改購物車清單】' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='修改購物車清單'))
+            user_state[user_id] = 'cartorderphonenum'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='=>請輸入手機號號碼：'))
         #-------------------提問及許願----------------------
         elif '問題提問' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
