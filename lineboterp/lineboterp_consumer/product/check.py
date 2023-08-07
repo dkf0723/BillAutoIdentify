@@ -190,7 +190,9 @@ def cartrpnum():
         if text == 'ok':
             unit = unitsearch(product_id)
             check_text = ('==購物車商品成功修改數量==\n商品名稱：%s\n修改後數量： %s %s' %(product,message,unit))
-            check_text = TextSendMessage(text=check_text),cart_list()
+            cart1 = cart_list()[0]
+            cart2 = cart_list()[1]
+            check_text = [TextSendMessage(text=check_text),cart1,cart2]
             state[id] = 'normal' #結束流程將user_state轉換預設狀態
         else:
             check_text = TextSendMessage(text='購物車商品數量修改失敗！請稍後再試。')
@@ -198,7 +200,9 @@ def cartrpnum():
     else:
         if(message == "取消"):
             check_text = '您的購物車商品數量修改流程\n已經取消囉～'
-            check_text = TextSendMessage(text=check_text),cart_list()
+            cart1 = cart_list()[0]
+            cart2 = cart_list()[1]
+            check_text = [TextSendMessage(text=check_text),cart1,cart2]
             state[id] = 'normal' #結束流程將user_state轉換預設狀態
         else:
             check_text = cartrevise()

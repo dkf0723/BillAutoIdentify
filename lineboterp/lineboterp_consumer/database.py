@@ -32,22 +32,25 @@ def databasetest():
   'password': dbdata['password'],
   'database': dbdata['database']
   }
-  # Construct connection string
-  try:
-    conn = mysql.connector.connect(**config)
-    databasetest_msg = '資料庫連接成功'
-  except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-      databasetest_msg = '使用者或密碼有錯'
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-      databasetest_msg = '資料庫不存在或其他錯誤'
-    else:
-      databasetest_msg = err
-  else:
-    cursor = conn.cursor()
+  #錯誤重新執行最大3次
+  max_retries = 3  # 最大重試次數
+  retry_count = 0  # 初始化重試計數
+  while retry_count<max_retries:
+    try:
+      conn = mysql.connector.connect(**config)
+      databasetest_msg = '資料庫連接成功'
+      break
+    except mysql.connector.Error as err:
+      if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+        databasetest_msg = '使用者或密碼有錯'
+      elif err.errno == errorcode.ER_BAD_DB_ERROR:
+        databasetest_msg = '資料庫不存在或其他錯誤'
+      else:
+        databasetest_msg = err
+  db['databasetest_msg'] = databasetest_msg
+  cursor = conn.cursor()
   db['conn'] = conn
   db['cursor'] = cursor
-  db['databasetest_msg'] = databasetest_msg
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
 def member_profile(userid):
   member = lineboterp.member
@@ -57,8 +60,17 @@ def member_profile(userid):
   formatted_datetimeget = timeget['formatted_datetime']
   order_dateget = timeget['order_date']
   query = """SELECT 會員_LINE_ID FROM member_profile;""" #會員資料檢查
-  cursor.execute(query)
-  member_result = cursor.fetchall()
+  #錯誤重新執行最大3次
+  max_retries = 3  # 最大重試次數
+  retry_count = 0  # 初始化重試計數
+  while retry_count<max_retries:
+    try:
+      cursor.execute(query)
+      member_result = cursor.fetchall()
+      break
+    except mysql.connector.Error as e:
+      retry_count += 1 #重試次數累加
+
   query1 = f"""
           SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
           FROM Order_information 
@@ -129,8 +141,18 @@ def preorder_list():
                 預購截止時間 
           FROM Product_information 
           WHERE 現預購商品='預購';"""
-  cursor.execute(query)
-  result = cursor.fetchall()
+  
+  #錯誤重新執行最大3次
+  max_retries = 3  # 最大重試次數
+  retry_count = 0  # 初始化重試計數
+  while retry_count<max_retries:
+    try:
+      cursor.execute(query)
+      result = cursor.fetchall()
+      break
+    except mysql.connector.Error as e:
+      retry_count += 1 #重試次數累加
+
   if result != []:
     listbuynow = result
   else:
@@ -145,8 +167,17 @@ def buynow_list():
                   商品單位,售出單價,售出單價2,庫存數量 
           FROM Product_information 
           WHERE 現預購商品='現購' and 庫存數量>0;"""
-  cursor.execute(query)
-  result = cursor.fetchall()
+  #錯誤重新執行最大3次
+  max_retries = 3  # 最大重試次數
+  retry_count = 0  # 初始化重試計數
+  while retry_count<max_retries:
+    try:
+      cursor.execute(query)
+      result = cursor.fetchall()
+      break
+    except mysql.connector.Error as e:
+      retry_count += 1 #重試次數累加
+
   if result != []:
     listpreorder = result
   else:
@@ -354,6 +385,26 @@ def unitsearch(product_id):
     for i in result:
       unit = i[0] #單位
   return unit
+
+#單獨庫存查詢
+def stock(pid,num):
+  cursor = lineboterp.db['cursor']
+  query = f"select 庫存數量 from Product_information where 商品ID = '{pid}'"
+  cursor.execute(query)
+  inventory_result = cursor.fetchall()
+  if inventory_result != []:
+    inventory = inventory_result[0][0] #庫存數量
+    if inventory > 0:
+      if num <=inventory:
+        checkstock = 'ok'
+        renum = num
+      else:
+        checkstock = 'ok'
+        renum = inventory
+    else:
+      checkstock = 'no'
+      renum = 0
+  return checkstock,renum
 #-------------------未取訂單查詢(100筆)----------------------
 def ordertoplist():
   userid = lineboterp.user_id
@@ -431,11 +482,27 @@ def cartsearch():
     select 訂單編號
     from Order_information
     where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%')
-    """#下一頁加100改offset(目前暫無考慮)
+    """
   cursor.execute(query)
   result = cursor.fetchall()
   if result == []:
     result = '資料庫搜尋不到'
+  return result
+#-------------------購物車單一商品小計查詢----------------------
+def cartsubtotal(pid):
+  userid = lineboterp.user_id
+  cursor = lineboterp.db['cursor']
+  query = f"""
+    select 商品小計
+    from order_details
+    where 訂單編號 = (
+    select 訂單編號
+    from Order_information
+    where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%') and 商品ID = '{pid}'
+    """
+  cursor.execute(query)
+  result = cursor.fetchall()
+  result = result[0][0]
   return result
 #-------------------購物車資料新增----------------------
 def cartadd(id,product_id,num):
@@ -524,7 +591,7 @@ def revise(id,product_id,num):
       #text = f'Commit failed: {str(e)}'
       text = 'no'
   return text
-#-------------------購物車單商品數量修改----------------------
+#-------------------修改購物車清單----------------------
 def removecart(user_id, product_id):
     try:
       conn = lineboterp.db['conn']
