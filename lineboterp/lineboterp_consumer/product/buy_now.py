@@ -43,7 +43,7 @@ def product_buynow_list():
                 product_price.append(price)
                 price2 = db_preorder_list[7]#售出單價2
                 product_price2.append(price2)
-                stock_quantity = db_preorder_list[8]#預購數量限制_倍數
+                stock_quantity = db_preorder_list[8]#庫存入量
                 product_stock_quantity.append(stock_quantity)
 
 
