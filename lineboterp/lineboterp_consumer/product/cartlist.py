@@ -329,3 +329,90 @@ def editcart():
                     } 
                 )
     return edcart_show
+
+def checkcart(content,lumpsum):
+    screen_information = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "高逸嚴選",
+                    "weight": "bold",
+                    "color": "#1DB446",
+                    "size": "sm"
+                },
+                {
+                    "type": "text",
+                    "text": "購物車訂單確認",
+                    "weight": "bold",
+                    "size": "xl",
+                    "margin": "md",
+                    "align": "center"
+                },
+                {
+                    "type": "separator",
+                    "margin": "xxl"
+                },
+                {
+                    "type": "text",
+                    "text": f"{content}",#訂單內容
+                    "size": "sm",
+                    "margin": "lg",
+                    "wrap": True
+                },
+                {
+                    "type": "separator",
+                    "margin": "xxl"
+                },
+                {
+                    "type": "text",
+                    "text": f"總額：NT${str('{:,}'.format(lumpsum))}",#總額
+                    "size": "md",
+                    "margin": "lg",
+                    "align": "end",
+                    "weight": "bold"
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "【1.確認】",
+                    "text": "1"
+                    }
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "【2.取消】",
+                    "text": "2"
+                    }
+                }
+                ],
+                "spacing": "none",
+                "paddingAll": "sm"
+            },
+            "styles": {
+                "footer": {
+                "separator": True
+                }
+            }
+            }
+    
+    checkcart_show = FlexSendMessage(
+                alt_text='購物車訂單確認',
+                contents={
+                    "type": "carousel",
+                    "contents": [screen_information]   
+                    } 
+                )
+    return checkcart_show
