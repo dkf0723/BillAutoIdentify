@@ -215,6 +215,7 @@ def cartorder():
     state = lineboterp.user_state
     message = lineboterp.msg
     message_storage = lineboterp.storage
+    check_text = ''
     if message.isdigit():
         if state[id] == 'cartorderphonenum':
             if message.isdigit():
@@ -237,24 +238,27 @@ def cartorder():
                         tnum += totallist[5]
                     message_storage[id+'showp'] = showp[:-4] #訂單資訊
                     message_storage[id+'shownum'] = tnum #總額
+                    message_storage[id+'phonenum'] = message
                     ##購物車列表
                     check_text = checkcart(message_storage[id+'showp'],message_storage[id+'shownum'])
         elif state[id] == 'cartorderrun':
             if message == '1':
-                '''orderinfo, establishment_message = order_create()#資料庫訂單建立
-                orderinfo = orderinfo[0]
+                orderinfo, establishment_message = cartordergo(message_storage[id+'phonenum'])#執行購物車訂單建立
+                number = 1
+                total = 0
                 if establishment_message == 'ok':
-                    if numtype == '訂購':
-                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：{str(orderinfo[4])}元\n已經可以前往「店面取貨」囉～"
-                        check_text = TextSendMessage(text=check_text),Company_location()
-                    elif numtype == '預購':
-                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：{str(orderinfo[4])}元\n注意：將於「預購結單日」傳送您是否預購成功呦～"
-                        check_text = TextSendMessage(text=check_text)
+                    check_text = f"您的購物車訂單已成立！\n訂單編號：{str(orderinfo[0][0])}"
+                    for orderlistinfo in orderinfo:
+                        check_text += f"商品{number}名稱：{orderlistinfo[1]}\n數量：{str(orderlistinfo[3])}{str(orderlistinfo[5])}\n小計：{str('{:,}'.format(orderlistinfo[4]))}\n---\n"
+                        number += 1
+                        total += orderlistinfo[4]
+                    check_text += f"總額：{str('{:,}'.format(total))}元\n已經可以前往「店面取貨」囉～"
+                    check_text = TextSendMessage(text=check_text),Company_location()
                     state[id] = 'normal' #從user_state轉換普通狀態
                 else:
-                    check_text = TextSendMessage(text=establishment_message)'''
-                check_text = f"您的訂單已成立！\n訂單編號：商品名稱：\n數量：\n總額：元\n已經可以前往「店面取貨」囉～"
-                check_text = TextSendMessage(text=check_text),Company_location()
+                    cart1 = cart_list()[0]
+                    cart2 = cart_list()[1]
+                    check_text = [TextSendMessage(text=establishment_message),cart1,cart2]
             elif message == '2':
                 check_text = '您的購物車訂單流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text)

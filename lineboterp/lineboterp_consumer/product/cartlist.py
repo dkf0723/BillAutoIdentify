@@ -18,7 +18,7 @@ def cart_list():
         changelist = '==購物車自檢結果==\n'
         #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
         for totallist in db_cartshow:
-            dbstock,dbrnum = stock(totallist[1],totallist[3])
+            dbstock,dbrnum,order = stock(totallist[1],totallist[3])
             if dbstock == 'ok':
                 if totallist[3] == dbrnum:
                     changenum = str(totallist[3])
