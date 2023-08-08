@@ -398,13 +398,16 @@ def stock(pid,num):
       if num <=inventory:
         checkstock = 'ok'
         renum = num
+        order = 'ok'#購物車訂單建立用
       else:
         checkstock = 'ok'
         renum = inventory
+        order = 'no'
     else:
       checkstock = 'no'
       renum = 0
-  return checkstock,renum
+      order = 'no'
+  return checkstock,renum,order
 #-------------------未取訂單查詢(100筆)----------------------
 def ordertoplist():
   userid = lineboterp.user_id
@@ -611,6 +614,117 @@ def removecart(user_id, product_id):
       #text = f'Commit failed: {str(e)}'
       text = 'no'
     return text
+#-------------------購物車訂單建立----------------------
+def cartordergo(phonenum):
+  userid = lineboterp.user_id
+  conn = lineboterp.db['conn']
+  cursor = lineboterp.db['cursor']
+  timeget = time()
+  formatted_datetimeget = timeget['formatted_datetime']
+  order_dateget = timeget['order_date']
+  stockcheck = 'ok'#預設庫存檢查無誤
+  establishment_message = '' #訂單檢查回傳訊息
+  
+  dblistcart = cartsearch()#購物車所有查詢(訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計)
+  for totallist in dblistcart:
+    pid = totallist[1]#商品ID
+    num = totallist[3]#訂購數量
+    checkstock,renum,order = stock(pid,num) #使用order即可=='ok'
+    if order != 'ok':
+      stockcheck = 'no'#庫存檢查錯誤
+      establishment_message += f"商品名稱：{totallist[3]}，訂單建立庫存檢查不足！\n"
+
+  if stockcheck == 'ok':#庫存無誤執行建立訂單流程
+    query2 = f"""
+            SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
+            FROM Order_information 
+            WHERE 訂單編號 like'order%' and 訂單成立時間 <= '{formatted_datetimeget}'
+            ORDER BY 訂單成立時間 DESC , 訂單編號 DESC;""" #訂單資料檢查
+    cursor.execute(query2)
+    order_result = cursor.fetchall()
+
+    if order_result == []:
+      serial_number = '00001'
+      query3_1 = f"""
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+            """
+      cursor.execute(query3_1)
+      conn.commit()#建立訂單資訊
+
+      query3_2 = f"""
+            UPDATE order_details
+            SET 訂單編號 = 'order{order_dateget}{serial_number}'
+            WHERE 訂單編號 = (
+            select 訂單編號 
+            from Order_information 
+            where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%');
+            """#將購物車編號轉換訂單編號
+      cursor.execute(query3_2)
+      conn.commit()
+      query3_3 = f"""
+            UPDATE Order_information
+            SET 總額 = (
+                SELECT SUM(商品小計) AS 小計
+                FROM order_details
+                WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
+            )
+            WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
+            """#訂單資訊總額計算
+      cursor.execute(query3_3)
+      conn.commit()
+      establishment_message = 'ok'
+      query4_1 = f"""
+                SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
+                FROM order_details Natural Join Product_information 
+                Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
+      cursor.execute(query4_1)
+      orderinfo = cursor.fetchall()
+    else:
+      checkaddtime = order_result[0][0]#取得最新一筆訂單序號
+      if checkaddtime[5:13] == f"{str(order_dateget)}":
+        serial_number = int(checkaddtime[13:])+1
+        serial_number = '0000'+str(serial_number)
+        if len(serial_number) != 5:
+          serial_number = serial_number[-5:]
+      else:
+        serial_number = '00001'
+      addorder = f"""
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+            """
+      cursor.execute(addorder)
+      conn.commit()
+      addorderdetails = f"""
+            UPDATE order_details
+            SET 訂單編號 = 'order{order_dateget}{serial_number}'
+            WHERE 訂單編號 = (
+            select 訂單編號 
+            from Order_information 
+            where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%');
+            """#將購物車編號轉換訂單編號
+      cursor.execute(addorderdetails)
+      conn.commit()
+      addtotalcost = f"""
+            UPDATE Order_information
+            SET 總額 = (
+                SELECT SUM(商品小計) AS 小計
+                FROM order_details
+                WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
+            )
+            WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
+            """
+      cursor.execute(addtotalcost)
+      conn.commit()
+      establishment_message = 'ok'
+      query4_2 = f"""
+                SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
+                FROM order_details Natural Join Product_information 
+                Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
+      cursor.execute(query4_2)
+      orderinfo = cursor.fetchall()
+  return orderinfo, establishment_message
+
 #-------------------修改資料UPDATE----------------------
 def test_dataUPDATE():
   return 
