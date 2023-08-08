@@ -632,9 +632,23 @@ def cartordergo(phonenum):
     checkstock,renum,order = stock(pid,num) #使用order即可=='ok'
     if order != 'ok':
       stockcheck = 'no'#庫存檢查錯誤
-      establishment_message += f"商品名稱：{totallist[3]}，訂單建立庫存檢查不足！\n"
+      establishment_message += f"商品名稱：{totallist[2]}，訂單建立庫存檢查不足！\n"
 
   if stockcheck == 'ok':#庫存無誤執行建立訂單流程
+    #修改庫存
+    for totallist in dblistcart:
+      query0 = f"select 庫存數量 from Product_information where 商品ID = '{totallist[1]}'"
+      cursor.execute(query0)
+      inventory_result = cursor.fetchall()
+      inventory = inventory_result[0][0] #現在庫存數量
+      query01 =f"""
+                  UPDATE Product_information
+                  SET 庫存數量 = '{str(int(inventory)-int(totallist[3]))}'
+                  WHERE 商品ID = '{totallist[1]}'
+                  """
+      cursor.execute(query01)
+      conn.commit()
+
     query2 = f"""
             SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
             FROM Order_information 
