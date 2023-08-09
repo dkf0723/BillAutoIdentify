@@ -239,7 +239,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, cart_list())
         elif '【送出購物車訂單】' in msg:
             user_state[user_id] = 'cartorderphonenum'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='=>請輸入手機號號碼：'))
+            line_bot_api.reply_message(event.reply_token, [TextSendMessage(text='購物車訂單流程中，如想取消請打字輸入" 取消 "'),TextSendMessage(text='購物車訂單填寫\n=>請打字輸入手機號碼：\nex.0952000000')])
         #-------------------提問及許願----------------------
         elif '問題提問' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
