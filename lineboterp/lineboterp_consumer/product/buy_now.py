@@ -268,7 +268,7 @@ def Order_buynow():
     user_state[user_id] = 'ordering'#從user_state轉換訂購狀態
     # 建立 Quick Reply 按鈕
     quick_reply_message = TextSendMessage(
-        text='商品ID：%s\n商品名稱：%s\n=>請輸入訂購數量：' %(product_id,product),
+        text='商品ID：%s\n商品名稱：%s\n=>請輸入現購數量：' %(product_id,product),
         quick_reply=QuickReply(items=quantity_option)
     )
     Order_buynow_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),quick_reply_message

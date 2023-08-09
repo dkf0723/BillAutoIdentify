@@ -184,13 +184,13 @@ def orderdtsearch():
 *電話號碼：{str(db_orderdt[0][1])}
 
 """
-        showlater = f"""訂單總額：NT${db_orderdt[0][8]}"""     
+        showlater = f"""訂單總額：NT${str('{:,}'.format(db_orderdt[0][8]))}"""     
         num = 1
         while len(db_orderdt) > 0:
             dt = f"""=>商品{num}
 品名：{db_orderdt[0][4]}
 數量：{db_orderdt[0][6]}{db_orderdt[0][5]}
-小計：{db_orderdt[0][7]}
+小計：{str('{:,}'.format(db_orderdt[0][7]))}
 ----------------------------
 """
             show += dt

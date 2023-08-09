@@ -45,8 +45,8 @@ def orderandpreorder_check():
             # 處理完問題後，結束等待回覆狀態
         if state[id] == 'ordering':
             message_storage[id+'num'] = message
-            message_storage[id+'ordertype'] = '訂購'
-            check_text = ('商品名稱：%s\n您輸入的訂購數量： %s' %(product,message))
+            message_storage[id+'ordertype'] = '現購'
+            check_text = ('商品名稱：%s\n您輸入的現購數量： %s' %(product,message))
             check_text += '\n=>請接著，打字輸入「電話號碼」\nex.0952000000'
             duplicate_save[id] = check_text
             check_text = TextSendMessage(text=check_text)
@@ -71,10 +71,15 @@ def orderandpreorder_check():
                 else:
                     message_storage[id+'phonenum'] = message
                     state[id] = 'end'#從user_state轉換確認狀態
-                    check_text =TemplateSendMessage(
+                    localsubtotal,dbunitin = quickcalculation(product_id,int(message_storage[id+'num']))#快速計算小計
+                    if str(localsubtotal).isdigit():
+                        subtotal = str('{:,}'.format(localsubtotal))
+                        message_storage[id+'subtotalin'] = subtotal
+                        message_storage[id+'unitin'] = dbunitin
+                        check_text =TemplateSendMessage(
                         alt_text='訂單確認',
                         template=ConfirmTemplate(
-                            text=('==訂單資料確認==\n商品ID：%s\n商品名稱：%s\n%s數量：%s\n電話號碼：%s' % (product_id,product,message_storage[id+'ordertype'],message_storage[id+'num'],message_storage[id+'phonenum'])),
+                            text=(f"==訂單資料確認==\n商品ID：{product_id}\n商品名稱：{product}\n電話號碼：{message_storage[id+'phonenum']}\n{message_storage[id+'ordertype']}數量：{message_storage[id+'num']+message_storage[id+'unitin']}\n總計：NT${message_storage[id+'subtotalin']}"),
                                 actions=[
                                     MessageAction(
                                         label='【1.確認】',
@@ -86,7 +91,10 @@ def orderandpreorder_check():
                                     )
                                 ]
                             )
-                        )   
+                        )
+                    else:
+                        check_text = TextSendMessage(text=localsubtotal)
+                       
         elif state[id] =='end':
             if message == '1':
                 numtype = message_storage[id+'ordertype']
@@ -114,6 +122,23 @@ def orderandpreorder_check():
                 check_text = '您的商品訂/預購流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text)
                 state[id] = 'normal' #從user_state轉換普通狀態
+            else:
+                check_text = TemplateSendMessage(
+                            alt_text='訂單確認',
+                            template=ConfirmTemplate(
+                                text=(f"==訂單資料確認==\n商品ID：{product_id}\n商品名稱：{product}\n電話號碼：{message_storage[id+'phonenum']}\n{message_storage[id+'ordertype']}數量：{message_storage[id+'num']+message_storage[id+'unitin']}\n總計：NT${message_storage[id+'subtotalin']}"),
+                                    actions=[
+                                        MessageAction(
+                                            label='【1.確認】',
+                                            text='1'
+                                        ),
+                                        MessageAction(
+                                            label='【2.取消】',
+                                            text='2'
+                                        )
+                                    ]
+                                )
+                            )
     else:
         if(message == "取消"):
             check_text = '您的商品訂/預購流程\n已經取消囉～'
@@ -137,7 +162,7 @@ def orderandpreorder_check():
             check_text = TemplateSendMessage(
                             alt_text='訂單確認',
                             template=ConfirmTemplate(
-                                text=('==訂單資料確認==\n商品名稱：%s\n訂購數量：%s\n%s' % (product,message_storage[id+'num'],message_storage[id+'phonenum'])),
+                                text=(f"==訂單資料確認==\n商品ID：{product_id}\n商品名稱：{product}\n電話號碼：{message_storage[id+'phonenum']}\n{message_storage[id+'ordertype']}數量：{message_storage[id+'num']+message_storage[id+'unitin']}\n總計：NT${message_storage[id+'subtotalin']}"),
                                     actions=[
                                         MessageAction(
                                             label='【1.確認】',

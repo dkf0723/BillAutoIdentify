@@ -408,6 +408,29 @@ def stock(pid,num):
       renum = 0
       order = 'no'
   return checkstock,renum,order
+
+#單獨計算小計=數量*售出單價或售出單價2
+def quickcalculation(pid,pnum):
+  cursor = lineboterp.db['cursor']
+  query = f"select 售出單價,售出單價2,商品單位 from Product_information where 商品ID = '{pid}'"
+  cursor.execute(query)
+  price_result = cursor.fetchall()
+  if price_result != []:
+    for row in price_result:
+      price1 = row[0]
+      if row[1] is not None:
+        price2 = row[1]
+      else:
+        price2 = row[0]
+      nuit = row[2]
+    if pnum >= 2:
+      subtotal_result = pnum * price2
+    else:
+      subtotal_result = pnum * price1
+  else:
+    subtotal_result = '計算小計時發生錯誤！'
+  return subtotal_result,nuit
+
 #-------------------未取訂單查詢(100筆)----------------------
 def ordertoplist():
   userid = lineboterp.user_id
