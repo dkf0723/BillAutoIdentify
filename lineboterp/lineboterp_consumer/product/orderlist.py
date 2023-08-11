@@ -5,6 +5,75 @@ from linebot.models import *
 import lineboterp
 from database  import *
 
+#-------------------訂單3查詢選擇----------------------
+def orderchoose():
+    inquire = {
+    "type": "bubble",
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "text",
+            "text": "請選擇查詢項目：\n【未取 / 預購 / 歷史】訂單",
+            "size": "lg",
+            "wrap": True
+        }
+        ]
+    },
+    "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "【未取訂單】",
+            "text": "未取訂單列表"
+            }
+        },
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "【預購訂單】",
+            "text": "預購訂單列表"
+            }
+        },
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "【歷史訂單】",
+            "text": "歷史訂單列表"
+            }
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [],
+            "margin": "sm"
+        }
+        ],
+        "flex": 0
+    }
+    }
+    orderinquire_show = FlexSendMessage(
+            alt_text="【未取/預購/歷史】訂單 查詢選擇",
+            contents={
+                "type": "carousel",
+                "contents": [inquire]    
+                } 
+            )
+    return orderinquire_show
 #-------------------未取列表----------------------
 def ordernottaken_list():
     db_nottaken = ordertoplist()
@@ -85,6 +154,85 @@ def ordernottaken_list():
             )
     return ordernottaken_show
 
+#-------------------預購列表----------------------
+def orderpreorder_list():
+    db_nottaken = orderpreorderlist()
+    if db_nottaken=='找不到符合條件的資料。':
+        orderpreorder_show = TextSendMessage(text='您尚未有未取資料')
+    else:
+        orderpreorder_show = []#發送全部
+        orderpreorder_handlelist = []#處理切割db_nottaken資料10筆一組
+
+        # 迴圈每次取出10個元素，並將這兩個元素作為一個子陣列存入結果陣列中，直到取完為止
+        while len(db_nottaken) > 0:
+            two_elements = db_nottaken[:10]  # 取得10個元素
+            orderpreorder_handlelist.append(two_elements)  # 將10個元素作為一個子陣列加入結果陣列
+            db_nottaken = db_nottaken[10:]  # 移除已取得的元素
+
+        for totallist in orderpreorder_handlelist:
+            buttons = []  # #模塊中10筆資料
+            for i in range(len(totallist)):
+                lumpsum = totallist[i][1]
+                if lumpsum is not None:
+                    lumpsum_formatted = '{:,}'.format(lumpsum)
+                dtime = totallist[i][2].strftime('%Y-%m-%d %H:%M')
+                button = {
+                    "type": "button",
+                    "action": {
+                        "type": "message",
+                        "label": f"[{dtime}] NT${lumpsum_formatted}",
+                        "text": f"【訂單詳細】{dtime}\n{totallist[i][0]}"
+                    }
+                }
+                buttons.append(button)
+
+            orderpreorder_show.append({
+                    "type": "bubble",
+                    "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                        {
+                        "type": "text",
+                        "text": "高逸嚴選",
+                        "weight": "bold",
+                        "color": "#1DB446",
+                        "size": "sm"
+                        },
+                        {
+                        "type": "text",
+                        "text": "預購訂單查詢",
+                        "weight": "bold",
+                        "size": "xxl",
+                        "margin": "md"
+                        },
+                        {
+                        "type": "separator",
+                        "margin": "xxl"
+                        },
+                        {
+                        "type": "box",
+                        "layout": "vertical",
+                        "margin": "md",
+                        "contents": buttons
+                        }
+                    ]
+                    },
+                    "styles": {
+                    "footer": {
+                        "separator": True
+                    }
+                    }
+                })
+        
+        orderpreorder_show = FlexSendMessage(
+            alt_text="預購訂單查詢",
+            contents={
+                "type": "carousel",
+                "contents": orderpreorder_show      
+                } 
+            )
+    return orderpreorder_show
 #-------------------已取列表----------------------
 def orderhastaken_list():
     db_hastaken = ordertopalllist()

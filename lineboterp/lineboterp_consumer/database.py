@@ -230,11 +230,15 @@ def order_create():
 
   if order_result == []:
     serial_number = '00001'
-    order_details,establishmentget = order_detail(serial_number,conn,cursor)
+    order_details,establishmentget,sort = order_detail(serial_number,conn,cursor)
     establishment_message = establishmentget
+    if sort == '現購':
+      sorttype = '未取'
+    elif sort == '預購':
+      sorttype = '預購'
     query3_1 = f"""
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
           """
     cursor.execute(query3_1)
     conn.commit()
@@ -271,11 +275,15 @@ def order_create():
         serial_number = serial_number[-5:]
     else:
       serial_number = '00001'
-    order_details, establishmentget = order_detail(serial_number,conn,cursor)
+    order_details, establishmentget,sort = order_detail(serial_number,conn,cursor)
     establishment_message = establishmentget
+    if sort == '現購':
+      sorttype = '未取'
+    elif sort == '預購':
+      sorttype = '預購'
     addorder = f"""
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
           """
     cursor.execute(addorder)
     conn.commit()
@@ -332,7 +340,7 @@ def order_detail(serial_number,conn,cursor):
           else:
             order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
         else:
-          establishment_message = f"商品id：{orderall[0]},訂購數量：{str(orderall[1])},庫存剩餘數量不足！"
+          establishment_message = f"商品id：{orderall[0]},預購數量：{str(orderall[1])},庫存剩餘數量不足！"
         query1 =f"""
                 UPDATE Product_information
                 SET 庫存數量 = '{str(int(inventory)-int(orderall[1]))}'
@@ -350,7 +358,7 @@ def order_detail(serial_number,conn,cursor):
           order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
   else:
     establishment_message = '資料庫查無此商品資料'
-  return order_details,establishment_message
+  return order_details,establishment_message,sort
 
 #預購倍數查詢
 def multiplesearch(product_id):
@@ -448,6 +456,23 @@ def ordertoplist():
   if result == []:
     result = '找不到符合條件的資料。'
   return result
+#-------------------預購訂單查詢(100筆)----------------------
+def orderpreorderlist():
+  userid = lineboterp.user_id
+  conn = lineboterp.db['conn']
+  cursor = lineboterp.db['cursor']
+  query = f"""
+    select 訂單編號,總額,訂單成立時間
+    from `Order_information` 
+    where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 = '預購'
+    order by 訂單成立時間 desc
+    limit 100 offset 0
+    """#下一頁加100改offset(目前暫無考慮)
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    result = '找不到符合條件的資料。'
+  return result
 #-------------------歷史訂單查詢(100筆)----------------------
 def ordertopalllist():
   userid = lineboterp.user_id
@@ -456,7 +481,7 @@ def ordertopalllist():
   query = f"""
         select 訂單編號,總額,訂單成立時間,訂單狀態未取已取,取貨完成時間
         from `Order_information`
-        where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 <> '未取' and 訂單編號 not like 'cart%'
+        where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 <> '未取' and 訂單狀態未取已取 <> '預購' and 訂單編號 not like 'cart%'
         order by 訂單成立時間 desc
         limit 100 offset 0
         """#下一頁加100改offset(目前暫無考慮)

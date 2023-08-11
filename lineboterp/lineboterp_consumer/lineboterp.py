@@ -158,25 +158,12 @@ def handle_message(event):
                 )
             ))
         elif '訂單查詢' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='未取訂單/歷史訂單 查詢選擇',
-            template=ConfirmTemplate(
-                    text='請選擇查詢項目：\n【未取訂單】或是【歷史訂單】',
-                    actions=[
-                        MessageAction(
-                            label='【未取訂單】',
-                            text='未取訂單列表'
-                        ),
-                        MessageAction(
-                            label='【歷史訂單】',
-                            text='歷史訂單列表'
-                        )
-                    ]
-                )
-            ))
+            line_bot_api.reply_message(event.reply_token, orderchoose())
         elif '未取訂單列表' in msg:
             ordernottaken = ordernottaken_list()
             line_bot_api.reply_message(event.reply_token, ordernottaken)
+        elif '預購訂單列表' in msg:
+            line_bot_api.reply_message(event.reply_token, orderpreorder_list())
         elif '歷史訂單列表' in msg:
             history = orderhastaken_list()
             line_bot_api.reply_message(event.reply_token, history)
