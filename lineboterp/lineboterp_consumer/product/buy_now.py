@@ -254,7 +254,7 @@ def Order_buynow():
     product_id = lineboterp.product[user_id+'product_id']
     product = lineboterp.product[user_id+'product']
     product_order_preorder = lineboterp.product_order_preorder
-    product_order_preorder[user_id] = '訂購'
+    product_order_preorder[user_id] = '現購'
     #Quick Reply 按鈕數量範圍
     quantity_option = []
     unit = unitsearch(product_id)
