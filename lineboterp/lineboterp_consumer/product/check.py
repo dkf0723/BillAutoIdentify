@@ -25,7 +25,7 @@ def product_check():
         check_text = cartorder()
     elif state[id] == 'ask':#QA
         check_text = ask()
-    elif state[id] == 'wishes':#願望清單
+    elif state[id] in ['wishes','wishesreason','wishessource','wishesimg','wishescheck']:#願望清單
         check_text = wishes()
     return check_text
 
