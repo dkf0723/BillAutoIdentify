@@ -787,9 +787,45 @@ def cartordergo(phonenum):
       orderinfo = cursor.fetchall()
   return orderinfo, establishment_message
 
-#-------------------修改資料UPDATE----------------------
-def test_dataUPDATE():
-  return 
+#-------------------許願商品建立----------------------
+def wishessend(wishesname,wishesreason,wishessource,img):
+  userid = lineboterp.user_id
+  try:
+    conn = lineboterp.db['conn']
+    cursor = lineboterp.db['cursor']
+    timeget = time()
+    formatted_datetimeget = timeget['formatted_datetime']
+    query =f"""
+            INSERT INTO wishlist (商品名稱,推薦原因,資料來源,商品圖片,願望建立時間,會員_LINE_ID)
+            VALUES ( '{wishesname}', '{wishesreason}','{wishessource}','{img}','{formatted_datetimeget}','{userid}');    
+              """
+    cursor.execute(query)
+    conn.commit()
+    confirmationmessage = 'ok'
+  except Exception as e: #例外處理
+      conn.rollback()  # 撤銷操作恢復到操作前的狀態
+      #text = f'Commit failed: {str(e)}'
+      confirmationmessage = 'no'
+  return confirmationmessage
+
+#-------------------(單張)images資料夾中圖片轉連結、完成並刪除----------------------
+def single_imagetolink():
+  id = lineboterp.user_id
+  storageimg = lineboterp.storage
+  imgurdata = imgurinfo()
+  # 取得圖片路徑
+  image_files = f"{storageimg[id+'img']}" #例：images/FXR0.jpg
+  #執行轉換連結
+  CLIENT_ID = imgurdata['CLIENT_ID_data']
+  PATH = image_files
+  title = image_files[:-4]
+  im = pyimgur.Imgur(CLIENT_ID)
+  uploaded_image = im.upload_image(PATH, title=title)
+  imagelink = uploaded_image.link
+  storageimg[id+'imagelink'] = imagelink #儲存圖片連結
+  #執行資料夾中此圖片刪除
+  if os.path.isfile(image_files):
+      os.remove(image_files)
 
 #-------------------圖片取得並發送----------------------
 def imagesent():
@@ -857,4 +893,3 @@ def imagetolink():
     print( imagetitle + "連結：" + imagelink)
     #delete_images()#刪除images檔案圖片
   return {'imagetitle':imagetitle,'imagelink':imagelink}
-

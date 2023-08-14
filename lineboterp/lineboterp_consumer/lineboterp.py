@@ -18,16 +18,17 @@ from ask_wishes.wishes import *
 from relevant_information import linebotinfo
 from product.cartlist import *
 from product.orderlist import *
-#======python的函數庫==========
+#======python的函式庫==========
 import tempfile, os
 import datetime
 import schedule #排程
 import threading #排程執行緒
 import time
 import requests
+import string #字符串處理相關的工具
+import random #隨機產生
 #安裝schedule套件=> pip install schedule
-#======python的函數庫==========
-
+#=========================
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 linebotdata = linebotinfo()
@@ -93,6 +94,7 @@ def handle_message(event):
     #-------------------確認使用者狀態進行處理----------------------
     #使用者狀態不屬於normal，不允許進行其他動作
     if user_state[user_id] != 'normal':
+        #執行使用者狀態處理
         check_text = product_check()
         line_bot_api.reply_message(event.reply_token, check_text)
     else:
@@ -231,7 +233,9 @@ def handle_message(event):
         elif '問題提問' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
         elif '許願商品' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='許願商品'))
+            user_state[user_id] = 'wishes'
+            storage[user_id+'wishesstep'] = 1
+            line_bot_api.reply_message(event.reply_token, initial_fill_screen())
         #-------------------執行購買或預購----------------------
         elif '【立即購買】' in msg:
             original_string = msg
@@ -321,9 +325,23 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, imgsend)
         #-------------------非上方功能的所有回覆----------------------
         else:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
+            if '【商品簡介】' not in msg:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
         #return user_id,user_state
 
+#使用者圖片處理
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image_message(event):
+    if user_state[user_id] == 'wishesimg':#願望圖片上傳狀態執行
+        image_name = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(4))#為圖片隨機命名
+        image_content = line_bot_api.get_message_content(event.message.id)#取得訊息的ID
+        image_name = image_name.upper()+'.jpg'#轉換大寫並加入副檔名
+        path='images/'+image_name #儲存資料夾路徑
+        with open(path, 'wb') as fd: #執行檔案寫入
+            for chunk in image_content.iter_content():
+                fd.write(chunk)
+        storage[user_id+'img'] = path #暫存圖片路徑
+        line_bot_api.reply_message(event.reply_token, wishes())
 
 @handler.add(PostbackEvent)
 def handle_message(event):
