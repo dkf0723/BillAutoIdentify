@@ -42,7 +42,7 @@ def wishes():
                 message_storage[id+'wishesall'] = f"1.許願商品名稱：{message}"
                 edit_text = f"{message_storage[id+'wishesall']}\n=>2.推薦原因(100字內)：<打字輸入>"
                 message_storage[id+'wishesstep'] += 1
-                check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])
+                check_text = skip_screen(edit_text,message_storage[id+'wishesstep'])#可略
                 message_storage[id+'userfilter'] = check_text
                 state[id] = 'wishesreason'
             else:
@@ -53,7 +53,7 @@ def wishes():
                 message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n2.推薦原因：{message}"
                 edit_text = f"{message_storage[id+'wishesall']}\n=>3.想法來源(可以是連結呦～)：<打字輸入>"
                 message_storage[id+'wishesstep'] += 1
-                check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])
+                check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])#不可略
                 message_storage[id+'userfilter'] = check_text
                 state[id] = 'wishessource'
             else:
@@ -63,7 +63,7 @@ def wishes():
             message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n想法來源：{message}"
             edit_text = f"{message_storage[id+'wishesall']}\n=>4.商品圖片：<發送 圖/照片>"
             message_storage[id+'wishesstep'] += 1
-            check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])
+            check_text = pictureup_screen(edit_text,message_storage[id+'wishesstep'])#相機相簿功能
             message_storage[id+'userfilter'] = check_text
             state[id] = 'wishesimg'
         elif state[id] == 'wishesimg':
@@ -282,7 +282,106 @@ def initial_fill_screen():
                     } 
                 )
     return initial_fill_screen_show
-#填寫畫面2～4
+
+#可略過，填寫畫面2
+def skip_screen(allcontent,wishesstep):
+    skip_information = {
+                "type": "bubble",
+                "hero": {
+                    "type": "image",
+                    "url": "https://i.imgur.com/rGlTAt3.jpg",
+                    "size": "full",
+                    "aspectRatio": "20:13",
+                    "aspectMode": "cover"
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": f"許願商品填寫({wishesstep}/4)",
+                        "weight": "bold",
+                        "size": "xl",
+                        "align": "center"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "margin": "lg",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "baseline",
+                            "spacing": "sm",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{allcontent}",
+                                "wrap": True,
+                                "color": "#666666",
+                                "size": "sm",
+                                "flex": 5
+                            }
+                            ]
+                        }
+                        ]
+                    }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "略過",
+                        "text": "(略過)"
+                        },
+                        "color": "#A44528",
+                        "style": "primary"
+                    },
+                    {
+                        "type": "button",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "重新填寫",
+                        "text": "重新填寫"
+                        },
+                        "color": "#5F403B",
+                        "style": "primary"
+                    },
+                    {
+                        "type": "button",
+                        "style": "link",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "取消",
+                        "text": "取消"
+                        }
+                    }
+                    ],
+                    "flex": 0
+                }
+                }
+
+    skipscreen_show = FlexSendMessage(
+                alt_text='購物車訂單確認',
+                contents={
+                    "type": "carousel",
+                    "contents": [skip_information]   
+                    } 
+                )
+    return skipscreen_show
+
+#填寫畫面3
 def fill_out_the_screen(allcontent,wishesstep):
     screen_information = {
                 "type": "bubble",
@@ -342,7 +441,7 @@ def fill_out_the_screen(allcontent,wishesstep):
                         "label": "重新填寫",
                         "text": "重新填寫"
                         },
-                        "color": "#B17157",
+                        "color": "#A44528",
                         "style": "primary"
                     },
                     {
@@ -368,3 +467,123 @@ def fill_out_the_screen(allcontent,wishesstep):
                     } 
                 )
     return fill_out_the_screen_show
+
+#相簿相機，填寫畫面4
+def pictureup_screen(allcontent,wishesstep):
+    pictureup_information = {
+                    "type": "bubble",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://i.imgur.com/rGlTAt3.jpg",
+                        "size": "full",
+                        "aspectRatio": "20:13",
+                        "aspectMode": "cover"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": f"許願商品填寫({wishesstep}/4)",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "sm",
+                            "contents": [
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": f"{allcontent}",
+                                    "wrap": True,
+                                    "color": "#666666",
+                                    "size": "sm",
+                                    "flex": 5
+                                }
+                                ]
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "uri",
+                            "label": "開啟相簿發送",
+                            "uri": "https://line.me/R/nv/cameraRoll/single"
+                            },
+                            "color": "#A44528",
+                            "style": "primary",
+                            "height": "sm"
+                        },
+                        {
+                            "type": "button",
+                            "height": "sm",
+                            "action": {
+                            "type": "uri",
+                            "label": "開啟相機發送",
+                            "uri": "https://line.me/R/nv/camera/"
+                            },
+                            "color": "#5F403B",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "button",
+                            "height": "sm",
+                            "action": {
+                            "type": "message",
+                            "label": "略過",
+                            "text": "(略過)"
+                            },
+                            "color": "#9C8C6C",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "button",
+                            "height": "sm",
+                            "action": {
+                            "type": "message",
+                            "label": "重新填寫",
+                            "text": "重新填寫"
+                            },
+                            "color": "#C9B0A8",
+                            "style": "primary"
+                        },
+                        {
+                            "type": "button",
+                            "style": "link",
+                            "height": "sm",
+                            "action": {
+                            "type": "message",
+                            "label": "取消",
+                            "text": "取消"
+                            }
+                        }
+                        ],
+                        "flex": 0
+                    }
+                    }
+
+    pictureup_show = FlexSendMessage(
+                alt_text='購物車訂單確認',
+                contents={
+                    "type": "carousel",
+                    "contents": [pictureup_information]   
+                    } 
+                )
+    return pictureup_show
