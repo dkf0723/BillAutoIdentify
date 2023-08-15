@@ -73,7 +73,7 @@ global orderall
 orderall = {}
 global db
 db = {}
-
+global msgtype
 
 #首次資料庫連線，最底下有排程設定
 databasetest()
@@ -83,6 +83,8 @@ databasetest()
 def handle_message(event):
     global user_id
     global msg
+    global msgtype
+    msgtype = event.message.type
     msg = event.message.text
     user_id = event.source.user_id
     #-------------------檢查是否有在會員名單並且有自己的購物車----------------------
@@ -235,6 +237,7 @@ def handle_message(event):
         elif '許願商品' in msg:
             user_state[user_id] = 'wishes'
             storage[user_id+'wishesstep'] = 1
+            storage[user_id+'userfilter'] = 'NaN'
             line_bot_api.reply_message(event.reply_token, initial_fill_screen())
         #-------------------執行購買或預購----------------------
         elif '【立即購買】' in msg:
@@ -332,6 +335,8 @@ def handle_message(event):
 #使用者圖片處理
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
+    global msgtype
+    msgtype = event.message.type
     if user_state[user_id] == 'wishesimg':#願望圖片上傳狀態執行
         image_name = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(4))#為圖片隨機命名
         image_content = line_bot_api.get_message_content(event.message.id)#取得訊息的ID
@@ -342,6 +347,12 @@ def handle_image_message(event):
                 fd.write(chunk)
         storage[user_id+'img'] = path #暫存圖片路徑
         line_bot_api.reply_message(event.reply_token, wishes())
+    else:
+        if user_state[user_id] in ['wishes','wishesreason','wishessource','wishescheck']:#以下狀態皆不需要接收到圖片
+            wishesin = wishes()
+            line_bot_api.reply_message(event.reply_token, [TextSendMessage(text='目前動作狀態無需發送照片呦～'),wishesin[1]])
+        else:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='目前動作狀態無需發送照片呦～'))
 
 @handler.add(PostbackEvent)
 def handle_message(event):
