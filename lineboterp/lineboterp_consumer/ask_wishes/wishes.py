@@ -12,19 +12,35 @@ def wishes():
     state = lineboterp.user_state
     message = lineboterp.msg
     message_storage = lineboterp.storage
+    msgtype = lineboterp.msgtype
     #商品名稱,商品圖片,推薦原因,願望建立時間,會員_LINE_ID,資料來源
     #使用者行為過濾
     userfilter = ['重新填寫','取消','營業資訊','團購商品','【預購商品】列表','【現購商品】列表','訂單/購物車查詢',
                     '訂單查詢','未取訂單列表','預購訂單列表','歷史訂單列表','【訂單詳細】','【加入購物車】',
                     '查看購物車','【修改數量】','修改購物車清單','【清單移除商品】','取消修改清單',
                     '【送出購物車訂單】','問題提問','許願商品','【立即購買】','【手刀預購】',
-                    '【現購列表下一頁】','【預購列表下一頁】','資料庫','測試','圖片']
-    if message not in userfilter:
+                    '【現購列表下一頁】','【預購列表下一頁】','資料庫','測試','圖片']#'圖片'不能刪是過程中來圖改變對接口
+    #行為過濾比對
+    for i in userfilter:
+        filterresult = 'ok'#預設值
+        if msgtype != 'text':#message 訊息屬性除了text
+            if state[id] in ['wishes','wishesreason','wishessource','wishescheck']:#以下狀態皆不需要接收到圖片
+                filterresult = 'no'
+                break
+            elif state[id] == 'wishesimg' and msgtype == 'image':
+                filterresult = 'ok'
+                break
+        else:
+            if i in message:
+                filterresult = 'no'
+                break
+
+    if filterresult == 'ok': #if message not in userfilter:
         if state[id] == 'wishes':
             message_storage[id+'wishesname'] = message #商品名稱
             if len(message) <= 15:
                 message_storage[id+'wishesall'] = f"1.許願商品名稱：{message}"
-                edit_text = f"{message_storage[id+'wishesall']}\n=>2.請打字輸入推薦原因：(100字內)"
+                edit_text = f"{message_storage[id+'wishesall']}\n=>2.推薦原因(100字內)：<打字輸入>"
                 message_storage[id+'wishesstep'] += 1
                 check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])
                 message_storage[id+'userfilter'] = check_text
@@ -35,7 +51,7 @@ def wishes():
             message_storage[id+'wishesreason'] = message #推薦原因
             if len(message) <= 100:
                 message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n2.推薦原因：{message}"
-                edit_text = f"{message_storage[id+'wishesall']}\n=>3.請打字輸入資料來源：(可以是連結呦～)"
+                edit_text = f"{message_storage[id+'wishesall']}\n=>3.想法來源(可以是連結呦～)：<打字輸入>"
                 message_storage[id+'wishesstep'] += 1
                 check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])
                 message_storage[id+'userfilter'] = check_text
@@ -44,8 +60,8 @@ def wishes():
                 check_text = TextSendMessage(text = f"2.推薦原因：「{message}」，長度大於100個字請縮短文字呦～")
         elif state[id] == 'wishessource':
             message_storage[id+'wishessource'] = message #資料來源
-            message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n3.資料來源：{message}"
-            edit_text = f"{message_storage[id+'wishesall']}\n=>4.請上傳商品圖片："
+            message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n想法來源：{message}"
+            edit_text = f"{message_storage[id+'wishesall']}\n=>4.商品圖片：<發送 圖/照片>"
             message_storage[id+'wishesstep'] += 1
             check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])
             message_storage[id+'userfilter'] = check_text
@@ -53,7 +69,7 @@ def wishes():
         elif state[id] == 'wishesimg':
             if '.jpg' in message_storage[id+'img']:#檢查暫存的圖片內容路徑
                 single_imagetolink()#執行圖片轉換連結(單張)
-                message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n4.圖片產生連結：{message_storage[id+'imagelink']}"
+                message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n4.上傳的圖片連結：{message_storage[id+'imagelink']}"
                 check_info = {
                         "type": "bubble",
                         "hero": {
@@ -109,8 +125,8 @@ def wishes():
                                 "height": "sm",
                                 "action": {
                                 "type": "message",
-                                "label": "願望送出",
-                                "text": "願望送出"
+                                "label": "許願送出",
+                                "text": "許願送出"
                                 },
                                 "style": "primary",
                                 "color": "#B17157"
@@ -154,8 +170,8 @@ def wishes():
             wishesname = message_storage[id+'wishesname']
             wishesreason = message_storage[id+'wishesreason']
             wishessource = message_storage[id+'wishessource']
-            img = message_storage[id+'img']
-            confirmationmessage = wishessend(wishesname,wishesreason,wishessource,img)
+            imagelink = message_storage[id+'imagelink']
+            confirmationmessage = wishessend(wishesname,wishesreason,wishessource,imagelink)
             if confirmationmessage == 'ok':
                 check_text = TextSendMessage(text='許願商品已經成功建立囉～')
             else:
@@ -163,28 +179,32 @@ def wishes():
             wishesname = 'NaN'
             wishesreason = 'NaN'
             wishessource = 'NaN'
-            img = 'NaN'
+            message_storage[id+'img'] = 'NaN'
+            imagelink = 'NaN'
+            message_storage[id+'userfilter'] = 'NaN'
             state[id] = 'normal'
     else:
-        #取消或重新填寫都將所有有關願望商品的暫存取消
-        message_storage[id+'wishesname'] = 'NaN'
-        message_storage[id+'wishesreason'] = 'NaN'
-        message_storage[id+'wishessource'] = 'NaN'
-        message_storage[id+'img'] = 'NaN'
-        if message == '重新填寫':
-            state[id] = 'wishes'
+        if message in ['重新填寫','取消']:
             message_storage[id+'userfilter'] = "NaN"
-            message_storage[id+'wishesstep'] = 1
-            check_text = initial_fill_screen()
-        elif message == '取消':
-            state[id] = 'normal'
-            check_text = TextSendMessage(text = '您的許願商品填寫流程\n已經取消囉～')
+            #取消或重新填寫都將所有有關願望商品的暫存取消
+            message_storage[id+'wishesname'] = 'NaN'
+            message_storage[id+'wishesreason'] = 'NaN'
+            message_storage[id+'wishessource'] = 'NaN'
+            message_storage[id+'img'] = 'NaN'
+            message_storage[id+'imagelink'] = 'NaN'
+            if message == '重新填寫':
+                state[id] = 'wishes'
+                message_storage[id+'wishesstep'] = 1
+                check_text = initial_fill_screen()
+            elif message == '取消':
+                state[id] = 'normal'
+                check_text = TextSendMessage(text = '您的許願商品填寫流程\n已經取消囉～')
         else:
-            cancelmessage = f"您傳送的訊息「{message}」不在許願商品填寫流程中的內容\n如果想取消請點擊下方取消按鈕～"
-            if message_storage[id+'userfilter'] == 'NaN':
-                check_text = TextSendMessage(text = cancelmessage),initial_fill_screen()
+            cancelmessage = f"您傳送的訊息「{message}」不在許願商品填寫流程中，如果想取消請點擊下方取消按鈕～"
+            if str(message_storage[id+'userfilter']) == 'NaN':
+                check_text = [TextSendMessage(text = cancelmessage),initial_fill_screen()]
             else:
-                check_text = TextSendMessage(text = cancelmessage),message_storage[id+'userfilter']
+                check_text = [TextSendMessage(text = cancelmessage),message_storage[id+'userfilter']]
     return check_text
 
 #填寫畫面1
@@ -222,7 +242,7 @@ def initial_fill_screen():
                             "contents": [
                             {
                                 "type": "text",
-                                "text": "=>1.許願商品名稱(15字內)：請打字輸入",
+                                "text": "提示：\n※前3步驟，請打字輸入！\n※最後第四步請發送照/圖片！\n=>1.許願商品名稱(15字內)：<打字輸入>",
                                 "wrap": True,
                                 "color": "#666666",
                                 "size": "sm",
