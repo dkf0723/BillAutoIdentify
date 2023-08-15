@@ -93,6 +93,8 @@ def handle_message(event):
     #-------------------確認及給予初始使用者狀態----------------------
     if user_id not in user_state:
         user_state[user_id] = 'normal'
+    if (user_id+'img') not in storage:
+        storage[user_id+'img'] = 'NaN'
     #-------------------確認使用者狀態進行處理----------------------
     #使用者狀態不屬於normal，不允許進行其他動作
     if user_state[user_id] != 'normal':
