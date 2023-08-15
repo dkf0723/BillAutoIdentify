@@ -19,7 +19,7 @@ def wishes():
                     '訂單查詢','未取訂單列表','預購訂單列表','歷史訂單列表','【訂單詳細】','【加入購物車】',
                     '查看購物車','【修改數量】','修改購物車清單','【清單移除商品】','取消修改清單',
                     '【送出購物車訂單】','問題提問','許願商品','【立即購買】','【手刀預購】',
-                    '【現購列表下一頁】','【預購列表下一頁】','資料庫','測試','圖片']#'圖片'不能刪是過程中來圖改變對接口
+                    '【現購列表下一頁】','【預購列表下一頁】','資料庫','測試','圖片']
     #行為過濾比對
     for i in userfilter:
         filterresult = 'ok'#預設值
@@ -46,7 +46,7 @@ def wishes():
                 message_storage[id+'userfilter'] = check_text
                 state[id] = 'wishesreason'
             else:
-                check_text = TextSendMessage(text = f"1.許願商品名稱：「{message}」，長度大於15個字請縮短文字呦～")
+                check_text = [TextSendMessage(text = f"1.許願商品名稱：「{message}」，長度大於15個字請縮短文字呦～"),initial_fill_screen()]
         elif state[id] == 'wishesreason':
             message_storage[id+'wishesreason'] = message #推薦原因
             if len(message) <= 100:
@@ -57,7 +57,7 @@ def wishes():
                 message_storage[id+'userfilter'] = check_text
                 state[id] = 'wishessource'
             else:
-                check_text = TextSendMessage(text = f"2.推薦原因：「{message}」，長度大於100個字請縮短文字呦～")
+                check_text = [TextSendMessage(text = f"2.推薦原因：「{message}」，長度大於100個字請縮短文字呦～"),message_storage[id+'userfilter']]
         elif state[id] == 'wishessource':
             message_storage[id+'wishessource'] = message #資料來源
             message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n想法來源：{message}"
@@ -67,9 +67,13 @@ def wishes():
             message_storage[id+'userfilter'] = check_text
             state[id] = 'wishesimg'
         elif state[id] == 'wishesimg':
-            if '.jpg' in message_storage[id+'img']:#檢查暫存的圖片內容路徑
-                single_imagetolink()#執行圖片轉換連結(單張)
-                message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n4.上傳的圖片連結：{message_storage[id+'imagelink']}"
+            if ('.jpg' in message_storage[id+'img']) or ('(略過)' in message):#檢查暫存的圖片內容路徑
+                if '.jpg' in message_storage[id+'img']:
+                    single_imagetolink()#執行圖片轉換連結(單張)
+                    message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n4.上傳的圖片連結：{message_storage[id+'imagelink']}"
+                else:
+                    message_storage[id+'imagelink'] = 'https://i.imgur.com/rGlTAt3.jpg'
+                    message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n4.上傳的圖片連結：(略過)"
                 check_info = {
                         "type": "bubble",
                         "hero": {
@@ -165,7 +169,7 @@ def wishes():
                 message_storage[id+'userfilter'] = check_text
                 state[id] = 'wishescheck'
             else:
-                check_text = TextSendMessage(text='4.您傳送的不是圖片，請打開聊天室圖片庫發送圖片！')
+                check_text = [TextSendMessage(text='4.您傳送的不是圖片，請打開聊天室圖片庫發送圖片！'),message_storage[id+'userfilter']]
         elif state[id] == 'wishescheck':
             wishesname = message_storage[id+'wishesname']
             wishesreason = message_storage[id+'wishesreason']
