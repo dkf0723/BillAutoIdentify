@@ -153,6 +153,14 @@ def wishes():
                                 }
                                 ],
                                 "flex": 0
+                            },
+                            "styles": {
+                                "body": {
+                                "backgroundColor": "#FCFAF1"
+                                },
+                                "footer": {
+                                "backgroundColor": "#FCFAF1"
+                                }
                             }
                             }
                 check_text =FlexSendMessage(
@@ -290,6 +298,14 @@ def initial_fill_screen():
                     }
                     ],
                     "flex": 0
+                },
+                "styles": {
+                    "body": {
+                    "backgroundColor": "#FCFAF1"
+                    },
+                    "footer": {
+                    "backgroundColor": "#FCFAF1"
+                    }
                 }
                 }
 
@@ -401,6 +417,14 @@ def skip_screen(allcontent,wishesstep):
                     }
                     ],
                     "flex": 0
+                },
+                "styles": {
+                    "body": {
+                    "backgroundColor": "#FCFAF1"
+                    },
+                    "footer": {
+                    "backgroundColor": "#FCFAF1"
+                    }
                 }
                 }
 
@@ -501,6 +525,14 @@ def fill_out_the_screen(allcontent,wishesstep):
                     }
                     ],
                     "flex": 0
+                },
+                "styles": {
+                    "body": {
+                    "backgroundColor": "#FCFAF1"
+                    },
+                    "footer": {
+                    "backgroundColor": "#FCFAF1"
+                    }
                 }
                 }
 
@@ -634,6 +666,14 @@ def pictureup_screen(allcontent,wishesstep):
                         }
                         ],
                         "flex": 0
+                    },
+                    "styles": {
+                        "body": {
+                        "backgroundColor": "#FCFAF1"
+                        },
+                        "footer": {
+                        "backgroundColor": "#FCFAF1"
+                        }
                     }
                     }
 

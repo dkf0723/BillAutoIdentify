@@ -315,10 +315,220 @@ def Company_location():
 
 #-------------------商家資訊----------------------
 def business_information():
-    business_detail= TextSendMessage(text='歡迎來到「高逸嚴選百貨團購」\n'\
+    '''business_detail= TextSendMessage(text='歡迎來到「高逸嚴選百貨團購」\n'\
     '\n我們的營業時間：\n一至五9:00-20:00\n(六日會發公告是否有營業)\n'\
     '\n簡介：\n高逸團購注重天然、高品質、高CP值商品，讓您們安心選購～若有任何許願商品也歡迎告知！感謝支持與陪伴，很開心能為您們服務！\n'\
     '\n地址：\n新北市中和區員山路325之4號2樓'
-    ),Company_location()
+    ),Company_location()'''
+    business_info = {
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "image",
+                            "url": "https://i.imgur.com/hQ0qG9c.jpg",
+                            "size": "5xl",
+                            "aspectMode": "cover",
+                            "aspectRatio": "150:196",
+                            "gravity": "center",
+                            "flex": 1
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "image",
+                                "url": "https://i.imgur.com/XsyIMd0.jpg",
+                                "size": "full",
+                                "aspectMode": "cover",
+                                "aspectRatio": "150:98",
+                                "gravity": "center"
+                            },
+                            {
+                                "type": "image",
+                                "url": "https://i.imgur.com/4Nh5x9j.jpg",
+                                "size": "full",
+                                "aspectMode": "cover",
+                                "aspectRatio": "150:98",
+                                "gravity": "center"
+                            }
+                            ],
+                            "flex": 1
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "image",
+                                "url": "https://i.imgur.com/rGlTAt3.jpg",
+                                "aspectMode": "cover",
+                                "size": "full"
+                            }
+                            ],
+                            "cornerRadius": "100px",
+                            "width": "80px",
+                            "height": "80px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "contents": [
+                                {
+                                    "type": "span",
+                                    "text": "高逸嚴選百貨團購",
+                                    "weight": "bold",
+                                    "color": "#000000",
+                                    "size": "lg"
+                                }
+                                ],
+                                "size": "sm",
+                                "wrap": True
+                            },
+                            {
+                                "type": "text",
+                                "text": "營業時間：\n週一至五9:00-20:00\n(六、日會發公告) ",
+                                "wrap": True
+                            }
+                            ]
+                        }
+                        ],
+                        "spacing": "xl",
+                        "paddingAll": "20px"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "separator"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "簡介",
+                                    "wrap": True,
+                                    "size": "xl",
+                                    "offsetTop": "xxl",
+                                    "weight": "bold"
+                                }
+                                ],
+                                "cornerRadius": "100px",
+                                "width": "30px",
+                                "height": "100px"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "高逸團購注重天然、高品質、高CP值商品，讓您們安心選購～若有任何許願商品也歡迎告知！感謝支持與陪伴，很開心能為您們服務！",
+                                    "wrap": True
+                                }
+                                ]
+                            }
+                            ],
+                            "spacing": "xl",
+                            "paddingAll": "20px"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "uri",
+                            "label": "FB粉絲專業",
+                            "uri": "https://www.facebook.com/profile.php?id=100063943548653&mibextid=LQQJ4d"
+                            },
+                            "style": "primary",
+                            "color": "#a8c1c9",
+                            "margin": "sm"
+                        },
+                        {
+                            "type": "separator",
+                            "margin": "md"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "地址",
+                                    "wrap": True,
+                                    "size": "xl",
+                                    "weight": "bold"
+                                }
+                                ],
+                                "cornerRadius": "100px",
+                                "width": "25px",
+                                "height": "72px"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "新北市中和區員山路325之4號2樓",
+                                    "wrap": True,
+                                    "offsetTop": "lg"
+                                }
+                                ]
+                            }
+                            ],
+                            "spacing": "xl",
+                            "paddingAll": "20px"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "uri",
+                        "label": "地圖導航",
+                        "uri": "https://goo.gl/maps/N1Rq3nX3XEpdtxLm9"
+                        },
+                        "style": "primary",
+                        "color": "#C9B0A8"
+                    }
+                    ],
+                    "paddingAll": "0px"
+                }
+                }
+
+    business_detail =FlexSendMessage(
+                            alt_text='營業資訊',
+                            contents={
+                                "type": "carousel",
+                                "contents": [business_info]   
+                                } 
+                            )
     return business_detail
 
