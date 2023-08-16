@@ -40,7 +40,7 @@ def wishes():
             message_storage[id+'wishesname'] = message #商品名稱
             if len(message) <= 15:
                 message_storage[id+'wishesall'] = f"1.許願商品名稱：{message}"
-                edit_text = f"{message_storage[id+'wishesall']}\n=>2.推薦原因(100字內)：<打字輸入>"
+                edit_text = f"{message_storage[id+'wishesall']}\n=>2.推薦原因(100字內)：\n<打字輸入>"
                 message_storage[id+'wishesstep'] += 1
                 check_text = skip_screen(edit_text,message_storage[id+'wishesstep'])#可略
                 message_storage[id+'userfilter'] = check_text
@@ -51,7 +51,7 @@ def wishes():
             message_storage[id+'wishesreason'] = message #推薦原因
             if len(message) <= 100:
                 message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n2.推薦原因：{message}"
-                edit_text = f"{message_storage[id+'wishesall']}\n=>3.想法來源(可以是連結呦～)：<打字輸入>"
+                edit_text = f"{message_storage[id+'wishesall']}\n=>3.想法來源(可以是連結呦～)：\n<打字輸入>"
                 message_storage[id+'wishesstep'] += 1
                 check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])#不可略
                 message_storage[id+'userfilter'] = check_text
@@ -60,8 +60,8 @@ def wishes():
                 check_text = [TextSendMessage(text = f"2.推薦原因：「{message}」，長度大於100個字請縮短文字呦～"),message_storage[id+'userfilter']]
         elif state[id] == 'wishessource':
             message_storage[id+'wishessource'] = message #資料來源
-            message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n想法來源：{message}"
-            edit_text = f"{message_storage[id+'wishesall']}\n=>4.商品圖片：<發送 圖/照片>"
+            message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n3.想法來源：{message}"
+            edit_text = f"{message_storage[id+'wishesall']}\n=>4.商品圖片：\n<發送 圖/照片>\n\n◎確認內容產生需要一點時間，發送後請稍等3秒！"
             message_storage[id+'wishesstep'] += 1
             check_text = pictureup_screen(edit_text,message_storage[id+'wishesstep'])#相機相簿功能
             message_storage[id+'userfilter'] = check_text
@@ -75,90 +75,86 @@ def wishes():
                     message_storage[id+'imagelink'] = 'https://i.imgur.com/rGlTAt3.jpg'
                     message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n4.上傳的圖片連結：(略過)"
                 check_info = {
-                        "type": "bubble",
-                        "hero": {
-                            "type": "image",
-                            "url": f"{message_storage[id+'imagelink']}",
-                            "size": "full",
-                            "aspectRatio": "20:13",
-                            "aspectMode": "cover"
-                        },
-                        "body": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": "許願商品填寫確認",
-                                "weight": "bold",
-                                "size": "xl",
-                                "align": "center"
+                            "type": "bubble",
+                            "hero": {
+                                "type": "image",
+                                "url": f"{message_storage[id+'imagelink']}",
+                                "size": "full",
+                                "aspectRatio": "20:13",
+                                "aspectMode": "cover"
                             },
-                            {
+                            "body": {
                                 "type": "box",
                                 "layout": "vertical",
-                                "margin": "lg",
-                                "spacing": "sm",
                                 "contents": [
                                 {
+                                    "type": "text",
+                                    "text": "許願商品填寫確認",
+                                    "weight": "bold",
+                                    "size": "xl",
+                                    "align": "center"
+                                },
+                                {
                                     "type": "box",
-                                    "layout": "baseline",
+                                    "layout": "vertical",
+                                    "margin": "lg",
                                     "spacing": "sm",
                                     "contents": [
                                     {
                                         "type": "text",
                                         "text": f"{message_storage[id+'wishesall']}",
                                         "wrap": True,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 5
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
                                     }
                                     ]
                                 }
                                 ]
-                            }
-                            ]
-                        },
-                        "footer": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "spacing": "md",
-                            "contents": [
-                            {
-                                "type": "button",
-                                "height": "sm",
-                                "action": {
-                                "type": "message",
-                                "label": "許願送出",
-                                "text": "許願送出"
+                            },
+                            "footer": {
+                                "type": "box",
+                                "layout": "vertical",
+                                "spacing": "md",
+                                "contents": [
+                                {
+                                    "type": "button",
+                                    "height": "sm",
+                                    "action": {
+                                    "type": "message",
+                                    "label": "願望送出",
+                                    "text": "願望送出"
+                                    },
+                                    "style": "primary",
+                                    "color": "#A44528"
                                 },
-                                "style": "primary",
-                                "color": "#B17157"
-                            },
-                            {
-                                "type": "button",
-                                "style": "secondary",
-                                "height": "sm",
-                                "action": {
-                                "type": "message",
-                                "label": "重新填寫",
-                                "text": "重新填寫"
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "height": "sm",
+                                    "action": {
+                                    "type": "message",
+                                    "label": "重新填寫",
+                                    "text": "重新填寫"
+                                    },
+                                    "color": "#5F403B"
+                                },
+                                {
+                                    "type": "button",
+                                    "style": "link",
+                                    "height": "sm",
+                                    "action": {
+                                    "type": "message",
+                                    "label": "取消",
+                                    "text": "取消"
+                                    }
                                 }
-                            },
-                            {
-                                "type": "button",
-                                "style": "link",
-                                "height": "sm",
-                                "action": {
-                                "type": "message",
-                                "label": "取消",
-                                "text": "取消"
-                                }
+                                ],
+                                "flex": 0
                             }
-                            ],
-                            "flex": 0
-                        }
-                        }
+                            }
                 check_text =FlexSendMessage(
                             alt_text='願望商品填寫確認',
                             contents={
@@ -240,19 +236,32 @@ def initial_fill_screen():
                         "spacing": "sm",
                         "contents": [
                         {
-                            "type": "box",
-                            "layout": "baseline",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": "提示：\n※前3步驟，請打字輸入！\n※最後第四步請發送照/圖片！\n=>1.許願商品名稱(15字內)：<打字輸入>",
-                                "wrap": True,
-                                "color": "#666666",
-                                "size": "sm",
-                                "flex": 5
-                            }
-                            ]
+                            "type": "text",
+                            "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                            "wrap": True,
+                            "color": "#f6b877",
+                            "size": "sm",
+                            "flex": 5
+                        },
+                        {
+                            "type": "text",
+                            "text": "<下方依序填寫～>",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "lg",
+                            "flex": 5,
+                            "margin": "lg",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": "=>1.許願商品名稱(15字內)：\n<請打字輸入>",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "margin": "sm",
+                            "weight": "bold"
                         }
                         ]
                     }
@@ -279,7 +288,7 @@ def initial_fill_screen():
                 }
 
     initial_fill_screen_show = FlexSendMessage(
-                alt_text='願望商品填寫',
+                alt_text="許願商品填寫(1/4)",
                 contents={
                     "type": "carousel",
                     "contents": [screen_information]   
@@ -316,19 +325,32 @@ def skip_screen(allcontent,wishesstep):
                         "spacing": "sm",
                         "contents": [
                         {
-                            "type": "box",
-                            "layout": "baseline",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": f"{allcontent}",
-                                "wrap": True,
-                                "color": "#666666",
-                                "size": "sm",
-                                "flex": 5
-                            }
-                            ]
+                            "type": "text",
+                            "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                            "wrap": True,
+                            "color": "#f6b877",
+                            "size": "sm",
+                            "flex": 5
+                        },
+                        {
+                            "type": "text",
+                            "text": "<下方依序填寫～>",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "lg",
+                            "flex": 5,
+                            "margin": "lg",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"{allcontent}",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "margin": "sm",
+                            "weight": "bold"
                         }
                         ]
                     }
@@ -377,7 +399,7 @@ def skip_screen(allcontent,wishesstep):
                 }
 
     skipscreen_show = FlexSendMessage(
-                alt_text='購物車訂單確認',
+                alt_text=f"許願商品填寫({wishesstep}/4)",
                 contents={
                     "type": "carousel",
                     "contents": [skip_information]   
@@ -414,19 +436,32 @@ def fill_out_the_screen(allcontent,wishesstep):
                         "spacing": "sm",
                         "contents": [
                         {
-                            "type": "box",
-                            "layout": "baseline",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": f"{allcontent}",
-                                "wrap": True,
-                                "color": "#666666",
-                                "size": "sm",
-                                "flex": 5
-                            }
-                            ]
+                            "type": "text",
+                            "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                            "wrap": True,
+                            "color": "#f6b877",
+                            "size": "sm",
+                            "flex": 5
+                        },
+                        {
+                            "type": "text",
+                            "text": "<下方依序填寫～>",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "lg",
+                            "flex": 5,
+                            "margin": "lg",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"{allcontent}",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "margin": "sm",
+                            "weight": "bold"
                         }
                         ]
                     }
@@ -464,7 +499,7 @@ def fill_out_the_screen(allcontent,wishesstep):
                 }
 
     fill_out_the_screen_show = FlexSendMessage(
-                alt_text='購物車訂單確認',
+                alt_text= f"許願商品填寫({wishesstep}/4)",
                 contents={
                     "type": "carousel",
                     "contents": [screen_information]   
@@ -501,19 +536,32 @@ def pictureup_screen(allcontent,wishesstep):
                             "spacing": "sm",
                             "contents": [
                             {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                {
-                                    "type": "text",
-                                    "text": f"{allcontent}",
-                                    "wrap": True,
-                                    "color": "#666666",
-                                    "size": "sm",
-                                    "flex": 5
-                                }
-                                ]
+                                "type": "text",
+                                "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                                "wrap": True,
+                                "color": "#f6b877",
+                                "size": "sm",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "<下方依序填寫～>",
+                                "wrap": True,
+                                "size": "lg",
+                                "flex": 5,
+                                "weight": "bold",
+                                "color": "#3b5a5f",
+                                "margin": "lg"
+                            },
+                            {
+                                "type": "text",
+                                "text": f"{allcontent}",
+                                "wrap": True,
+                                "size": "md",
+                                "flex": 5,
+                                "weight": "bold",
+                                "color": "#3b5a5f",
+                                "margin": "sm"
                             }
                             ]
                         }
@@ -584,7 +632,7 @@ def pictureup_screen(allcontent,wishesstep):
                     }
 
     pictureup_show = FlexSendMessage(
-                alt_text='購物車訂單確認',
+                alt_text='許願商品確認',
                 contents={
                     "type": "carousel",
                     "contents": [pictureup_information]   
