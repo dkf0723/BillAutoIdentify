@@ -124,8 +124,8 @@ def wishes():
                                     "height": "sm",
                                     "action": {
                                     "type": "message",
-                                    "label": "願望送出",
-                                    "text": "願望送出"
+                                    "label": "許願送出",
+                                    "text": "許願送出"
                                     },
                                     "style": "primary",
                                     "color": "#A44528"
@@ -162,27 +162,32 @@ def wishes():
                                 "contents": [check_info]   
                                 } 
                             )
+                message_storage[id+'wishescheck_info'] = check_text
                 message_storage[id+'userfilter'] = check_text
                 state[id] = 'wishescheck'
             else:
                 check_text = [TextSendMessage(text='4.您傳送的不是圖片，請打開聊天室圖片庫發送圖片！'),message_storage[id+'userfilter']]
         elif state[id] == 'wishescheck':
-            wishesname = message_storage[id+'wishesname']
-            wishesreason = message_storage[id+'wishesreason']
-            wishessource = message_storage[id+'wishessource']
-            imagelink = message_storage[id+'imagelink']
-            confirmationmessage = wishessend(wishesname,wishesreason,wishessource,imagelink)
-            if confirmationmessage == 'ok':
-                check_text = TextSendMessage(text='許願商品已經成功建立囉～')
+            if message == '許願送出':
+                wishesname = message_storage[id+'wishesname']
+                wishesreason = message_storage[id+'wishesreason']
+                wishessource = message_storage[id+'wishessource']
+                imagelink = message_storage[id+'imagelink']
+                confirmationmessage = wishessend(wishesname,wishesreason,wishessource,imagelink)
+                if confirmationmessage == 'ok':
+                    check_text = TextSendMessage(text='許願商品已經成功建立囉～')
+                else:
+                    check_text = TextSendMessage(text='許願商品建立時發生錯誤！請稍後再試～')
+                wishesname = 'NaN'
+                wishesreason = 'NaN'
+                wishessource = 'NaN'
+                message_storage[id+'img'] = 'NaN'
+                imagelink = 'NaN'
+                message_storage[id+'userfilter'] = 'NaN'
+                message_storage[id+'wishescheck_info'] = 'NaN'
+                state[id] = 'normal'
             else:
-                check_text = TextSendMessage(text='許願商品建立時發生錯誤！請稍後再試～')
-            wishesname = 'NaN'
-            wishesreason = 'NaN'
-            wishessource = 'NaN'
-            message_storage[id+'img'] = 'NaN'
-            imagelink = 'NaN'
-            message_storage[id+'userfilter'] = 'NaN'
-            state[id] = 'normal'
+                check_text = [TextSendMessage(text= f"「{message}」不在許願商品填寫確認中的指令喔！請點擊訊息框下方的按鈕。"),message_storage[id+'wishescheck_info']]
     else:
         if message in ['重新填寫','取消']:
             message_storage[id+'userfilter'] = "NaN"
@@ -192,6 +197,7 @@ def wishes():
             message_storage[id+'wishessource'] = 'NaN'
             message_storage[id+'img'] = 'NaN'
             message_storage[id+'imagelink'] = 'NaN'
+            message_storage[id+'wishescheck_info'] = 'NaN'
             if message == '重新填寫':
                 state[id] = 'wishes'
                 message_storage[id+'wishesstep'] = 1
