@@ -145,7 +145,7 @@ def orderandpreorder_check():
                             )
     else:
         if(message == "取消"):
-            check_text = '您的商品訂/預購流程\n已經取消囉～'
+            check_text = '您的商品現/預購流程\n已經取消囉～'
             check_text = TextSendMessage(text=check_text)
             state[id] = 'normal' #從user_state轉換普通狀態
             #下方重置
