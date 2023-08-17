@@ -258,6 +258,7 @@ def Order_buynow():
     #Quick Reply 按鈕數量範圍
     quantity_option = []
     unit = unitsearch(product_id)
+    quantity_option.append(QuickReplyButton(action=MessageAction(label='取消', text='取消')))
     for i in range(10):
         if unit == '無':
             quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))

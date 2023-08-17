@@ -18,6 +18,7 @@ from ask_wishes.wishes import *
 from relevant_information import linebotinfo
 from product.cartlist import *
 from product.orderlist import *
+from selection_screen import *
 #======python的函式庫==========
 import tempfile, os
 import datetime
@@ -107,22 +108,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, business_detail)
         #-------------------團購商品及2種商品列表----------------------
         elif '團購商品' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='商品狀態選擇',
-            template=ConfirmTemplate(
-                    text='請選擇商品狀態：\n【預購商品】或是【現購商品】',
-                    actions=[
-                        MessageAction(
-                            label='【預購商品】',
-                            text='【預購商品】列表'
-                        ),
-                        MessageAction(
-                            label='【現購商品】',
-                            text='【現購商品】列表'
-                        )
-                    ]
-                )
-            ))
+            line_bot_api.reply_message(event.reply_token, Order_preorder_selectionscreen())
         elif '【預購商品】列表' in msg:
             list_page[user_id+'預購min'] = 0
             list_page[user_id+'預購max'] = 9

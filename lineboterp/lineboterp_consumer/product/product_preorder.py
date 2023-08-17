@@ -122,10 +122,32 @@ def product_preorder_list():
                             },
                             {
                             "type": "text",
+                            "text": f"預購數量倍數： {product_multiple[i]}",
+                            "wrap": True,
+                            "color": "#FF0000",
+                            "size": "sm",
+                            "flex": 15
+                            }
+                        ]
+                        },
+                        {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                            {
+                            "type": "text",
+                            "text": "※",
+                            "color": "#aaaaaa",
+                            "size": "sm",
+                            "flex": 1
+                            },
+                            {
+                            "type": "text",
                             "wrap": True,
                             "color": "#666666",
                             "size": "sm",
-                            "text": "預購成立後將於預購截止日發送是否成功訊息",
+                            "text": "預購成立後將於預購商品到貨時發送取貨通知訊息",#"預購成立後將於預購截止日發送是否成功訊息"
                             "flex": 15
                             }
                         ]
@@ -236,12 +258,15 @@ def Order_preorder():
     user_state = lineboterp.user_state
     product_id = lineboterp.product[user_id+'product_id']
     product = lineboterp.product[user_id+'product']
+    storage_multiple = lineboterp.storage
     product_order_preorder = lineboterp.product_order_preorder
     product_order_preorder[user_id] = '預購'
     #Quick Reply 按鈕數量範圍
     quantity_option = []
     multiple = multiplesearch(product_id)
+    storage_multiple[user_id+'multiple'] = multiple
     unit = unitsearch(product_id)
+    quantity_option.append(QuickReplyButton(action=MessageAction(label='取消', text='取消')))
     for i in range(10):
         if unit != '無':
             if (i+1) % multiple == 0:

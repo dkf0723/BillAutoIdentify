@@ -41,6 +41,7 @@ def orderandpreorder_check():
     duplicate_save = lineboterp.duplicate_save
     message_storage = lineboterp.storage
     orderall = lineboterp.orderall
+    storage_multiple = lineboterp.storage[id+'multiple']
     if message.isdigit():
             # 處理完問題後，結束等待回覆狀態
         if state[id] == 'ordering':
@@ -53,13 +54,16 @@ def orderandpreorder_check():
             duplicate_save[id] = check_text
             state[id] = 'phonenum' #從user_state轉換輸入電話狀態
         elif state[id] == 'preorder':
-            message_storage[id+'num'] = message
-            message_storage[id+'ordertype'] = '預購'
-            check_text = ('商品名稱：%s\n您輸入的預購數量： %s' %(product,message))
-            check_text += '\n=>請接著，打字輸入「電話號碼」\n ex.0952000000'
-            check_text = TextSendMessage(text=check_text)
-            duplicate_save[id] = check_text
-            state[id] = 'phonenum' #從user_state轉換輸入電話狀態
+            if int(message) % storage_multiple == 0:
+                message_storage[id+'num'] = message
+                message_storage[id+'ordertype'] = '預購'
+                check_text = ('商品名稱：%s\n您輸入的預購數量： %s' %(product,message))
+                check_text += '\n=>請接著，打字輸入「電話號碼」\n ex.0952000000'
+                check_text = TextSendMessage(text=check_text)
+                duplicate_save[id] = check_text
+                state[id] = 'phonenum' #從user_state轉換輸入電話狀態
+            else:
+                check_text = [TextSendMessage(text=f"您輸入的「{message}」預購數量倍數不是{str(storage_multiple)}喔！\n請重新輸入預購數量。"),Order_preorder()[0],Order_preorder()[1]]
         elif state[id] == 'phonenum':
             if message.isdigit():
                 if(len(message) < 10):
@@ -459,7 +463,7 @@ def business_information():
                             "type": "button",
                             "action": {
                             "type": "uri",
-                            "label": "FB粉絲專業",
+                            "label": "FB粉絲專頁",
                             "uri": "https://www.facebook.com/profile.php?id=100063943548653&mibextid=LQQJ4d"
                             },
                             "style": "primary",
@@ -496,7 +500,7 @@ def business_information():
                                 "contents": [
                                 {
                                     "type": "text",
-                                    "text": "新北市中和區員山路325之4號2樓",
+                                    "text": "新北市中和區員山路325之4號2樓(全家-中和員山店旁)",
                                     "wrap": True,
                                     "offsetTop": "lg"
                                 }
