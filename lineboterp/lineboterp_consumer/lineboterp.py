@@ -133,24 +133,9 @@ def handle_message(event):
                 ))
         #-------------------查詢、訂單、購物車----------------------
         elif '訂單/購物車查詢' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='訂單/購物車 查詢選擇',
-            template=ConfirmTemplate(
-                    text='請選擇查詢項目：\n【訂單】或是【購物車】',
-                    actions=[
-                        MessageAction(
-                            label='【訂單】',
-                            text='訂單查詢'
-                        ),
-                        MessageAction(
-                            label='【購物車】',
-                            text='查看購物車'
-                        )
-                    ]
-                )
-            ))
+            line_bot_api.reply_message(event.reply_token, Order_cart_selectionscreen())
         elif '訂單查詢' in msg:
-            line_bot_api.reply_message(event.reply_token, orderchoose())
+            line_bot_api.reply_message(event.reply_token, Notpickedup_preordered_history_selectionscreen())
         elif '未取訂單列表' in msg:
             ordernottaken = ordernottaken_list()
             line_bot_api.reply_message(event.reply_token, ordernottaken)
