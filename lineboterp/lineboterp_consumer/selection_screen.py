@@ -536,3 +536,132 @@ def Notpickedup_preordered_history_selectionscreen():
                                 } 
                             )
     return screen
+
+#現預購訂單(1/2)畫面
+def Order_buynow_preorder_screen(product_order_preorder,product_id,product,quickreply,errormsg):
+    user_id = lineboterp.user_id
+    multiple = lineboterp.storage[user_id+'multiple']
+    if product_order_preorder == '現購':
+        distinguish = '#1a9879'#綠
+        enter = f"=>1.請選擇{product_order_preorder}數量："
+    elif product_order_preorder == '預購':
+        distinguish = '#c42149'#紅
+        enter = f"=>1.請選擇{product_order_preorder}數量({multiple}的倍數)："
+    if errormsg == 'no':
+        errormsg = '無'
+    else:
+        errormsg = str(errormsg)
+    msg = {
+        "type": "text",
+        "text": f"◎錯誤：{errormsg}",
+        "wrap": True,
+        "color": "#c42149",
+        "size": "sm",
+        "flex": 5,
+        "weight": "bold"
+        }
+
+    order_buynow_preorder_screen = {
+                    "type": "bubble",
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "高逸嚴選",
+                            "color": "#A44528",
+                            "size": "sm",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"{product_order_preorder}填寫(1/2)",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "separator",
+                            "color": f"{distinguish}",
+                            "margin": "md"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "xs",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"◇商品ID：{product_id} \n◇商品名稱：{product} ",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            },
+                            {
+                                "type": "text",
+                                "text": "<下方依序填寫～>",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "xl",
+                                "weight": "bold"
+                            },
+                            {
+                                "type": "text",
+                                "text": f"{enter}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            },
+                            {
+                                "type": "text",
+                                "text": "※提示：可以自行輸入更多的數量",
+                                "wrap": True,
+                                "color": "#f6b877",
+                                "size": "sm",
+                                "flex": 5,
+                                "weight": "bold"
+                            },msg
+                            ]
+                        }
+                        ],
+                        "backgroundColor": "#FCFAF1"
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "md",
+                        "contents": [
+                        {
+                            "type": "button",
+                            "style": "link",
+                            "height": "sm",
+                            "action": {
+                            "type": "message",
+                            "label": "取消",
+                            "text": "取消"
+                            }
+                        }
+                        ],
+                        "flex": 0
+                    }
+                    }
+    screen =FlexSendMessage(
+                            alt_text='現/預購商品選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": [order_buynow_preorder_screen]   
+                                },
+                            quick_reply = quickreply
+                            )
+    return screen

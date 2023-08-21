@@ -216,6 +216,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, initial_fill_screen())
         #-------------------執行購買或預購----------------------
         elif '【立即購買】' in msg:
+            errormsg = 'no'
             original_string = msg
             # 找到"【立即購買】"的位置
             start_index = original_string.find("【立即購買】")
@@ -227,9 +228,10 @@ def handle_message(event):
                 product_name = substr.split("_")[1].strip() # 取出～後面的字並去除空白字元
             product[user_id+'product_id'] = product_id
             product[user_id+'product'] = product_name
-            Order_buynow_text = Order_buynow()
+            Order_buynow_text = Order_buynow(errormsg)
             line_bot_api.reply_message(event.reply_token, Order_buynow_text)
         elif '【手刀預購】' in msg:
+            errormsg = 'no'
             original_string = msg
             # 找到"【手刀預購】"的位置
             start_index = original_string.find("【手刀預購】")
@@ -241,7 +243,7 @@ def handle_message(event):
                 product_name = substr.split("_")[1].strip() # 取出～後面的字並去除空白字元
             product[user_id+'product_id'] = product_id
             product[user_id+'product'] = product_name
-            Order_preorder_text = Order_preorder()
+            Order_preorder_text = Order_preorder(errormsg)
             line_bot_api.reply_message(event.reply_token, Order_preorder_text)
         #-------------------現/預購、訂單下一頁----------------------
         elif '【現購列表下一頁】' in msg:

@@ -251,7 +251,7 @@ def initial_fill_screen():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                            "text": "提示：\n※前3步驟，請打字輸入！\n※步驟4，請發送照/圖片！",
                             "wrap": True,
                             "color": "#f6b877",
                             "size": "sm",
@@ -348,7 +348,7 @@ def skip_screen(allcontent,wishesstep):
                         "contents": [
                         {
                             "type": "text",
-                            "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                            "text": "提示：\n※前3步驟，請打字輸入！\n※步驟4，請發送照/圖片！",
                             "wrap": True,
                             "color": "#f6b877",
                             "size": "sm",
@@ -467,7 +467,7 @@ def fill_out_the_screen(allcontent,wishesstep):
                         "contents": [
                         {
                             "type": "text",
-                            "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                            "text": "提示：\n※前3步驟，請打字輸入！\n※步驟4，請發送照/圖片！",
                             "wrap": True,
                             "color": "#f6b877",
                             "size": "sm",
@@ -575,7 +575,7 @@ def pictureup_screen(allcontent,wishesstep):
                             "contents": [
                             {
                                 "type": "text",
-                                "text": "提示：\n※前3步驟，請打字輸入！\n※第4步，請發送照/圖片！",
+                                "text": "提示：\n※前3步驟，請打字輸入！\n※步驟4，請發送照/圖片！",
                                 "wrap": True,
                                 "color": "#f6b877",
                                 "size": "sm",

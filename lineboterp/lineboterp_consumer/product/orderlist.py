@@ -33,7 +33,8 @@ def ordernottaken_list():
                         "type": "message",
                         "label": f"[{dtime}] NT${lumpsum_formatted}",
                         "text": f"【訂單詳細】{dtime}\n{totallist[i][0]}"
-                    }
+                    },
+                    "color": "#FF8C00"
                 }
                 buttons.append(button)
 
@@ -47,7 +48,7 @@ def ordernottaken_list():
                         "type": "text",
                         "text": "高逸嚴選",
                         "weight": "bold",
-                        "color": "#1DB446",
+                        "color": "#A44528",
                         "size": "sm"
                         },
                         {
@@ -113,7 +114,8 @@ def orderpreorder_list():
                         "type": "message",
                         "label": f"[{dtime}] NT${lumpsum_formatted}",
                         "text": f"【訂單詳細】{dtime}\n{totallist[i][0]}"
-                    }
+                    },
+                    "color": "#fe587b"
                 }
                 buttons.append(button)
 
@@ -127,7 +129,7 @@ def orderpreorder_list():
                         "type": "text",
                         "text": "高逸嚴選",
                         "weight": "bold",
-                        "color": "#1DB446",
+                        "color": "#A44528",
                         "size": "sm"
                         },
                         {
@@ -164,7 +166,7 @@ def orderpreorder_list():
                 } 
             )
     return orderpreorder_show
-#-------------------已取列表----------------------
+#-------------------歷史列表----------------------
 def orderhastaken_list():
     db_hastaken = ordertopalllist()
     if db_hastaken=='找不到符合條件的資料。':
@@ -192,7 +194,8 @@ def orderhastaken_list():
                         "type": "message",
                         "label": f"[{dtime}] NT${lumpsum_formatted}",
                         "text": f"【訂單詳細】{dtime}\n{totallist[i][0]}"
-                    }
+                    },
+                    "color": "#8FBC8F"
                 }
                 buttons.append(button)
 
@@ -206,7 +209,7 @@ def orderhastaken_list():
                         "type": "text",
                         "text": "高逸嚴選",
                         "weight": "bold",
-                        "color": "#1DB446",
+                        "color": "#A44528",
                         "size": "sm"
                         },
                         {

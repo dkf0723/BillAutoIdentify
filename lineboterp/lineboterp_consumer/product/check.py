@@ -53,6 +53,7 @@ def orderandpreorder_check():
             check_text = TextSendMessage(text=check_text)
             duplicate_save[id] = check_text
             state[id] = 'phonenum' #從user_state轉換輸入電話狀態
+            errormsg = 'no'
         elif state[id] == 'preorder':
             if int(message) % storage_multiple == 0:
                 message_storage[id+'num'] = message
@@ -62,8 +63,10 @@ def orderandpreorder_check():
                 check_text = TextSendMessage(text=check_text)
                 duplicate_save[id] = check_text
                 state[id] = 'phonenum' #從user_state轉換輸入電話狀態
+                errormsg = 'no'
             else:
-                check_text = [TextSendMessage(text=f"您輸入的「{message}」預購數量倍數不是{str(storage_multiple)}喔！\n請重新輸入預購數量。"),Order_preorder()[0],Order_preorder()[1]]
+                errormsg = f"您輸入的預購倍數「{message}」不是{str(storage_multiple)}的倍數喔！請重新輸入預購數量。"
+                check_text = Order_preorder(errormsg)
         elif state[id] == 'phonenum':
             if message.isdigit():
                 if(len(message) < 10):
@@ -157,9 +160,11 @@ def orderandpreorder_check():
             message_storage[id+'ordertype'] = 'NaN'
         elif state[id] in ['ordering','preorder']:
             if state[id] == 'ordering':
-                check_text = Order_buynow()
+                errormsg = f"您輸入的「{message}」不是此現購流程中會出現的內容喔！請重新輸入現購數量。"
+                check_text = Order_buynow(errormsg)
             elif state[id] == 'preorder':
-                check_text = Order_preorder()
+                errormsg = f"您輸入的「{message}」不是此預購流程中會出現的內容喔！請重新輸入預購數量。"
+                check_text = Order_preorder(errormsg)
         elif state[id] =='phonenum':
             check_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),duplicate_save[id]
         elif state[id] =='end':
