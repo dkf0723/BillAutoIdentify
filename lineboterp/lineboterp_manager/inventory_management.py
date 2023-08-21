@@ -4,7 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import manager
 
-#------------------以下要換位置-----------------------
+#------------------原本以下要換位置-----------------------
 def exist_goods(goods_name): 
     dict_data = manager.dict_data
     """判斷商品是否已經存在""" 
@@ -16,7 +16,7 @@ def exist_goods(goods_name):
 
 #'新增商品'
 def add_goods(): 
-    dict_data = manager.dict_data
+    dict_data = manager.dict_data    
     """補貨""" 
     goods_name = '雞排'
     goods_count = 10  #'進貨数量:'
