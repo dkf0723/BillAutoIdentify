@@ -51,25 +51,38 @@ def databasetest():
   cursor = conn.cursor()
   db['conn'] = conn
   db['cursor'] = cursor
-#-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
-def member_profile(userid):
-  member = lineboterp.member
+#-------------------錯誤重試----------------------
+def retry(category,query):#select/notselect
   conn = lineboterp.db['conn']
   cursor = lineboterp.db['cursor']
-  timeget = time()
-  formatted_datetimeget = timeget['formatted_datetime']
-  order_dateget = timeget['order_date']
-  query = """SELECT 會員_LINE_ID FROM member_profile;""" #會員資料檢查
-  #錯誤重新執行最大3次
   max_retries = 3  # 最大重試次數
   retry_count = 0  # 初始化重試計數
   while retry_count<max_retries:
     try:
-      cursor.execute(query)
-      member_result = cursor.fetchall()
+      if category == 'select':
+        cursor.execute(query)
+        result = cursor.fetchall()
+        result2 = 'no'#不是購物車新增的內容
+      elif category == 'notselect':
+        cursor.execute(query)
+        conn.commit()
+        result = 'ok'
+        result2 = 'ok'#購物車新增用
       break
     except mysql.connector.Error as e:
       retry_count += 1 #重試次數累加
+      result2 = 'no'#購物車新增用
+  return result,result2
+#-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
+def member_profile(userid):
+  member = lineboterp.member
+  timeget = time()
+  formatted_datetimeget = timeget['formatted_datetime']
+  order_dateget = timeget['order_date']
+
+  query = """SELECT 會員_LINE_ID FROM member_profile;""" #會員資料檢查
+  category ='select' #重試類別select/notselect
+  member_result,result2 = retry(category,query)
 
   query1 = f"""
           SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
@@ -77,18 +90,18 @@ def member_profile(userid):
           WHERE 訂單編號 like'cart%' and 訂單成立時間 <= '{formatted_datetimeget}'
           ORDER BY 訂單成立時間 DESC,訂單編號 DESC;
           """#購物車資料檢查(DESC遞減取得最新)
-  cursor.execute(query1)
-  cart_result = cursor.fetchall()
+  category ='select' #重試類別select/notselect
+  cart_result,result2 = retry(category,query1)
+  
   storagememberlist = []#存放查詢到的所有會員列表
   storagecartlist = []#存放查詢到的所有購物車會員列表
-
   if member_result == []:
-    query3 = f"""
+    query2 = f"""
         INSERT INTO member_profile (會員_LINE_ID,會員信賴度_取貨率退貨率,加入時間,身分別)
         VALUES ( '{userid}','0.80', '{formatted_datetimeget}','消費者');
         """
-    cursor.execute(query3)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,query2)
   else:
     for row in member_result:
       memberlist = row[0]
@@ -98,8 +111,8 @@ def member_profile(userid):
         INSERT INTO member_profile (會員_LINE_ID,會員信賴度_取貨率退貨率,加入時間,身分別)
         VALUES ( '{userid}','0.80', '{formatted_datetimeget}','消費者');
         """
-      cursor.execute(query3)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query3)
 
   if cart_result == []:
     serial_number = '000001'
@@ -107,8 +120,9 @@ def member_profile(userid):
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
           VALUES ( 'cart{order_dateget}{str(serial_number)}','{userid}','add','dd' ,'{formatted_datetimeget}');
           """
-    cursor.execute(query4)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,query4)
+
   else:
     checkaddtime = cart_result[0][0]#取得最新一筆購物車序號
     for row1 in cart_result:
@@ -122,64 +136,43 @@ def member_profile(userid):
           serial_number = serial_number[-6:]
       else:
         serial_number = '000001'
-      query4 = f"""
+      query5 = f"""
         INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
         VALUES ( 'cart{order_dateget}{serial_number}','{userid}','add','dd' ,'{formatted_datetimeget}');
         """
-      cursor.execute(query4)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query5)
   member[userid] = 'yy'
 
 
 #-------------------查詢預購商品列表----------------------
 def preorder_list():
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   query = """
           SELECT 商品ID, 商品名稱, 現預購商品, 商品圖片, 商品簡介, 
                 商品單位, 售出單價, 售出單價2, 預購數量限制_倍數, 
                 預購截止時間 
           FROM Product_information 
           WHERE 現預購商品='預購';"""
-  
-  #錯誤重新執行最大3次
-  max_retries = 3  # 最大重試次數
-  retry_count = 0  # 初始化重試計數
-  while retry_count<max_retries:
-    try:
-      cursor.execute(query)
-      result = cursor.fetchall()
-      break
-    except mysql.connector.Error as e:
-      retry_count += 1 #重試次數累加
+  category ='select' #重試類別select/notselect
+  preorder_result,result2 = retry(category,query)
 
-  if result != []:
-    listbuynow = result
+  if preorder_result != []:
+    listbuynow = preorder_result
   else:
     listbuynow = "找不到符合條件的資料。"
   return listbuynow
 #-------------------查詢現購商品列表----------------------
 def buynow_list():
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   query = """
           SELECT 商品ID,商品名稱,現預購商品,商品圖片,商品簡介,
                   商品單位,售出單價,售出單價2,庫存數量 
           FROM Product_information 
           WHERE 現預購商品='現購' and 庫存數量>0;"""
-  #錯誤重新執行最大3次
-  max_retries = 3  # 最大重試次數
-  retry_count = 0  # 初始化重試計數
-  while retry_count<max_retries:
-    try:
-      cursor.execute(query)
-      result = cursor.fetchall()
-      break
-    except mysql.connector.Error as e:
-      retry_count += 1 #重試次數累加
+  category ='select' #重試類別select/notselect
+  buynow__result,result2 = retry(category,query)
 
-  if result != []:
-    listpreorder = result
+  if buynow__result != []:
+    listpreorder = buynow__result
   else:
     listpreorder = "找不到符合條件的資料。"
   return listpreorder
@@ -190,8 +183,16 @@ def test_datasearch():
   conn = lineboterp.db['conn']
   cursor = lineboterp.db['cursor']
   query = "SELECT * FROM wishlist;"
-  cursor.execute(query)
-  result = cursor.fetchall()
+  max_retries = 3  # 最大重試次數
+  retry_count = 0  # 初始化重試計數
+  while retry_count<max_retries:
+    try:
+      cursor.execute(query)
+      result = cursor.fetchall()
+      break
+    except mysql.connector.Error as e:
+      retry_count += 1 #重試次數累加
+
   if result is not None:
     testmsg = "願望清單讀取內容：\n"
     for row in result:
@@ -211,10 +212,7 @@ def test_datasearch():
 #-------------------訂單成立----------------------
 def order_create():
   userid = lineboterp.user_id
-  orderall = lineboterp.orderall[userid]
   phonenum = lineboterp.storage[userid+'phonenum']
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   timeget = time()
   formatted_datetimeget = timeget['formatted_datetime']
   order_dateget = timeget['order_date']
@@ -225,12 +223,12 @@ def order_create():
           FROM Order_information 
           WHERE 訂單編號 like'order%' and 訂單成立時間 <= '{formatted_datetimeget}'
           ORDER BY 訂單成立時間 DESC , 訂單編號 DESC;""" #訂單資料檢查
-  cursor.execute(query2)
-  order_result = cursor.fetchall()
-
+  category ='select' #重試類別select/notselect
+  order_result,result2 = retry(category,query2)
+  
   if order_result == []:
     serial_number = '00001'
-    order_details,establishmentget,sort = order_detail(serial_number,conn,cursor)
+    order_details,establishmentget,sort = order_detail(serial_number)
     establishment_message = establishmentget
     if sort == '現購':
       sorttype = '未取'
@@ -240,14 +238,16 @@ def order_create():
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
           VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
           """
-    cursor.execute(query3_1)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,query3_1)
+
     query3_2 = f"""
           INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
           VALUES {order_details};
           """
-    cursor.execute(query3_2)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,query3_2)
+
     query3_3 = f"""
           UPDATE Order_information
           SET 總額 = (
@@ -257,15 +257,17 @@ def order_create():
           )
           WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
           """
-    cursor.execute(query3_3)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,query3_3)
+
     establishment_message = 'ok'
     query4_1 = f"""
               SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
               FROM order_details Natural Join Product_information 
               Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
-    cursor.execute(query4_1)
-    orderinfo = cursor.fetchall()
+    category ='select' #重試類別select/notselect
+    orderinfo,result2 = retry(category,query4_1)
+
   else:
     checkaddtime = order_result[0][0]#取得最新一筆訂單序號
     if checkaddtime[5:13] == f"{str(order_dateget)}":
@@ -275,7 +277,7 @@ def order_create():
         serial_number = serial_number[-5:]
     else:
       serial_number = '00001'
-    order_details, establishmentget,sort = order_detail(serial_number,conn,cursor)
+    order_details, establishmentget,sort = order_detail(serial_number)
     establishment_message = establishmentget
     if sort == '現購':
       sorttype = '未取'
@@ -285,14 +287,16 @@ def order_create():
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
           VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
           """
-    cursor.execute(addorder)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,addorder)
+
     addorderdetails = f"""
           INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
           VALUES {order_details};
           """
-    cursor.execute(addorderdetails)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,addorderdetails)
+ 
     addtotalcost = f"""
           UPDATE Order_information
           SET 總額 = (
@@ -302,19 +306,20 @@ def order_create():
           )
           WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
           """
-    cursor.execute(addtotalcost)
-    conn.commit()
+    category ='notselect' #重試類別select/notselect
+    result,result2 = retry(category,addtotalcost)
+
     establishment_message = 'ok'
     query4_2 = f"""
               SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
               FROM order_details Natural Join Product_information 
               Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
-    cursor.execute(query4_2)
-    orderinfo = cursor.fetchall()
+    category ='select' #重試類別select/notselect
+    orderinfo,result2 = retry(category,query4_2)
   return orderinfo, establishment_message
 
 #檢查庫存等動作(單筆)
-def order_detail(serial_number,conn,cursor):
+def order_detail(serial_number):
   userid = lineboterp.user_id
   orderall = lineboterp.orderall[userid]
   timeget = time()
@@ -323,8 +328,9 @@ def order_detail(serial_number,conn,cursor):
   establishment_message = ''
   
   query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{orderall[0]}'"
-  cursor.execute(query)
-  inventory_result = cursor.fetchall()
+  category ='select' #重試類別select/notselect
+  inventory_result,result2 = retry(category,query)
+
   if inventory_result != []:
     for row in inventory_result:
       sort = row[0] #現預購商品
@@ -346,8 +352,8 @@ def order_detail(serial_number,conn,cursor):
                 SET 庫存數量 = '{str(int(inventory)-int(orderall[1]))}'
                 WHERE 商品ID = '{orderall[0]}'
                 """
-        cursor.execute(query1)
-        conn.commit()
+        category ='notselect' #重試類別select/notselect
+        result,result2 = retry(category,query1)
       else:
         if int(orderall[1]) >= 2:
           if price2 is not None:
@@ -362,44 +368,44 @@ def order_detail(serial_number,conn,cursor):
 
 #預購倍數查詢
 def multiplesearch(product_id):
-  cursor = lineboterp.db['cursor']
   query = f"""
     select 預購數量限制_倍數 
     from Product_information 
     where 現預購商品 = '預購' and 商品ID = '{product_id}'
     """
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result == []:
+  category ='select' #重試類別select/notselect
+  multiple_result,result2 = retry(category,query)
+
+  if multiple_result == []:
     multiple = 1 #預設倍數
   else:
-    for i in result:
+    for i in multiple_result:
       multiple = int(i[0]) #查詢倍數
   return multiple
 
 #商品單位查詢
 def unitsearch(product_id):
-  cursor = lineboterp.db['cursor']
   query = f"""
     select 商品單位 
     from Product_information 
     where 商品ID = '{product_id}'
     """
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result == []:
+  category ='select' #重試類別select/notselect
+  unit_result,result2 = retry(category,query)
+
+  if unit_result == []:
     unit = '無'
   else:
-    for i in result:
+    for i in unit_result:
       unit = i[0] #單位
   return unit
 
 #單獨庫存查詢
 def stock(pid,num):
-  cursor = lineboterp.db['cursor']
   query = f"select 庫存數量 from Product_information where 商品ID = '{pid}'"
-  cursor.execute(query)
-  inventory_result = cursor.fetchall()
+  category ='select' #重試類別select/notselect
+  inventory_result,result2 = retry(category,query)
+
   if inventory_result != []:
     inventory = inventory_result[0][0] #庫存數量
     if inventory > 0:
@@ -419,10 +425,10 @@ def stock(pid,num):
 
 #單獨計算小計=數量*售出單價或售出單價2
 def quickcalculation(pid,pnum):
-  cursor = lineboterp.db['cursor']
   query = f"select 售出單價,售出單價2,商品單位 from Product_information where 商品ID = '{pid}'"
-  cursor.execute(query)
-  price_result = cursor.fetchall()
+  category ='select' #重試類別select/notselect
+  price_result,result2 = retry(category,query)
+
   if price_result != []:
     for row in price_result:
       price1 = row[0]
@@ -442,8 +448,6 @@ def quickcalculation(pid,pnum):
 #-------------------未取訂單查詢(100筆)----------------------
 def ordertoplist():
   userid = lineboterp.user_id
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
@@ -451,16 +455,15 @@ def ordertoplist():
     order by 訂單成立時間 desc
     limit 100 offset 0
     """#下一頁加100改offset(目前暫無考慮)
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result == []:
-    result = '找不到符合條件的資料。'
-  return result
+  category ='select' #重試類別select/notselect
+  nottaken_result,result2 = retry(category,query)
+
+  if nottaken_result == []:
+    nottaken_result = '找不到符合條件的資料。'
+  return nottaken_result
 #-------------------預購訂單查詢(100筆)----------------------
 def orderpreorderlist():
   userid = lineboterp.user_id
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
@@ -468,16 +471,15 @@ def orderpreorderlist():
     order by 訂單成立時間 desc
     limit 100 offset 0
     """#下一頁加100改offset(目前暫無考慮)
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result == []:
-    result = '找不到符合條件的資料。'
-  return result
+  category ='select' #重試類別select/notselect
+  preorder_result,result2 = retry(category,query)
+
+  if preorder_result == []:
+    preorder_result = '找不到符合條件的資料。'
+  return preorder_result
 #-------------------歷史訂單查詢(100筆)----------------------
 def ordertopalllist():
   userid = lineboterp.user_id
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   query = f"""
         select 訂單編號,總額,訂單成立時間,訂單狀態未取已取,取貨完成時間
         from `Order_information`
@@ -485,17 +487,16 @@ def ordertopalllist():
         order by 訂單成立時間 desc
         limit 100 offset 0
         """#下一頁加100改offset(目前暫無考慮)
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result == []:
-    result = '找不到符合條件的資料。'
-  return result
+  category ='select' #重試類別select/notselect
+  historicalorder_result,result2 = retry(category,query)
+
+  if historicalorder_result == []:
+    historicalorder_result = '找不到符合條件的資料。'
+  return historicalorder_result
 #-------------------訂單詳細資料------------------------
 def orderdt():
   userid = lineboterp.user_id
   ordersearch = lineboterp.orderall[userid+'dt']
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   query = f"""
           SELECT
             Order_information.訂單編號,
@@ -517,15 +518,15 @@ def orderdt():
             Product_information ON order_details.商品ID = Product_information.商品ID
           WHERE Order_information.訂單編號 = '{ordersearch}' ;
           """
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result == []:
-    result = '找不到符合條件的資料。'
-  return result
+  category ='select' #重試類別select/notselect
+  orderdetails_result,result2 = retry(category,query)
+
+  if orderdetails_result == []:
+    orderdetails_result = '找不到符合條件的資料。'
+  return orderdetails_result
 #-------------------購物車資料查詢----------------------
 def cartsearch():
   userid = lineboterp.user_id
-  cursor = lineboterp.db['cursor']
   query = f"""
     select 訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
     from order_details natural join Product_information
@@ -534,15 +535,15 @@ def cartsearch():
     from Order_information
     where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%')
     """
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result == []:
-    result = '資料庫搜尋不到'
-  return result
+  category ='select' #重試類別select/notselect
+  cart_result,result2 = retry(category,query)
+
+  if cart_result == []:
+    cart_result = '資料庫搜尋不到'
+  return cart_result
 #-------------------購物車單一商品小計查詢----------------------
 def cartsubtotal(pid):
   userid = lineboterp.user_id
-  cursor = lineboterp.db['cursor']
   query = f"""
     select 商品小計
     from order_details
@@ -551,122 +552,120 @@ def cartsubtotal(pid):
     from Order_information
     where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%') and 商品ID = '{pid}'
     """
-  cursor.execute(query)
-  result = cursor.fetchall()
-  result = result[0][0]
-  return result
+  category ='select' #重試類別select/notselect
+  subtotal_result,result2 = retry(category,query)
+
+  subtotal_result = subtotal_result[0][0]
+  return subtotal_result
 #-------------------購物車資料新增----------------------
 def cartadd(id,product_id,num):
-  try:
-    conn = lineboterp.db['conn']
-    cursor = lineboterp.db['cursor']
-    query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
-    cursor.execute(query)
-    inventory_result = cursor.fetchall()
-    if inventory_result != []:
-      if inventory_result[0][2] is not None:
-        if num >= 2 :
-          query1 =f"""
-                  INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
-                  VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
-                  '{product_id}','{num}',(select 售出單價2 from Product_information where 商品ID = '{product_id}')*{num});
-                  """
-        else:
-          query1 =f"""
-                  INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
-                  VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
-                  '{product_id}','{num}',(select 售出單價 from Product_information where 商品ID = '{product_id}')*{num});
-                  """
+  conn = lineboterp.db['conn']
+  query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
+  category ='select' #重試類別select/notselect
+  inventory_result,result2 = retry(category,query)
+
+  if inventory_result != []:
+    if inventory_result[0][2] is not None:
+      if num >= 2 :
+        query1 =f"""
+                INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+                VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
+                '{product_id}','{num}',(select 售出單價2 from Product_information where 商品ID = '{product_id}')*{num});
+                """
+        category ='notselect' #重試類別select/notselect
+        result,result2 = retry(category,query1)
       else:
         query1 =f"""
-                  INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
-                  VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
-                  '{product_id}','{num}',(select 售出單價 from Product_information where 商品ID = '{product_id}')*{num});
-                  """
-      cursor.execute(query1)
-      conn.commit()
-      text = 'ok'
+                INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+                VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
+                '{product_id}','{num}',(select 售出單價 from Product_information where 商品ID = '{product_id}')*{num});
+                """
+        category ='notselect' #重試類別select/notselect
+        result,result2 = retry(category,query1)
     else:
-      text = 'Null'
-  except Exception as e: #例外處理
-      conn.rollback()  # 撤銷操作恢復到操作前的狀態
-      #text = f'Commit failed: {str(e)}'
-      text = 'no'
-      state = lineboterp.user_state
-      state[id] = 'normal' #結束流程將user_state轉換預設狀態
-  return text
+      query1 =f"""
+                INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+                VALUES ((select 訂單編號 from Order_information where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%'),
+                '{product_id}','{num}',(select 售出單價 from Product_information where 商品ID = '{product_id}')*{num});
+                """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query1)
+  else:
+    result2 = 'Null'
+
+  #錯誤時恢復狀態
+  if result2 == 'no':
+    conn.rollback()  # 撤銷操作恢復到操作前的狀態
+    state = lineboterp.user_state
+    state[id] = 'normal' #結束流程將user_state轉換預設狀態
+  return result2
 #-------------------購物車單商品數量修改----------------------
 def revise(id,product_id,num):
-  try:
-    conn = lineboterp.db['conn']
-    cursor = lineboterp.db['cursor']
-    query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
-    cursor.execute(query)
-    inventory_result = cursor.fetchall()
-    if inventory_result != []:
-      if inventory_result[0][2] is not None:
-        if num >= 2 :
-          query1 = f"""
-              UPDATE order_details
-              SET 訂購數量 = '{num}', 商品小計 = (select 售出單價2 from Product_information where 商品ID = '{product_id}')*{num}
-              WHERE 訂單編號 = (
-              select 訂單編號
-              from Order_information
-              where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
-              """
-        else:
-          query1 = f"""
-              UPDATE order_details
-              SET 訂購數量 = '{num}', 商品小計 = (select 售出單價 from Product_information where 商品ID = '{product_id}')*{num}
-              WHERE 訂單編號 = (
-              select 訂單編號
-              from Order_information
-              where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
-              """
+  conn = lineboterp.db['conn']
+  query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
+  category ='select' #重試類別select/notselect
+  inventory_result,result2 = retry(category,query)
+
+  if inventory_result != []:
+    if inventory_result[0][2] is not None:
+      if num >= 2 :
+        query1 = f"""
+            UPDATE order_details
+            SET 訂購數量 = '{num}', 商品小計 = (select 售出單價2 from Product_information where 商品ID = '{product_id}')*{num}
+            WHERE 訂單編號 = (
+            select 訂單編號
+            from Order_information
+            where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
+            """
+        category ='notselect' #重試類別select/notselect
+        result,result2 = retry(category,query1)
       else:
         query1 = f"""
-              UPDATE order_details
-              SET 訂購數量 = '{num}', 商品小計 = (select 售出單價 from Product_information where 商品ID = '{product_id}')*{num}
-              WHERE 訂單編號 = (
-              select 訂單編號
-              from Order_information
-              where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
-              """
-      cursor.execute(query1)
-      conn.commit()
-      text = 'ok'
+            UPDATE order_details
+            SET 訂購數量 = '{num}', 商品小計 = (select 售出單價 from Product_information where 商品ID = '{product_id}')*{num}
+            WHERE 訂單編號 = (
+            select 訂單編號
+            from Order_information
+            where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
+            """
+        category ='notselect' #重試類別select/notselect
+        result,result2 = retry(category,query1)
     else:
-      text = 'Null'
-  except Exception as e: #例外處理
-      conn.rollback()  # 撤銷操作恢復到操作前的狀態
-      #text = f'Commit failed: {str(e)}'
-      text = 'no'
-  return text
+      query1 = f"""
+            UPDATE order_details
+            SET 訂購數量 = '{num}', 商品小計 = (select 售出單價 from Product_information where 商品ID = '{product_id}')*{num}
+            WHERE 訂單編號 = (
+            select 訂單編號
+            from Order_information
+            where 會員_LINE_ID = '{id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}';
+            """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query1)
+  else:
+    result2 = 'Null'
+  #錯誤時恢復狀態
+  if result2 == 'no':
+    conn.rollback()  # 撤銷操作恢復到操作前的狀態
+  return result2
 #-------------------修改購物車清單----------------------
 def removecart(user_id, product_id):
-    try:
-      conn = lineboterp.db['conn']
-      cursor = lineboterp.db['cursor']
-      query = f"""
-              DELETE FROM order_details 
-              WHERE 訂單編號 = (
-              select 訂單編號
-              from Order_information
-              where 會員_LINE_ID = '{user_id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}'
-              """
-      cursor.execute(query)
-      conn.commit()
-      text = 'ok'
-    except Exception as e: #例外處理
-      conn.rollback()  # 撤銷操作恢復到操作前的狀態
-      #text = f'Commit failed: {str(e)}'
-      text = 'no'
-    return text
+  conn = lineboterp.db['conn']
+  query = f"""
+          DELETE FROM order_details 
+          WHERE 訂單編號 = (
+          select 訂單編號
+          from Order_information
+          where 會員_LINE_ID = '{user_id}' and 訂單編號 like 'cart%') and 商品ID = '{product_id}'
+          """
+  category ='notselect' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  #錯誤時恢復狀態
+  if result2 == 'no':
+    conn.rollback()  # 撤銷操作恢復到操作前的狀態
+  return result2
 #-------------------購物車訂單建立----------------------
 def cartordergo(phonenum):
   userid = lineboterp.user_id
-  conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   timeget = time()
   formatted_datetimeget = timeget['formatted_datetime']
   order_dateget = timeget['order_date']
@@ -686,24 +685,25 @@ def cartordergo(phonenum):
     #修改庫存
     for totallist in dblistcart:
       query0 = f"select 庫存數量 from Product_information where 商品ID = '{totallist[1]}'"
-      cursor.execute(query0)
-      inventory_result = cursor.fetchall()
+      category ='select' #重試類別select/notselect
+      inventory_result,result2 = retry(category,query0)
+
       inventory = inventory_result[0][0] #現在庫存數量
       query01 =f"""
                   UPDATE Product_information
                   SET 庫存數量 = '{str(int(inventory)-int(totallist[3]))}'
                   WHERE 商品ID = '{totallist[1]}'
                   """
-      cursor.execute(query01)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query01)
 
     query2 = f"""
             SELECT 訂單編號, 會員_LINE_ID ,訂單成立時間
             FROM Order_information 
             WHERE 訂單編號 like'order%' and 訂單成立時間 <= '{formatted_datetimeget}'
             ORDER BY 訂單成立時間 DESC , 訂單編號 DESC;""" #訂單資料檢查
-    cursor.execute(query2)
-    order_result = cursor.fetchall()
+    category ='select' #重試類別select/notselect
+    order_result,result2 = retry(category,query2)
 
     if order_result == []:
       serial_number = '00001'
@@ -711,8 +711,8 @@ def cartordergo(phonenum):
             INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
             VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
             """
-      cursor.execute(query3_1)
-      conn.commit()#建立訂單資訊
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query3_1)
 
       query3_2 = f"""
             UPDATE order_details
@@ -722,8 +722,9 @@ def cartordergo(phonenum):
             from Order_information 
             where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%');
             """#將購物車編號轉換訂單編號
-      cursor.execute(query3_2)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query3_2)
+
       query3_3 = f"""
             UPDATE Order_information
             SET 總額 = (
@@ -733,15 +734,17 @@ def cartordergo(phonenum):
             )
             WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
             """#訂單資訊總額計算
-      cursor.execute(query3_3)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query3_3)
+
       establishment_message = 'ok'
       query4_1 = f"""
                 SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
                 FROM order_details Natural Join Product_information 
                 Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
-      cursor.execute(query4_1)
-      orderinfo = cursor.fetchall()
+      category ='select' #重試類別select/notselect
+      orderinfo,result2 = retry(category,query4_1)
+
     else:
       checkaddtime = order_result[0][0]#取得最新一筆訂單序號
       if checkaddtime[5:13] == f"{str(order_dateget)}":
@@ -755,8 +758,9 @@ def cartordergo(phonenum):
             INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
             VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
             """
-      cursor.execute(addorder)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,addorder)
+
       addorderdetails = f"""
             UPDATE order_details
             SET 訂單編號 = 'order{order_dateget}{serial_number}'
@@ -765,8 +769,9 @@ def cartordergo(phonenum):
             from Order_information 
             where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%');
             """#將購物車編號轉換訂單編號
-      cursor.execute(addorderdetails)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,addorderdetails)
+
       addtotalcost = f"""
             UPDATE Order_information
             SET 總額 = (
@@ -776,15 +781,16 @@ def cartordergo(phonenum):
             )
             WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
             """
-      cursor.execute(addtotalcost)
-      conn.commit()
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,addtotalcost)
+
       establishment_message = 'ok'
       query4_2 = f"""
                 SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
                 FROM order_details Natural Join Product_information 
                 Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
-      cursor.execute(query4_2)
-      orderinfo = cursor.fetchall()
+      category ='select' #重試類別select/notselect
+      orderinfo,result2 = retry(category,query4_2)
   return orderinfo, establishment_message
 
 #-------------------許願商品建立----------------------
@@ -829,7 +835,6 @@ def single_imagetolink():
 
 #-------------------圖片取得並發送----------------------
 def imagesent():
-    conn = lineboterp.db['conn']
     cursor = lineboterp.db['cursor']
     img = []
     send = []
