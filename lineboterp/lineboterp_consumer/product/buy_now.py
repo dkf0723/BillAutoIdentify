@@ -4,6 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import lineboterp
 from database import buynow_list,unitsearch
+from selection_screen import Order_buynow_preorder_screen
 
 #-------------------現購清單----------------------
 def product_buynow_list():
@@ -248,7 +249,7 @@ def product_buynow_list():
             })
     return product_show
 #-------------------現購訂單----------------------
-def Order_buynow():
+def Order_buynow(errormsg):
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
     product_id = lineboterp.product[user_id+'product_id']
@@ -258,20 +259,15 @@ def Order_buynow():
     #Quick Reply 按鈕數量範圍
     quantity_option = []
     unit = unitsearch(product_id)
-    quantity_option.append(QuickReplyButton(action=MessageAction(label='取消', text='取消')))
     for i in range(10):
         if unit == '無':
             quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
         else:
             quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1)+unit, text=str(i+1))))
     #------------------------
-
     user_state[user_id] = 'ordering'#從user_state轉換訂購狀態
-    # 建立 Quick Reply 按鈕
-    quick_reply_message = TextSendMessage(
-        text='商品ID：%s\n商品名稱：%s\n=>請輸入現購數量：' %(product_id,product),
-        quick_reply=QuickReply(items=quantity_option)
-    )
-    Order_buynow_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
-        # 傳送回應訊息給使用者
+    # 建立畫面及Quick Reply 按鈕
+    quickreply = QuickReply(items=quantity_option)
+    Order_buynow_text = Order_buynow_preorder_screen(product_order_preorder[user_id],product_id,product,quickreply,errormsg)
     return Order_buynow_text
+

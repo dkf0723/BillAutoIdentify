@@ -82,7 +82,7 @@ def cart_list():
                 "type": "text",
                 "text": "高逸嚴選",
                 "weight": "bold",
-                "color": "#1DB446",
+                "color": "#A44528",
                 "size": "sm"
             },
             {
@@ -172,6 +172,7 @@ def addcart():
             #Quick Reply 按鈕數量範圍
             quantity_option = []
             unit = unitsearch(product_id)
+            quantity_option.append(QuickReplyButton(action=MessageAction(label='取消', text='取消')))
             for i in range(10):
                 if unit == '無':
                     quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
@@ -277,7 +278,7 @@ def editcart():
                 "type": "text",
                 "text": "高逸嚴選",
                 "weight": "bold",
-                "color": "#1DB446",
+                "color": "#A44528",
                 "size": "sm"
             },
             {
@@ -341,7 +342,7 @@ def checkcart(content,lumpsum):
                     "type": "text",
                     "text": "高逸嚴選",
                     "weight": "bold",
-                    "color": "#1DB446",
+                    "color": "#A44528",
                     "size": "sm"
                 },
                 {
@@ -359,7 +360,7 @@ def checkcart(content,lumpsum):
                 {
                     "type": "text",
                     "text": f"{content}",#訂單內容
-                    "size": "sm",
+                    "size": "lg",
                     "margin": "lg",
                     "wrap": True
                 },
@@ -370,7 +371,7 @@ def checkcart(content,lumpsum):
                 {
                     "type": "text",
                     "text": f"總額：NT${str('{:,}'.format(lumpsum))}",#總額
-                    "size": "md",
+                    "size": "lg",
                     "margin": "lg",
                     "align": "end",
                     "weight": "bold"

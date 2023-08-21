@@ -4,6 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import lineboterp
 from database import preorder_list,multiplesearch,unitsearch
+from selection_screen import Order_buynow_preorder_screen
 #-------------------預購清單----------------------
 def product_preorder_list():
     product_show = ''
@@ -253,7 +254,7 @@ def product_preorder_list():
             })
     return product_show
 #-------------------預購訂單----------------------
-def Order_preorder():
+def Order_preorder(errormsg):
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
     product_id = lineboterp.product[user_id+'product_id']
@@ -266,7 +267,6 @@ def Order_preorder():
     multiple = multiplesearch(product_id)
     storage_multiple[user_id+'multiple'] = multiple
     unit = unitsearch(product_id)
-    quantity_option.append(QuickReplyButton(action=MessageAction(label='取消', text='取消')))
     for i in range(10):
         if unit != '無':
             if (i+1) % multiple == 0:
@@ -277,11 +277,7 @@ def Order_preorder():
     #------------------------
     
     user_state[user_id] = 'preorder'#從user_state轉換預購狀態
-    # 建立 Quick Reply 按鈕
-    quick_reply_message = TextSendMessage(
-        text='商品ID：%s\n商品名稱：%s\n=>請輸入預購數量：' %(product_id,product),
-        quick_reply=QuickReply(items=quantity_option)
-    )    
-    Order_preorder_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
-        # 傳送回應訊息給使用者
+     # 建立畫面及Quick Reply 按鈕
+    quickreply = QuickReply(items=quantity_option)
+    Order_preorder_text = Order_buynow_preorder_screen(product_order_preorder[user_id],product_id,product,quickreply,errormsg)
     return Order_preorder_text
