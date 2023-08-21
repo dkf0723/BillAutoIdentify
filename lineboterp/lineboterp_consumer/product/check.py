@@ -184,6 +184,7 @@ def orderandpreorder_check():
             check_text = TextSendMessage(text=check_text),TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "')    
     return check_text
 
+#購物車商品新增
 def cartnum():
     id = lineboterp.user_id
     state = lineboterp.user_state
