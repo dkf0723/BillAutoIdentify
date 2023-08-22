@@ -366,6 +366,21 @@ def order_detail(serial_number):
     establishment_message = '資料庫查無此商品資料'
   return order_details,establishment_message,sort
 
+#最近一筆電話取得
+def recent_phone_call(user_id):
+  query = f"""
+    SELECT 電話
+    FROM Order_information
+    where 會員_LINE_ID = '{user_id}' and 訂單編號 LIKE 'order%'
+    ORDER BY 訂單成立時間 DESC
+    LIMIT 1
+    """
+  category ='select' #重試類別select/notselect
+  phone_result,result2 = retry(category,query)
+  if phone_result == []:
+    phone_result = 'no'#都沒有成立過訂單
+  return phone_result
+
 #預購倍數查詢
 def multiplesearch(product_id):
   query = f"""

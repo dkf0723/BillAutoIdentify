@@ -294,7 +294,8 @@ def handle_message(event):
                 ))
         #-------------------資料庫連線測試----------------------
         elif '資料庫' in msg:
-            databasetest_msg = databasetest()['databasetest_msg']
+            #databasetest_msg = databasetest()['databasetest_msg']
+            databasetest_msg = db['databasetest_msg']
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
         elif '測試' in msg:
             datasearch = test_datasearch()
