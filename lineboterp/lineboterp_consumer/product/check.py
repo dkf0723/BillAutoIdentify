@@ -9,6 +9,7 @@ from ask_wishes.ask import *
 from ask_wishes.wishes import *
 from database import *
 from product.cartlist import cart_list,addcart,cartrevise,checkcart
+from selection_screen import Order_phonenum_screen
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
@@ -38,34 +39,35 @@ def orderandpreorder_check():
     product_id = lineboterp.product[id+'product_id']
     product = lineboterp.product[id+'product']
     product_order_preorder = lineboterp.product_order_preorder
-    duplicate_save = lineboterp.duplicate_save
     message_storage = lineboterp.storage
     orderall = lineboterp.orderall
     storage_multiple = lineboterp.storage[id+'multiple']
+    phone = recent_phone_call(id)[0][0]#最近一筆電話取得
     if message.isdigit():
             # 處理完問題後，結束等待回覆狀態
         if state[id] == 'ordering':
-            message_storage[id+'num'] = message
-            message_storage[id+'ordertype'] = '現購'
-            check_text = ('商品名稱：%s\n您輸入的現購數量： %s' %(product,message))
-            check_text += '\n=>請接著，打字輸入「電話號碼」\nex.0952000000'
-            duplicate_save[id] = check_text
-            check_text = TextSendMessage(text=check_text)
-            duplicate_save[id] = check_text
-            state[id] = 'phonenum' #從user_state轉換輸入電話狀態
-            errormsg = 'no'
-        elif state[id] == 'preorder':
-            if int(message) % storage_multiple == 0:
+            if int(message) > 0:
                 message_storage[id+'num'] = message
-                message_storage[id+'ordertype'] = '預購'
-                check_text = ('商品名稱：%s\n您輸入的預購數量： %s' %(product,message))
-                check_text += '\n=>請接著，打字輸入「電話號碼」\n ex.0952000000'
-                check_text = TextSendMessage(text=check_text)
-                duplicate_save[id] = check_text
-                state[id] = 'phonenum' #從user_state轉換輸入電話狀態
+                message_storage[id+'ordertype'] = '現購'
                 errormsg = 'no'
+                check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
+                state[id] = 'phonenum' #從user_state轉換輸入電話狀態
             else:
-                errormsg = f"您輸入的預購倍數「{message}」不是{str(storage_multiple)}的倍數喔！請重新輸入預購數量。"
+                errormsg = f"您輸入的數量「{message}」有誤！請重新輸入現購數量。"
+                check_text = Order_preorder(errormsg)
+        elif state[id] == 'preorder':
+            if int(message) > 0:
+                if int(message) % storage_multiple == 0:
+                    message_storage[id+'num'] = message
+                    message_storage[id+'ordertype'] = '預購'
+                    errormsg = 'no'
+                    check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
+                    state[id] = 'phonenum' #從user_state轉換輸入電話狀態
+                else:
+                    errormsg = f"您輸入的預購倍數「{message}」不是{str(storage_multiple)}的倍數喔！請重新輸入預購數量。"
+                    check_text = Order_preorder(errormsg)
+            else:
+                errormsg = f"您輸入的數量「{message}」有誤！請重新輸入預購數量。"
                 check_text = Order_preorder(errormsg)
         elif state[id] == 'phonenum':
             if message.isdigit():
@@ -166,7 +168,17 @@ def orderandpreorder_check():
                 errormsg = f"您輸入的「{message}」不是此預購流程中會出現的內容喔！請重新輸入預購數量。"
                 check_text = Order_preorder(errormsg)
         elif state[id] =='phonenum':
-            check_text = TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "'),duplicate_save[id]
+            if message == '重新填寫':
+                message_storage[id+'num'] = 'NaN'
+                message_storage[id+'phonenum'] = 'NaN'
+                errormsg = 'no'
+                if product_order_preorder[id] == '現購':
+                    check_text = Order_buynow(errormsg)
+                elif product_order_preorder[id] == '預購':
+                    check_text = Order_preorder(errormsg)
+            else:
+                errormsg = f"您輸入的「{message}」不是此{product_order_preorder[id]}流程中會出現的內容喔！請重新輸入連絡電話。"
+                check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
         elif state[id] =='end':
             check_text = TemplateSendMessage(
                             alt_text='訂單確認',
