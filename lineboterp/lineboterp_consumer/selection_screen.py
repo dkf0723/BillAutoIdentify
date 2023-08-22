@@ -564,102 +564,171 @@ def Order_buynow_preorder_screen(product_order_preorder,product_id,product,quick
         }
 
     order_buynow_preorder_screen = {
-                    "type": "bubble",
-                    "body": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                        {
-                            "type": "text",
-                            "text": "高逸嚴選",
-                            "color": "#A44528",
-                            "size": "sm",
-                            "weight": "bold"
-                        },
-                        {
-                            "type": "text",
-                            "text": f"{product_order_preorder}填寫(1/2)",
-                            "weight": "bold",
-                            "size": "xl",
-                            "align": "center",
-                            "margin": "xl"
-                        },
-                        {
-                            "type": "separator",
-                            "color": f"{distinguish}",
-                            "margin": "md"
-                        },
-                        {
+                        "type": "bubble",
+                        "body": {
                             "type": "box",
                             "layout": "vertical",
-                            "margin": "lg",
-                            "spacing": "xs",
                             "contents": [
                             {
                                 "type": "text",
-                                "text": f"◇商品ID：{product_id} \n◇商品名稱：{product} ",
-                                "wrap": True,
-                                "color": "#3b5a5f",
-                                "size": "md",
-                                "flex": 5,
-                                "margin": "sm",
-                                "weight": "bold"
-                            },
-                            {
-                                "type": "text",
-                                "text": "<下方依序填寫～>",
-                                "wrap": True,
-                                "color": "#3b5a5f",
-                                "size": "md",
-                                "flex": 5,
-                                "margin": "xl",
-                                "weight": "bold"
-                            },
-                            {
-                                "type": "text",
-                                "text": f"{enter}",
-                                "wrap": True,
-                                "color": "#3b5a5f",
-                                "size": "md",
-                                "flex": 5,
-                                "margin": "sm",
-                                "weight": "bold"
-                            },
-                            {
-                                "type": "text",
-                                "text": "※提示：可以自行輸入更多的數量",
-                                "wrap": True,
-                                "color": "#f6b877",
+                                "text": "高逸嚴選",
+                                "color": "#A44528",
                                 "size": "sm",
-                                "flex": 5,
                                 "weight": "bold"
-                            },msg
-                            ]
-                        }
-                        ],
-                        "backgroundColor": "#FCFAF1"
-                    },
-                    "footer": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "spacing": "md",
-                        "contents": [
-                        {
-                            "type": "button",
-                            "style": "link",
-                            "height": "sm",
-                            "action": {
-                            "type": "message",
-                            "label": "取消",
-                            "text": "取消"
+                            },
+                            {
+                                "type": "text",
+                                "text": f"{product_order_preorder}填寫(1/2)",
+                                "weight": "bold",
+                                "size": "xl",
+                                "align": "center",
+                                "margin": "xl"
+                            },
+                            {
+                                "type": "separator",
+                                "color": f"{distinguish}",
+                                "margin": "md"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "margin": "lg",
+                                "spacing": "xs",
+                                "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "◇商品編號：",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ],
+                                        "width": "100px"
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"{product_id}",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ]
+                                    }
+                                    ]
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "◇商品名稱：",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ],
+                                        "width": "100px"
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"{product}",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ]
+                                    }
+                                    ]
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "<下方依序填寫～>",
+                                    "wrap": True,
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "margin": "xl",
+                                    "weight": "bold"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": f"{enter}",
+                                    "wrap": True,
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "margin": "sm",
+                                    "weight": "bold"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "※提示：可以自行輸入更多的數量",
+                                    "wrap": True,
+                                    "color": "#f6b877",
+                                    "size": "sm",
+                                    "flex": 5,
+                                    "weight": "bold"
+                                },
+                                msg
+                                ]
                             }
+                            ],
+                            "backgroundColor": "#FCFAF1"
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "spacing": "md",
+                            "contents": [
+                            {
+                                "type": "button",
+                                "style": "link",
+                                "height": "sm",
+                                "action": {
+                                "type": "message",
+                                "label": "取消",
+                                "text": "取消"
+                                }
+                            }
+                            ],
+                            "flex": 0
                         }
-                        ],
-                        "flex": 0
-                    }
-                    }
+                        }
     screen =FlexSendMessage(
-                            alt_text=f"{product_order_preorder}購填寫(1/2)",
+                            alt_text=f"{product_order_preorder}填寫(1/2)",
                             contents={
                                 "type": "carousel",
                                 "contents": [order_buynow_preorder_screen]   
@@ -730,105 +799,768 @@ def Order_phonenum_screen(product_order_preorder,product_id,product,errormsg,pho
         "flex": 5,
         "weight": "bold"
         }
-    order_phonenum_screen={
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "高逸嚴選",
-                        "color": "#A44528",
-                        "size": "sm",
-                        "weight": "bold"
-                    },
-                    {
-                        "type": "text",
-                        "text": f"{product_order_preorder}填寫(2/2)",
-                        "weight": "bold",
-                        "size": "xl",
-                        "align": "center",
-                        "margin": "xl"
-                    },
-                    {
-                        "type": "separator",
-                        "color": f"{distinguish}",
-                        "margin": "md"
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "lg",
-                        "spacing": "xs",
-                        "contents": [
-                        {
-                            "type": "text",
-                            "text": f"◇商品ID：{product_id} \n◇商品名稱：{product} ",
-                            "wrap": True,
-                            "color": "#3b5a5f",
-                            "size": "md",
-                            "flex": 5,
-                            "margin": "sm",
-                            "weight": "bold"
+    order_phonenum_screen = {
+                        "type": "bubble",
+                        "body": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "高逸嚴選",
+                                "color": "#A44528",
+                                "size": "sm",
+                                "weight": "bold"
+                            },
+                            {
+                                "type": "text",
+                                "text": f"{product_order_preorder}填寫(2/2)",
+                                "weight": "bold",
+                                "size": "xl",
+                                "align": "center",
+                                "margin": "xl"
+                            },
+                            {
+                                "type": "separator",
+                                "color": f"{distinguish}",
+                                "margin": "md"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "margin": "lg",
+                                "spacing": "xs",
+                                "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "◇商品編號：",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ],
+                                        "width": "100px"
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"{product_id}",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ]
+                                    }
+                                    ]
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "◇商品名稱：",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ],
+                                        "width": "100px"
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"{product}",
+                                            "wrap": True,
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ]
+                                    }
+                                    ]
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "<下方依序填寫～>",
+                                    "wrap": True,
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "margin": "xl",
+                                    "weight": "bold"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": f"1.{product_order_preorder}數量：{num}{unit}",
+                                    "wrap": True,
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "margin": "sm",
+                                    "weight": "bold"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "=>2.請輸入您的聯絡電話：",
+                                    "wrap": True,
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "margin": "sm",
+                                    "weight": "bold"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "※提示：請自行輸入！ex.0952025413",
+                                    "wrap": True,
+                                    "color": "#f6b877",
+                                    "size": "sm",
+                                    "flex": 5,
+                                    "weight": "bold"
+                                },
+                                msg
+                                ]
+                            }
+                            ],
+                            "backgroundColor": "#FCFAF1"
                         },
-                        {
-                            "type": "text",
-                            "text": "<下方依序填寫～>",
-                            "wrap": True,
-                            "color": "#3b5a5f",
-                            "size": "md",
-                            "flex": 5,
-                            "margin": "xl",
-                            "weight": "bold"
-                        },
-                        {
-                            "type": "text",
-                            "text": f"1.{product_order_preorder}數量：{num}{unit}",
-                            "wrap": True,
-                            "color": "#3b5a5f",
-                            "size": "md",
-                            "flex": 5,
-                            "margin": "sm",
-                            "weight": "bold"
-                        },
-                        {
-                            "type": "text",
-                            "text": "=>2.請輸入您的聯絡電話：",
-                            "wrap": True,
-                            "color": "#3b5a5f",
-                            "size": "md",
-                            "flex": 5,
-                            "margin": "sm",
-                            "weight": "bold"
-                        },
-                        {
-                            "type": "text",
-                            "text": "※提示：請自行輸入！ex.0952025413",
-                            "wrap": True,
-                            "color": "#f6b877",
-                            "size": "sm",
-                            "flex": 5,
-                            "weight": "bold"
-                        },msg
-                        ]
-                    }
-                    ],
-                    "backgroundColor": "#FCFAF1"
-                },##
-                "footer": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "md",
-                    "contents": phone_quick_buttons,
-                    "flex": 0
-                }
-                }
+                        "footer": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "spacing": "md",
+                            "contents": phone_quick_buttons,
+                            "flex": 0
+                        }
+                        }
     screen =FlexSendMessage(
-                            alt_text=f"{product_order_preorder}購填寫(2/2)",
+                            alt_text=f"{product_order_preorder}填寫(2/2)",
                             contents={
                                 "type": "carousel",
                                 "contents": [order_phonenum_screen]   
+                                }
+                            )
+    return screen
+
+#單一訂單確認畫面
+def Single_order_confirmation_screen(product_order_preorder,product_id,product,phonenum,num,unit,oderprice,oderdiscount,subtotalin):
+    if product_order_preorder == '現購':
+        distinguish = '#1a9879'#綠
+    elif product_order_preorder == '預購':
+        distinguish = '#c42149'#紅
+    single_order_confirmation_screen={
+                            "type": "bubble",
+                            "body": {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "高逸嚴選",
+                                    "color": "#A44528",
+                                    "size": "sm",
+                                    "weight": "bold"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": f"{product_order_preorder}訂單確認",
+                                    "weight": "bold",
+                                    "size": "xl",
+                                    "align": "center",
+                                    "margin": "xl"
+                                },
+                                {
+                                    "type": "separator",
+                                    "color": f"{distinguish}",
+                                    "margin": "md"
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "margin": "lg",
+                                    "spacing": "xs",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇商品編號：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{product_id}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇商品名稱：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{product}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇電話號碼：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{phonenum}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇商品單價：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"每{unit}{oderprice}元{oderdiscount}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"◇{product_order_preorder}數量：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{num}{unit}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "separator",
+                                        "margin": "xl"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"總計：NT${subtotalin}",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "lg",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold",
+                                        "align": "end"
+                                    }
+                                    ]
+                                }
+                                ]
+                            },
+                            "footer": {
+                                "type": "box",
+                                "layout": "vertical",
+                                "spacing": "md",
+                                "contents": [
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "height": "sm",
+                                    "action": {
+                                    "type": "message",
+                                    "label": f"送出{product_order_preorder}訂單",
+                                    "text": "1"
+                                    },
+                                    "color": "#A44528"
+                                },
+                                {
+                                    "type": "button",
+                                    "style": "link",
+                                    "height": "sm",
+                                    "action": {
+                                    "type": "message",
+                                    "label": "取消",
+                                    "text": "2"
+                                    }
+                                }
+                                ],
+                                "flex": 0
+                            }
+                            }
+    screen =FlexSendMessage(
+                            alt_text=f"{product_order_preorder}訂單確認",
+                            contents={
+                                "type": "carousel",
+                                "contents": [single_order_confirmation_screen]   
+                                }
+                            )
+    return screen
+
+#訂單成立訊息
+def Order_establishment_message(product_order_preorder,ordernumber,product,product_id,num,unit,total,continue_browsing,oderprice,oderdiscount,phonenum):
+    if product_order_preorder == '現購':
+        distinguish = '#1a9879'#綠
+        takemsg = '已經可以前往「店面取貨」囉～'
+    elif product_order_preorder == '預購':
+        distinguish = '#c42149'#紅
+        takemsg = '於「商品到貨日」傳送取貨提醒～'
+    order_establishment_message = {
+                            "type": "bubble",
+                            "body": {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "高逸嚴選",
+                                    "color": "#A44528",
+                                    "size": "sm",
+                                    "weight": "bold"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": f"{product_order_preorder}訂單已成立！",
+                                    "weight": "bold",
+                                    "size": "xl",
+                                    "align": "center",
+                                    "margin": "xl"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": f"訂單編號：{ordernumber}",
+                                    "weight": "bold",
+                                    "size": "md",
+                                    "align": "center",
+                                    "margin": "sm",
+                                    "color": f"{distinguish}"
+                                },
+                                {
+                                    "type": "separator",
+                                    "color": f"{distinguish}",
+                                    "margin": "md"
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "margin": "lg",
+                                    "spacing": "xs",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇商品編號：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{product_id}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇商品名稱：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{product}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇電話號碼：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{phonenum}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇商品單價：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"每{unit}{oderprice}元{oderdiscount}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "horizontal",
+                                        "contents": [
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "◇現購數量：",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ],
+                                            "width": "100px"
+                                        },
+                                        {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": f"{num}{unit}",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "size": "md",
+                                                "flex": 5,
+                                                "margin": "sm",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        }
+                                        ]
+                                    },
+                                    {
+                                        "type": "separator",
+                                        "margin": "xl"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"總計：NT${total}",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "lg",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold",
+                                        "align": "end"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"\n{takemsg}",
+                                        "wrap": True,
+                                        "color": "#fb5840",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold",
+                                        "align": "center"
+                                    }
+                                    ]
+                                }
+                                ]
+                            },
+                            "footer": {
+                                "type": "box",
+                                "layout": "vertical",
+                                "spacing": "md",
+                                "contents": [
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "height": "sm",
+                                    "action": {
+                                    "type": "message",
+                                    "label": f"繼續瀏覽{product_order_preorder}商品",
+                                    "text": f"{continue_browsing}"
+                                    },
+                                    "color": "#A44528"
+                                }
+                                ],
+                                "flex": 0
+                            }
+                            }
+    screen =FlexSendMessage(
+                            alt_text=f"{product_order_preorder}訂單成立！",
+                            contents={
+                                "type": "carousel",
+                                "contents": [order_establishment_message]   
                                 }
                             )
     return screen

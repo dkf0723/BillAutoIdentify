@@ -9,7 +9,7 @@ from ask_wishes.ask import *
 from ask_wishes.wishes import *
 from database import *
 from product.cartlist import cart_list,addcart,cartrevise,checkcart
-from selection_screen import Order_phonenum_screen
+from selection_screen import Order_phonenum_screen,Single_order_confirmation_screen,Order_establishment_message
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
@@ -80,27 +80,17 @@ def orderandpreorder_check():
                 else:
                     message_storage[id+'phonenum'] = message
                     state[id] = 'end'#從user_state轉換確認狀態
-                    localsubtotal,dbunitin = quickcalculation(product_id,int(message_storage[id+'num']))#快速計算小計
+                    localsubtotal,dbunitin,price,discount = quickcalculation(product_id,int(message_storage[id+'num']))#快速計算小計
                     if str(localsubtotal).isdigit():
                         subtotal = str('{:,}'.format(localsubtotal))
                         message_storage[id+'subtotalin'] = subtotal
                         message_storage[id+'unitin'] = dbunitin
-                        check_text =TemplateSendMessage(
-                        alt_text='訂單確認',
-                        template=ConfirmTemplate(
-                            text=(f"==訂單資料確認==\n商品ID：{product_id}\n商品名稱：{product}\n電話號碼：{message_storage[id+'phonenum']}\n{message_storage[id+'ordertype']}數量：{message_storage[id+'num']+message_storage[id+'unitin']}\n總計：NT${message_storage[id+'subtotalin']}"),
-                                actions=[
-                                    MessageAction(
-                                        label='【1.確認】',
-                                        text='1'
-                                    ),
-                                    MessageAction(
-                                        label='【2.取消】',
-                                        text='2'
-                                    )
-                                ]
-                            )
-                        )
+                        message_storage[id+'oderprice'] = price
+                        message_storage[id+'oderdiscount'] = discount
+                        check_text = Single_order_confirmation_screen(product_order_preorder[id],product_id,product,message_storage[id+'phonenum'],
+                                                          message_storage[id+'num'],message_storage[id+'unitin'],
+                                                          message_storage[id+'oderprice'],message_storage[id+'oderdiscount'],
+                                                          message_storage[id+'subtotalin'])
                     else:
                         check_text = TextSendMessage(text=localsubtotal)
                        
@@ -112,11 +102,21 @@ def orderandpreorder_check():
                 orderinfo = orderinfo[0]
                 if establishment_message == 'ok':
                     if numtype == '現購':
-                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：NT${str('{:,}'.format(orderinfo[4]))}\n已經可以前往「店面取貨」囉～"
-                        check_text = TextSendMessage(text=check_text),Company_location()
+                        pagemin = lineboterp.list_page[lineboterp.user_id+'現購min']
+                        pagemax = lineboterp.list_page[lineboterp.user_id+'現購max']
+                        continue_browsing = "【現購列表下一頁】"+ str(pagemin+1) +"～"+ str(pagemax)
+                        check_text = Order_establishment_message(orderinfo[2],str(orderinfo[0]),orderinfo[1],orderinfo[6],
+                                                                 str(orderinfo[3]),str(orderinfo[5]),str('{:,}'.format(orderinfo[4])),
+                                                                 continue_browsing,message_storage[id+'oderprice'],
+                                                                 message_storage[id+'oderdiscount'],message_storage[id+'phonenum'])
                     elif numtype == '預購':
-                        check_text = f"您的{orderinfo[2]}訂單已成立！\n訂單編號：{str(orderinfo[0])}商品名稱：{orderinfo[1]}\n數量：{str(orderinfo[3])}{str(orderinfo[5])}\n總額：NT${str('{:,}'.format(orderinfo[4]))}\n注意：將於「預購結單日」傳送您是否預購成功呦～"
-                        check_text = TextSendMessage(text=check_text)
+                        pagemin = lineboterp.list_page[lineboterp.user_id+'預購min']
+                        pagemax = lineboterp.list_page[lineboterp.user_id+'預購max']
+                        continue_browsing = "【預購列表下一頁】"+ str(pagemin+1) +"～"+ str(pagemax)
+                        check_text = Order_establishment_message(orderinfo[2],str(orderinfo[0]),orderinfo[1],orderinfo[6],
+                                                                 str(orderinfo[3]),str(orderinfo[5]),str('{:,}'.format(orderinfo[4])),
+                                                                 continue_browsing,message_storage[id+'oderprice'],
+                                                                 message_storage[id+'oderdiscount'],message_storage[id+'phonenum'])
                     state[id] = 'normal' #從user_state轉換普通狀態
                     #下方重置
                     message_storage[id+'num'] = 'NaN'
@@ -125,29 +125,28 @@ def orderandpreorder_check():
                     product = 'NaN'
                     product_order_preorder[id] = 'NaN'
                     message_storage[id+'ordertype'] = 'NaN'
+                    message_storage[id+'oderprice'] = 'NaN'
+                    message_storage[id+'oderdiscount'] = 'NaN'
                 else:
                     check_text = TextSendMessage(text=establishment_message)
             elif message == '2':
                 check_text = '您的商品訂/預購流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text)
                 state[id] = 'normal' #從user_state轉換普通狀態
+                #下方重置
+                message_storage[id+'num'] = 'NaN'
+                message_storage[id+'phonenum'] = 'NaN'
+                product_id = 'NaN'
+                product = 'NaN'
+                product_order_preorder[id] = 'NaN'
+                message_storage[id+'ordertype'] = 'NaN'
+                message_storage[id+'oderprice'] = 'NaN'
+                message_storage[id+'oderdiscount'] = 'NaN'
             else:
-                check_text = TemplateSendMessage(
-                            alt_text='訂單確認',
-                            template=ConfirmTemplate(
-                                text=(f"==訂單資料確認==\n商品ID：{product_id}\n商品名稱：{product}\n電話號碼：{message_storage[id+'phonenum']}\n{message_storage[id+'ordertype']}數量：{message_storage[id+'num']+message_storage[id+'unitin']}\n總計：NT${message_storage[id+'subtotalin']}"),
-                                    actions=[
-                                        MessageAction(
-                                            label='【1.確認】',
-                                            text='1'
-                                        ),
-                                        MessageAction(
-                                            label='【2.取消】',
-                                            text='2'
-                                        )
-                                    ]
-                                )
-                            )
+                check_text = Single_order_confirmation_screen(product_order_preorder[id],product_id,product,message_storage[id+'phonenum'],
+                                                          message_storage[id+'num'],message_storage[id+'unitin'],
+                                                          message_storage[id+'oderprice'],message_storage[id+'oderdiscount'],
+                                                          message_storage[id+'subtotalin'])
     else:
         if(message == "取消"):
             check_text = '您的商品現/預購流程\n已經取消囉～'
@@ -160,6 +159,8 @@ def orderandpreorder_check():
             product = 'NaN'
             product_order_preorder[id] = 'NaN'
             message_storage[id+'ordertype'] = 'NaN'
+            message_storage[id+'oderprice'] = 'NaN'
+            message_storage[id+'oderdiscount'] = 'NaN'
         elif state[id] in ['ordering','preorder']:
             if state[id] == 'ordering':
                 errormsg = f"您輸入的「{message}」不是此現購流程中會出現的內容喔！請重新輸入現購數量。"
@@ -177,25 +178,13 @@ def orderandpreorder_check():
                 elif product_order_preorder[id] == '預購':
                     check_text = Order_preorder(errormsg)
             else:
-                errormsg = f"您輸入的「{message}」不是此{product_order_preorder[id]}流程中會出現的內容喔！請重新輸入連絡電話。"
+                errormsg = f"您輸入的「{message}」不是此{product_order_preorder[id]}流程中會出現的內容喔！請重新輸入聯絡電話。"
                 check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
         elif state[id] =='end':
-            check_text = TemplateSendMessage(
-                            alt_text='訂單確認',
-                            template=ConfirmTemplate(
-                                text=(f"==訂單資料確認==\n商品ID：{product_id}\n商品名稱：{product}\n電話號碼：{message_storage[id+'phonenum']}\n{message_storage[id+'ordertype']}數量：{message_storage[id+'num']+message_storage[id+'unitin']}\n總計：NT${message_storage[id+'subtotalin']}"),
-                                    actions=[
-                                        MessageAction(
-                                            label='【1.確認】',
-                                            text='1'
-                                        ),
-                                        MessageAction(
-                                            label='【2.取消】',
-                                            text='2'
-                                        )
-                                    ]
-                                )
-                            )
+            check_text = Single_order_confirmation_screen(product_order_preorder[id],product_id,product,message_storage[id+'phonenum'],
+                                                          message_storage[id+'num'],message_storage[id+'unitin'],
+                                                          message_storage[id+'oderprice'],message_storage[id+'oderdiscount'],
+                                                          message_storage[id+'subtotalin'])
         else:
             check_text = '您還在訂/預購中喔！\n輸入的 "' + message + '" 不是此流程的填寫！\n請重新輸入，謝謝～'
             check_text = TextSendMessage(text=check_text),TextSendMessage(text='訂/預購流程中，如想取消請打字輸入" 取消 "')    

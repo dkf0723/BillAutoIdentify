@@ -262,7 +262,7 @@ def order_create():
 
     establishment_message = 'ok'
     query4_1 = f"""
-              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
+              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID  
               FROM order_details Natural Join Product_information 
               Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
     category ='select' #重試類別select/notselect
@@ -311,7 +311,7 @@ def order_create():
 
     establishment_message = 'ok'
     query4_2 = f"""
-              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
+              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID  
               FROM order_details Natural Join Product_information 
               Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
     category ='select' #重試類別select/notselect
@@ -449,16 +449,27 @@ def quickcalculation(pid,pnum):
       price1 = row[0]
       if row[1] is not None:
         price2 = row[1]
+        discount00 = '(優惠價)'
       else:
         price2 = row[0]
+        discount00 = '(無優惠)'
       nuit = row[2]
     if pnum >= 2:
       subtotal_result = pnum * price2
+      price = price2
+      discount01 = '(優惠價)'
     else:
       subtotal_result = pnum * price1
+      price = price1
+      discount01 = '(無優惠)'
   else:
     subtotal_result = '計算小計時發生錯誤！'
-  return subtotal_result,nuit
+
+  if discount00 == discount01:
+    discount = '(優惠價)'
+  else:
+    discount = ''
+  return subtotal_result,nuit,price,discount
 
 #-------------------未取訂單查詢(100筆)----------------------
 def ordertoplist():

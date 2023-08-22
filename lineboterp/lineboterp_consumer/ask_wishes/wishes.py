@@ -678,7 +678,7 @@ def pictureup_screen(allcontent,wishesstep):
                     }
 
     pictureup_show = FlexSendMessage(
-                alt_text='許願商品確認',
+                alt_text=f"許願商品填寫({wishesstep}/4)",
                 contents={
                     "type": "carousel",
                     "contents": [pictureup_information]   
