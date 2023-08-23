@@ -48,24 +48,24 @@ def databasetest():
       else:
         databasetest_msg = err
   db['databasetest_msg'] = databasetest_msg
-  cursor = conn.cursor()
   db['conn'] = conn
-  db['cursor'] = cursor
 #-------------------錯誤重試----------------------
 def retry(category,query):#select/notselect
   conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   max_retries = 3  # 最大重試次數
   retry_count = 0  # 初始化重試計數
   while retry_count<max_retries:
+    cursor = conn.cursor()#重新建立游標
     try:
       if category == 'select':
         cursor.execute(query)
         result = cursor.fetchall()
+        cursor.close()#游標關閉
         result2 = 'no'#不是購物車新增的內容
       elif category == 'notselect':
         cursor.execute(query)
         conn.commit()
+        cursor.close()#游標關閉
         result = 'ok'
         result2 = 'ok'#購物車新增用
       break
