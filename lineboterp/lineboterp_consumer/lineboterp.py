@@ -21,14 +21,16 @@ from product.orderlist import *
 from selection_screen import *
 #======python的函式庫==========
 import tempfile, os
-import datetime
+from datetime import datetime, timedelta
 import schedule #排程
 import threading #排程執行緒
+from apscheduler.schedulers.background import BackgroundScheduler#另一種排程
 import time
 import requests
 import string #字符串處理相關的工具
 import random #隨機產生
 #安裝schedule套件=> pip install schedule
+#安裝apscheduler套件=>pip install apscheduler
 #=========================
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
@@ -77,7 +79,24 @@ db = {}
 global msgtype
 
 #首次資料庫連線，最底下有排程設定
-databasetest()
+check = databasetest()
+check1 = databasetest1()
+#資料庫重新連線1
+def dbconnect_job():
+    while db['connection1'] == 'ok':
+        db['conn'] = db['conn1']#暫時更換
+        db['conn'].close()
+        check = databasetest()#3分鐘
+        if check == 'ok':#停止迴圈
+            db['connection1'] = 'no'
+#資料庫重新連線2        
+def dbconnect1_job():
+    while db['connection'] == 'ok':
+        db['conn1'] = db['conn']#暫時更換
+        db['conn1'].close()
+        check1 = databasetest1()#5分鐘
+        if check1 == 'ok':#停止迴圈
+            db['connection'] = 'no'
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
@@ -295,8 +314,9 @@ def handle_message(event):
         #-------------------資料庫連線測試----------------------
         elif '資料庫' in msg:
             #databasetest_msg = databasetest()['databasetest_msg']
-            databasetest_msg = db['databasetest_msg']
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】\n結果：%s' %(databasetest_msg)))
+            databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n更新時間：\n{db['databaseup']}\n下次更新時間：\n{db['databasenext']}\n\n"
+            databasetest_msg += f"資料庫連線2：\n{db['databasetest_msg1']}\n{db['conn1']}\n更新時間：\n{db['databaseup1']}\n下次更新時間：\n{db['databasenext1']}"
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】結果：\n%s' %(databasetest_msg)))
         elif '測試' in msg:
             datasearch = test_datasearch()
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
@@ -308,8 +328,14 @@ def handle_message(event):
         else:
             if '【商品簡介】' not in msg:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
-        #return user_id,user_state
+    timeget = gettime()
+    formatted_millisecond = timeget['formatted_millisecond']
+    if formatted_millisecond > db['databasenext']:
+        dbconnect_job()
+    if formatted_millisecond > db['databasenext1']:
+        dbconnect1_job()
 
+            
 #使用者圖片處理
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
@@ -346,21 +372,19 @@ def welcome(event):
     member_profile(uid)#執行會員資料確認
         
 #-------------------排程設定----------------------
-#資料庫重新連線
-def dbconnect_job():
-    db['conn'].close()
-    databasetest()
+scheduler = BackgroundScheduler()
 
 # 建立新的執行緒來運行排程函式
-def run_schedule():
-    while True:
-        dbconnect_job()
-        schedule.run_pending()
-        time.sleep(180)  # 秒
+def task_3_minutes():
+    dbconnect_job()
+
+def task_5_minutes():
+    dbconnect1_job()
 
 # 啟動排程執行緒
-schedule_thread = threading.Thread(target=run_schedule)
-schedule_thread.start()
+scheduler.add_job(task_5_minutes, 'interval', minutes=5) #分鐘
+scheduler.add_job(task_3_minutes, 'interval', minutes=3) #分鐘
+scheduler.start()
 #-----------------------------------------
 import os
 if __name__ == "__main__":

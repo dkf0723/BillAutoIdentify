@@ -6,3 +6,4 @@ Pillow
 boto3
 pyimgur
 schedule
+apscheduler
