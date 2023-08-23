@@ -349,7 +349,6 @@ def welcome(event):
 #資料庫重新連線
 def dbconnect_job():
     db['conn'].close()
-    db['cursor'].close()
     databasetest()
 
 # 建立新的執行緒來運行排程函式
