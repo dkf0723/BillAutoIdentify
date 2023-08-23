@@ -824,7 +824,7 @@ def wishessend(wishesname,wishesreason,wishessource,img):
   userid = lineboterp.user_id
   try:
     conn = lineboterp.db['conn']
-    cursor = lineboterp.db['cursor']
+    cursor = conn.cursor()#重新建立游標
     timeget = time()
     formatted_datetimeget = timeget['formatted_datetime']
     query =f"""
@@ -861,7 +861,9 @@ def single_imagetolink():
 
 #-------------------圖片取得並發送----------------------
 def imagesent():
-    cursor = lineboterp.db['cursor']
+    #cursor = lineboterp.db['cursor']
+    conn = lineboterp.db['conn']
+    cursor = conn.cursor()#重新建立游標
     img = []
     send = []
     #query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 1 OFFSET 0;"#0開始1筆

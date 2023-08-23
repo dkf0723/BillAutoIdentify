@@ -51,7 +51,7 @@ def wishes():
             message_storage[id+'wishesreason'] = message #推薦原因
             if len(message) <= 100:
                 message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n2.推薦原因：{message}"
-                edit_text = f"{message_storage[id+'wishesall']}\n=>3.想法來源(可以是連結呦～)：\n<打字輸入>"
+                edit_text = f"{message_storage[id+'wishesall']}\n=>3.想法來源(可以是網址連結呦～)：\n<打字輸入>"
                 message_storage[id+'wishesstep'] += 1
                 check_text = fill_out_the_screen(edit_text,message_storage[id+'wishesstep'])#不可略
                 message_storage[id+'userfilter'] = check_text
@@ -59,7 +59,9 @@ def wishes():
             else:
                 check_text = [TextSendMessage(text = f"2.推薦原因：「{message}」，長度大於100個字請縮短文字呦～"),message_storage[id+'userfilter']]
         elif state[id] == 'wishessource':
-            message_storage[id+'wishessource'] = message #資料來源
+            message_storage[id+'wishessource'] = message #想法來源
+            if 'http' in message:
+                message = '網址連結已取得！'
             message_storage[id+'wishesall'] = f"{message_storage[id+'wishesall']}\n3.想法來源：{message}"
             edit_text = f"{message_storage[id+'wishesall']}\n=>4.商品圖片：\n<發送 圖/照片>\n\n◎確認內容產生需要一點時間，發送後請稍等3秒！"
             message_storage[id+'wishesstep'] += 1
