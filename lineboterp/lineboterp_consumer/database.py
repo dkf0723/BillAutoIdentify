@@ -9,21 +9,27 @@ from linebot.models import *
 from relevant_information import dbinfo,imgurinfo
 import os, io, pyimgur, glob
 import lineboterp
+import random #隨機產生
 #安裝 Python 的 MySQL 連接器及其相依性>pip install mysql-connector-python
 #安裝Python 的 pyimgur套件> pip install pyimgur
 # Obtain connection string information from the portal
 
 #-------------------取得現在時間----------------------
-def time():
+def gettime():
   current_datetime = datetime.now()# 取得當前的日期和時間
   modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
+  formatted_millisecond = modified_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
   formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')# 格式化日期和時間，不包含毫秒部分
   formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
   order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
-  return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date}
+  return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date,'formatted_millisecond':formatted_millisecond}
 #-------------------資料庫連線----------------------
+#第一個連線
 def databasetest():
   db = lineboterp.db
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_millisecond']
+  db['connection'] = 'no'
   #取得資料庫資訊
   dbdata = dbinfo()  
   config = {
@@ -47,36 +53,97 @@ def databasetest():
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
+  modified_datetime = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S.%f')
+  modified_datetime += timedelta(minutes=3)
+  new_formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+
   db['databasetest_msg'] = databasetest_msg
+  db['databaseup'] = formatted_millisecond
+  db['databasenext'] = new_formatted_datetime
   db['conn'] = conn
-#-------------------錯誤重試----------------------
-def retry(category,query):#select/notselect
-  conn = lineboterp.db['conn']
+  db['connection'] = 'ok'
+  return 'ok'
+
+#第二個連線
+def databasetest1():
+  db = lineboterp.db
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_millisecond']
+  db['connection1'] = 'no'
+  #取得資料庫資訊
+  dbdata = dbinfo()  
+  config = {
+  'host': dbdata['host'],
+  'user': dbdata['user'],
+  'password': dbdata['password'],
+  'database': dbdata['database']
+  }
+  #錯誤重新執行最大3次
   max_retries = 3  # 最大重試次數
   retry_count = 0  # 初始化重試計數
   while retry_count<max_retries:
-    cursor = conn.cursor()#重新建立游標
     try:
-      if category == 'select':
-        cursor.execute(query)
-        result = cursor.fetchall()
-        cursor.close()#游標關閉
-        result2 = 'no'#不是購物車新增的內容
-      elif category == 'notselect':
-        cursor.execute(query)
-        conn.commit()
-        cursor.close()#游標關閉
-        result = 'ok'
-        result2 = 'ok'#購物車新增用
+      conn = mysql.connector.connect(**config)
+      databasetest_msg = '資料庫連接成功'
       break
-    except mysql.connector.Error as e:
-      retry_count += 1 #重試次數累加
-      result2 = 'no'#購物車新增用
+    except mysql.connector.Error as err:
+      if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+        databasetest_msg = '使用者或密碼有錯'
+      elif err.errno == errorcode.ER_BAD_DB_ERROR:
+        databasetest_msg = '資料庫不存在或其他錯誤'
+      else:
+        databasetest_msg = err
+  modified_datetime = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S.%f')
+  modified_datetime += timedelta(minutes=5)
+  new_formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+  db['databasetest_msg1'] = databasetest_msg
+  db['databaseup1'] = formatted_millisecond
+  db['databasenext1'] = new_formatted_datetime
+  db['conn1'] = conn
+  db['connection1'] = 'ok'
+  return 'ok'
+#-------------------錯誤重試----------------------
+def retry(category,query):#select/notselect
+  block = 0#結束點是1
+  step = 0 #第幾輪
+  while block == 0:
+    if step == 0:
+      conn = lineboterp.db['conn']
+    else:
+      conn = lineboterp.db['conn1']
+    max_retries = 3  # 最大重試次數
+    retry_count = 0  # 初始化重試計數
+    if step == 1:
+      stepout = 1 #第二輪標記，完成下面動作可退出
+    while retry_count<max_retries:
+      step = 0 #單輪重試恢復預設值
+      cursor = conn.cursor()#重新建立游標
+      try:
+        if category == 'select':
+          cursor.execute(query)
+          result = cursor.fetchall()
+          cursor.close()#游標關閉
+          result2 = 'no'#不是購物車新增的內容
+        elif category == 'notselect':
+          cursor.execute(query)
+          conn.commit()
+          cursor.close()#游標關閉
+          result = 'ok'
+          result2 = 'ok'#購物車新增用
+        stepout = 1 #不進行第二輪
+        break
+      except mysql.connector.Error as e:
+        cursor.close()#游標關閉
+        retry_count += 1 #重試次數累加
+        result2 = 'no'#購物車新增用
+        step = 1
+    if stepout == 1:#成功取得資料後退出
+      block = 1
   return result,result2
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
 def member_profile(userid):
   member = lineboterp.member
-  timeget = time()
+  timeget = gettime()
   formatted_datetimeget = timeget['formatted_datetime']
   order_dateget = timeget['order_date']
 
@@ -181,16 +248,18 @@ def buynow_list():
 def test_datasearch():
   #測試讀取資料庫願望清單(所有)
   conn = lineboterp.db['conn']
-  cursor = lineboterp.db['cursor']
   query = "SELECT * FROM wishlist;"
   max_retries = 3  # 最大重試次數
   retry_count = 0  # 初始化重試計數
   while retry_count<max_retries:
+    cursor = conn.cursor()#重新建立游標
     try:
       cursor.execute(query)
       result = cursor.fetchall()
+      cursor.close()#游標關閉
       break
     except mysql.connector.Error as e:
+      cursor.close()#游標關閉
       retry_count += 1 #重試次數累加
 
   if result is not None:
@@ -213,7 +282,7 @@ def test_datasearch():
 def order_create():
   userid = lineboterp.user_id
   phonenum = lineboterp.storage[userid+'phonenum']
-  timeget = time()
+  timeget = gettime()
   formatted_datetimeget = timeget['formatted_datetime']
   order_dateget = timeget['order_date']
   establishment_message = '' #訂單檢查回傳訊息
@@ -322,7 +391,7 @@ def order_create():
 def order_detail(serial_number):
   userid = lineboterp.user_id
   orderall = lineboterp.orderall[userid]
-  timeget = time()
+  timeget = gettime()
   order_dateget = timeget['order_date']
   order_details = ''
   establishment_message = ''
@@ -692,7 +761,7 @@ def removecart(user_id, product_id):
 #-------------------購物車訂單建立----------------------
 def cartordergo(phonenum):
   userid = lineboterp.user_id
-  timeget = time()
+  timeget = gettime()
   formatted_datetimeget = timeget['formatted_datetime']
   order_dateget = timeget['order_date']
   stockcheck = 'ok'#預設庫存檢查無誤
@@ -825,7 +894,7 @@ def wishessend(wishesname,wishesreason,wishessource,img):
   try:
     conn = lineboterp.db['conn']
     cursor = conn.cursor()#重新建立游標
-    timeget = time()
+    timeget = gettime()
     formatted_datetimeget = timeget['formatted_datetime']
     query =f"""
             INSERT INTO wishlist (商品名稱,推薦原因,資料來源,商品圖片,願望建立時間,會員_LINE_ID)
@@ -835,6 +904,7 @@ def wishessend(wishesname,wishesreason,wishessource,img):
     conn.commit()
     confirmationmessage = 'ok'
   except Exception as e: #例外處理
+      cursor.close()#游標關閉
       conn.rollback()  # 撤銷操作恢復到操作前的狀態
       #text = f'Commit failed: {str(e)}'
       confirmationmessage = 'no'
