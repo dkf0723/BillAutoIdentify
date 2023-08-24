@@ -126,9 +126,24 @@ def handle_message(event):
                 )
             ))
         elif '【依類別】查詢' in msg:
-            send_category_selection(event, line_bot_api)
+               send_category_selection(event, line_bot_api)
+        elif msg in ['frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
+              selected_category = msg
+              flex_message = test_categoryate(selected_category)
+              line_bot_api.reply_message(event.reply_token, flex_message)
         elif '【依廠商】查詢'in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
+              flex_message = test_manufacturers()
+              line_bot_api.reply_message(event.reply_token, flex_message)
+        
+        #else:
+              #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
+        elif  msg.startswith('選我選我'): 
+              manufacturer_id = msg[5:]  # 提取廠商編號
+              flex_message = products_manufacturers(manufacturer_id)
+              line_bot_api.reply_message(event.reply_token, flex_message)
+            #testmanufacturers = test_manufacturers()
+            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(testmanufacturers)))
+            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
         elif '【新增上架】' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',
@@ -147,9 +162,12 @@ def handle_message(event):
                 )
             ))
         elif '【舊廠商】'in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
+            flex_message = test_manufacturers()
+            line_bot_api.reply_message(event.reply_token, flex_message)
+            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
         elif '【新廠商】'in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))   
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
+
         elif '未取名單' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
         elif '報表管理' in msg:
