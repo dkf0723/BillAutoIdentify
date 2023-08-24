@@ -299,8 +299,8 @@ def handle_message(event):
         #-------------------資料庫連線測試----------------------
         elif '資料庫' in msg:
             #databasetest_msg = databasetest()['databasetest_msg']
-            databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n下次更新時間：\n{db['databasenext']}\n\n"
-            databasetest_msg += f"資料庫連線2：\n{db['databasetest_msg1']}\n{db['conn1']}\n下次更新時間：\n{db['databasenext1']}"
+            databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n更新時間：\n{db['databaseup']}\n下次更新時間：\n{db['databasenext']}\n\n"
+            databasetest_msg += f"資料庫連線2：\n{db['databasetest_msg1']}\n{db['conn1']}\n更新時間：\n{db['databaseup1']}\n下次更新時間：\n{db['databasenext1']}"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】結果：\n%s' %(databasetest_msg)))
         elif '測試' in msg:
             datasearch = test_datasearch()
@@ -367,8 +367,9 @@ def dbconnect1_job():
 #檢測資料庫連線
 def checkdb():
     timeget = gettime()
-    formatted_millisecond = timeget['formatted_millisecond']
-    modified_minutes = formatted_millisecond.minute
+    formatted_millisecond = timeget['formatted_datetime']
+    formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
+    modified_minutes = formatted_datetime_obj.minute
     minutes = int(modified_minutes)
     if minutes not in [0,15,30,45]:
         if minutes % 3 == 0:
@@ -392,7 +393,7 @@ def task_5_minutes():
 # 啟動排程
 #scheduler.add_job(task_5_minutes, 'interval', minutes=5) #分鐘
 #scheduler.add_job(task_3_minutes, 'interval', minutes=3) #分鐘
-scheduler.add_job(task_1_minutes, 'interval', minutes=3) #分鐘
+scheduler.add_job(task_1_minutes, 'interval', minutes=1) #分鐘
 scheduler.start()
 #-----------------------------------------
 import os
