@@ -1,5 +1,7 @@
+from linebot.models import FlexSendMessage
 import mysql.connector
 import requests
+from datetime import datetime, timedelta
 from mysql.connector import errorcode
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import (InvalidSignatureError)
@@ -7,11 +9,12 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from relevant_information import dbinfo,imgurinfo
 import os, io, pyimgur, glob
+import manager
 #安裝 Python 的 MySQL 連接器及其相依性>pip install mysql-connector-python
 #安裝Python 的 pyimgur套件> pip install pyimgur
 # Obtain connection string information from the portal
 
-#-------------------資料庫連線----------------------
+#-------------------舊資料庫連線----------------------
 def databasetest():
   #取得資料庫資訊
   dbdata = dbinfo()  
@@ -35,6 +38,188 @@ def databasetest():
   else:
     cursor = conn.cursor()
   return {'databasetest_msg': databasetest_msg, 'conn':conn, 'cursor':cursor, 'config':config}
+#----------------查詢資料庫裡所有廠商編號及廠商名--------------------
+def test_manufacturers():
+    testimplement = databasetest()
+    conn = testimplement['conn']
+    cursor = testimplement['cursor']
+    query = "SELECT * FROM Manufacturer_Information;"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    
+    if result is not None:
+        bubbles = []
+        for row in result:
+            mid = row[0]
+            mname = row[1]
+            bubble = {               
+                      
+                    
+              "type": "bubble",
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "【商品查詢1】查詢",
+                    "size": "xl",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": f"【廠商的編號】: {mid}",
+                            "weight": "bold",
+                            "margin": "sm",
+                            "flex": 0
+                          },
+                          {
+                            "type": "text",
+                            "text": f"【廠商名稱】: {mname}",
+                            "flex": 0,
+                            "margin": "sm",
+                            "weight": "bold"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "separator",
+                    "margin": "lg",
+                    "color": "#888888"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "button",
+                    "style": "primary",
+                    "color": "#905c44",
+                    "margin": "none",
+                    "action": {
+                      "type": "message",
+                      "label": "選擇此廠商",
+                      "text": f"選擇廠商 {mid}"
+                    },
+                    "height": "md",
+                    "offsetEnd": "none",
+                    "offsetBottom": "sm"
+                  }
+                ],
+                "spacing": "none",
+                "margin": "none"
+              }
+            }
+            bubbles.append(bubble)
+        flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "carousel", "contents": bubbles})
+    else:
+        flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "text", "text": "找不到符合條件的廠商。"})
+    
+    cursor.close()
+    conn.close()
+    return flex_message
+
+def products_manufacturers(manufacturer_id):
+    testAimplement = databasetest()
+    conn = testAimplement['conn']
+    cursor = testAimplement['cursor']
+    query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information WHERE 廠商編號 = '{manufacturer_id}'"
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    if result:
+        bubbles = []
+        for row in result:
+            pid = row[9]  # '商品ID'
+            pname = row[10]  # '商品名稱'
+            stock_num = row[14]  # '庫存數量'
+            sell_price = row[16]  # '售出單價'
+
+            bubble = {
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                        {"type": "text", "text": f"商品ID: {pid}"},
+                        {"type": "text", "text": f"商品名稱: {pname}"},
+                        {"type": "text", "text": f"庫存數量: {stock_num}"},
+                        {"type": "text", "text": f"售出單價: {sell_price}"}
+                    ]
+                },
+            }
+            bubbles.append(bubble)
+        flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "carousel", "contents": bubbles})
+    else:
+        flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
+
+    cursor.close()
+    conn.close()
+    return flex_message
+
+
+#-----------分類下的所有商品-----------
+def test_categoryate(selected_category):
+    testBimplement = databasetest()
+    conn = testBimplement['conn']
+    cursor = testBimplement['cursor']
+    query = f"SELECT 商品ID, 商品名稱 FROM Product_information WHERE 商品ID LIKE '{selected_category}%'"
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    if result is not None:
+        bubbles = []
+        for row in result:
+            pid = row[0]  # '商品ID'
+            pname = row[1]  # '商品名稱'
+
+            bubble = {
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                        {"type": "text", "text": f"商品ID：{pid}"},
+                        {"type": "text", "text": f"商品名稱：{pname}"}
+                    ]
+                }
+            }
+            bubbles.append(bubble)
+
+        flex_message = FlexSendMessage(
+            alt_text="類別下所有商品",
+            contents={
+                "type": "carousel",
+                "contents": bubbles
+            }
+        )
+    else:
+        flex_message = FlexSendMessage(
+            alt_text="類別下所有商品",
+            contents={
+                "type": "text",
+                "text": "找不到符合條件的資料。"
+            }
+        )
+
+    cursor.close()
+    conn.close()
+    return flex_message
+
 
 #查詢資料SELECT
 def test_datasearch():
@@ -65,21 +250,18 @@ def test_datasearch():
   conn.close()
   return testmsg
 
-#修改資料UPDATE
-def test_dataUPDATE():
-  return
 
 #-------------------圖片取得並發送----------------------
 def imagesent():
-    implement = databasetest()  # 定義 databasetest() 函式並返回相關物件
+    implement = databasetest()  # 定義 databasetest() 函式並返回相關物件 #要
     img = []
     send = []
-    conn = implement['conn']
-    cursor = implement['cursor']
+    conn = implement['conn'] #要
+    cursor = implement['cursor'] #要
     #query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 1 OFFSET 0;"#0開始1筆
-    query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 2 OFFSET 0;"
-    cursor.execute(query)
-    result = cursor.fetchall()
+    query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 2 OFFSET 0;" #要
+    cursor.execute(query) #要
+    result = cursor.fetchall() #要
     
     if result is not None:
         for row in result:
@@ -141,40 +323,29 @@ def imagetolink():
     #delete_images()#刪除images檔案圖片
   return {'imagetitle':imagetitle,'imagelink':imagelink}
 
-#-------------------取出未取名單---------------------------------
 
-def order_details():
-  OrderId = []
-  LineId = []
-  PhoneNumber = []
-  OrderTime = []
-  PickuptTime = []
-  amount = []
-  count = 0
-  #讀取訂單資料(所有)
-  implement = databasetest()
-  conn = implement['conn']
-  cursor = implement['cursor']
-  query = "SELECT * FROM Order_information;"
+#查詢並列出所有廠商名稱
+def manufacturers(mid,mname):
+  conn = manager.db['conn']
+  cursor = manager.db['cursor']
+  query = f"""select * from Manufacturer_Information"""
   cursor.execute(query)
   result = cursor.fetchall()
-  if result is not None:
-    testmsg = "願望清單讀取內容：\n"
-    for row in result:
-      if row[5] == "未取":
-        # 透過欄位名稱獲取資料
-        OrderId.append(row[0])#'訂單編號'
-        LineId.append(row[1])#'LineId'
-        PhoneNumber.append(row[2])#電話
-        OrderTime.append(row[3])#'下定時間'
-        PickuptTime.append(row[4])#'取貨完成時間'
-        amount.append(row[10])#'總額'
-        # 在這裡進行資料處理或其他操作
-        testmsg += ('共%s筆未取訂單\n---\n' %(count))
-  else:
-    testmsg = "找不到符合條件的資料。"
-  # 關閉游標與連線
-  testmsg += "(end)"
+
+#關閉查詢游標及關閉連線
   cursor.close()
   conn.close()
+
+  if result is not None:
+    testmsg = "所有廠商如下：\n"
+    for row in result:
+      # 透過欄位名稱獲取資料
+      mid = row[0]#'廠商編號'
+      mname = row[1]#'廠商名'
+      # 在這裡進行資料處理或其他操作
+      testmsg += f'廠商編號:\n{mid}\n廠商名：\n{mname}\n'
+  else:
+    testmsg = "找不到符合條件的資料。"
+
+  testmsg += "(end)"
   return testmsg
