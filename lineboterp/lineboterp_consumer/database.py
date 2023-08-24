@@ -55,13 +55,15 @@ def databasetest():
 
   nowtime = datetime.strptime(formatted_datetime, '%Y-%m-%d %H:%M:%S')
   check = nowtime.minute
-  check1 = [0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57]
-  next_minute = min([i for i in check1 if i > check] + [check1[0]])
-  if next_minute < check:
-    modified_add = nowtime + timedelta(hours=1, minutes=next_minute - check)
+  check1 = [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57]
+  if check in [57, 58, 59]:
+    modified_add = nowtime + timedelta(hours=1)
+    modified_add = modified_add.replace(minute=0)
   else:
+    next_minute = min([i for i in check1 if i > check])
     modified_add = nowtime.replace(minute=next_minute)
   new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
+
   db['databasetest_msg'] = databasetest_msg
   db['databaseup'] = formatted_datetime
   db['databasenext'] = new_formatted_datetime
@@ -95,15 +97,18 @@ def databasetest1():
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
+
   nowtime = datetime.strptime(formatted_datetime, '%Y-%m-%d %H:%M:%S')
   check = nowtime.minute
-  check1 = [0, 5,10,15,20,25,30,35,40,45,50,55]
-  next_minute = min([i for i in check1 if i > check] + [check1[0]])
-  if next_minute < check:
-    modified_add = nowtime + timedelta(hours=1, minutes=next_minute - check)
+  check1 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+  if check in [55, 56, 57, 58, 59]:
+    modified_add = nowtime + timedelta(hours=1)
+    modified_add = modified_add.replace(minute=0)
   else:
+    next_minute = min([i for i in check1 if i > check])
     modified_add = nowtime.replace(minute=next_minute)
   new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
+
   db['databasetest_msg1'] = databasetest_msg
   db['databaseup1'] = formatted_datetime
   db['databasenext1'] = new_formatted_datetime
