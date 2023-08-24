@@ -27,8 +27,6 @@ def gettime():
 #第一個連線
 def databasetest():
   db = lineboterp.db
-  timeget = gettime()
-  formatted_millisecond = timeget['formatted_millisecond']
   #取得資料庫資訊
   dbdata = dbinfo()  
   config = {
@@ -52,22 +50,13 @@ def databasetest():
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
-  modified_datetime = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S.%f')
-  modified_datetime += timedelta(minutes=3)
-  new_formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
-
   db['databasetest_msg'] = databasetest_msg
-  db['databaseup'] = formatted_millisecond
-  db['databasenext'] = new_formatted_datetime
+  db['databasenext'] = '每小時中的0點及3的倍數分鐘執行。'
   db['conn'] = conn
-  db['blockcheck'] = 'ok'#防止兩個同時重新連線(可以)
-  return 'ok'
 
 #第二個連線
 def databasetest1():
   db = lineboterp.db
-  timeget = gettime()
-  formatted_millisecond = timeget['formatted_millisecond']
   #取得資料庫資訊
   dbdata = dbinfo()  
   config = {
@@ -91,15 +80,9 @@ def databasetest1():
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
-  modified_datetime = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S.%f')
-  modified_datetime += timedelta(minutes=5)
-  new_formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
   db['databasetest_msg1'] = databasetest_msg
-  db['databaseup1'] = formatted_millisecond
-  db['databasenext1'] = new_formatted_datetime
+  db['databasenext1'] = '每小時中的0點及5的倍數分鐘執行。'
   db['conn1'] = conn
-  db['blockcheck1'] = 'ok'#防止兩個同時重新連線(可以)
-  return 'ok'
 #-------------------錯誤重試----------------------
 def retry(category,query):#select/notselect
   block = 0#結束點是1
@@ -132,6 +115,7 @@ def retry(category,query):#select/notselect
         break
       except mysql.connector.Error as e:
         cursor.close()#游標關閉
+        conn.rollback()  # 撤銷操作恢復到操作前的狀態
         retry_count += 1 #重試次數累加
         result2 = 'no'#購物車新增用
         step = 1
