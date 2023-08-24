@@ -27,6 +27,8 @@ def gettime():
 #第一個連線
 def databasetest():
   db = lineboterp.db
+  timeget = gettime()
+  formatted_datetime = timeget['formatted_datetime']
   #取得資料庫資訊
   dbdata = dbinfo()  
   config = {
@@ -50,13 +52,26 @@ def databasetest():
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
+
+  nowtime = datetime.strptime(formatted_datetime, '%Y-%m-%d %H:%M:%S')
+  check = nowtime.minute
+  check1 = [0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57]
+  next_minute = min([i for i in check1 if i > check] + [check1[0]])
+  if next_minute < check:
+    modified_add = nowtime + timedelta(hours=1, minutes=next_minute - check)
+  else:
+    modified_add = nowtime.replace(minute=next_minute)
+  new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
   db['databasetest_msg'] = databasetest_msg
-  db['databasenext'] = '每小時中的0點及3的倍數分鐘執行。'
+  db['databaseup'] = formatted_datetime
+  db['databasenext'] = new_formatted_datetime
   db['conn'] = conn
 
 #第二個連線
 def databasetest1():
   db = lineboterp.db
+  timeget = gettime()
+  formatted_datetime = timeget['formatted_datetime']
   #取得資料庫資訊
   dbdata = dbinfo()  
   config = {
@@ -80,24 +95,35 @@ def databasetest1():
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
+  nowtime = datetime.strptime(formatted_datetime, '%Y-%m-%d %H:%M:%S')
+  check = nowtime.minute
+  check1 = [0, 5,10,15,20,25,30,35,40,45,50,55]
+  next_minute = min([i for i in check1 if i > check] + [check1[0]])
+  if next_minute < check:
+    modified_add = nowtime + timedelta(hours=1, minutes=next_minute - check)
+  else:
+    modified_add = nowtime.replace(minute=next_minute)
+  new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
   db['databasetest_msg1'] = databasetest_msg
-  db['databasenext1'] = '每小時中的0點及5的倍數分鐘執行。'
+  db['databaseup1'] = formatted_datetime
+  db['databasenext1'] = new_formatted_datetime
   db['conn1'] = conn
 #-------------------錯誤重試----------------------
 def retry(category,query):#select/notselect
   block = 0#結束點是1
   step = 0 #第幾輪
+  stepout = 0 #第二輪標記
   while block == 0:
     if step == 0:
       conn = lineboterp.db['conn']
-    else:
+    elif step == 1:
       conn = lineboterp.db['conn1']
+      stepout = 1 #第二輪標記，完成下面動作可退出
     max_retries = 3  # 最大重試次數
     retry_count = 0  # 初始化重試計數
-    if step == 1:
-      stepout = 1 #第二輪標記，完成下面動作可退出
     while retry_count<max_retries:
       step = 0 #單輪重試恢復預設值
+      stepout = 0#單輪重試恢復預設值
       cursor = conn.cursor()#重新建立游標
       try:
         if category == 'select':
@@ -118,8 +144,11 @@ def retry(category,query):#select/notselect
         conn.rollback()  # 撤銷操作恢復到操作前的狀態
         retry_count += 1 #重試次數累加
         result2 = 'no'#購物車新增用
+        stepout = 1
         step = 1
     if stepout == 1:#成功取得資料後退出
+      block = 1
+    if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
       block = 1
   return result,result2
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
