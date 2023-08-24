@@ -29,7 +29,6 @@ def databasetest():
   db = lineboterp.db
   timeget = gettime()
   formatted_millisecond = timeget['formatted_millisecond']
-  db['connection'] = 'no'
   #取得資料庫資訊
   dbdata = dbinfo()  
   config = {
@@ -61,7 +60,7 @@ def databasetest():
   db['databaseup'] = formatted_millisecond
   db['databasenext'] = new_formatted_datetime
   db['conn'] = conn
-  db['connection'] = 'ok'
+  db['blockcheck'] = 'ok'#防止兩個同時重新連線(可以)
   return 'ok'
 
 #第二個連線
@@ -69,7 +68,6 @@ def databasetest1():
   db = lineboterp.db
   timeget = gettime()
   formatted_millisecond = timeget['formatted_millisecond']
-  db['connection1'] = 'no'
   #取得資料庫資訊
   dbdata = dbinfo()  
   config = {
@@ -100,7 +98,7 @@ def databasetest1():
   db['databaseup1'] = formatted_millisecond
   db['databasenext1'] = new_formatted_datetime
   db['conn1'] = conn
-  db['connection1'] = 'ok'
+  db['blockcheck1'] = 'ok'#防止兩個同時重新連線(可以)
   return 'ok'
 #-------------------錯誤重試----------------------
 def retry(category,query):#select/notselect

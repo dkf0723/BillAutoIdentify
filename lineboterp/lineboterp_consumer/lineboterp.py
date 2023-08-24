@@ -78,25 +78,28 @@ global db
 db = {}
 global msgtype
 
-#首次資料庫連線，最底下有排程設定
-check = databasetest()
-check1 = databasetest1()
-#資料庫重新連線1
-def dbconnect_job():
-    while db['connection1'] == 'ok':
+#-------------------資料庫首次連線及排成重新連線----------------------
+#資料庫連線1
+def dbconnect_job(distinguish):
+    if distinguish == 0:#首次
+        check = databasetest()
+    else:
         db['conn'] = db['conn1']#暫時更換
         db['conn'].close()
         check = databasetest()#3分鐘
-        if check == 'ok':#停止迴圈
-            db['connection1'] = 'no'
-#資料庫重新連線2        
-def dbconnect1_job():
-    while db['connection'] == 'ok':
+#資料庫連線2
+def dbconnect1_job(distinguish):
+    if distinguish == 0:#首次
+        check1 = databasetest1()
+    else:
         db['conn1'] = db['conn']#暫時更換
         db['conn1'].close()
         check1 = databasetest1()#5分鐘
-        if check1 == 'ok':#停止迴圈
-            db['connection'] = 'no'
+
+#首次資料庫連線，最底下有排程設定
+dbconnect_job(0)
+dbconnect1_job(0)
+#-----------------------------------------
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
@@ -328,12 +331,14 @@ def handle_message(event):
         else:
             if '【商品簡介】' not in msg:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
+    '''
+    #檢測資料庫排程是否正常運作
     timeget = gettime()
     formatted_millisecond = timeget['formatted_millisecond']
     if formatted_millisecond > db['databasenext']:
         dbconnect_job()
     if formatted_millisecond > db['databasenext1']:
-        dbconnect1_job()
+        dbconnect1_job()'''
 
             
 #使用者圖片處理
@@ -373,15 +378,22 @@ def welcome(event):
         
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
-
-# 建立新的執行緒來運行排程函式
+# 建立排程函式
 def task_3_minutes():
-    dbconnect_job()
+    global db
+    db['blockcheck'] = 'no'#防止兩個同時重新連線
+    while db['blockcheck1'] == 'no':
+        waiting_state = '等待資料庫線路二完成！'
+    dbconnect_job(1)
 
 def task_5_minutes():
-    dbconnect1_job()
+    global db
+    db['blockcheck1'] = 'no'#防止兩個同時重新連線
+    while db['blockcheck'] == 'no':
+        waiting_state = '等待資料庫線路一完成！'
+    dbconnect1_job(1)
 
-# 啟動排程執行緒
+# 啟動排程
 scheduler.add_job(task_5_minutes, 'interval', minutes=5) #分鐘
 scheduler.add_job(task_3_minutes, 'interval', minutes=3) #分鐘
 scheduler.start()
