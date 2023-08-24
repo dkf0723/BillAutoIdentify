@@ -200,15 +200,23 @@ def handle_message(event):
                             QuickReplyButton(action=MessageAction(label="保健食品", text="healthy")),
                             QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),
                         ]))
-                line_bot_api.reply_message(event.reply_token, message)
-                '''user_state[user_id] = 'adding'
-                user_state1[user_id] = 'num'
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入進貨數量：'))'''
+                line_bot_api.reply_message(event.reply_token, message)    
+                #user_state[user_id] = 'adding'
+                #user_state1[user_id] = 'num'
+                #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入進貨數量：'))
             elif msg[7:] == '廠商':
-                testmanufacturers = test_manufacturers()
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試1】提取資料測試：\n%s' %(testmanufacturers)))
+                flex_message = test_manufacturers()
+                line_bot_api.reply_message(event.reply_token, flex_message)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
+        elif msg.startswith('選擇廠商'):
+                manufacturer_id = msg[5:]  # 提取廠商編號
+                flex_message = products_manufacturers(manufacturer_id)
+                line_bot_api.reply_message(event.reply_token, flex_message)
+        elif msg in ['frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
+                selected_category = msg
+                flex_message = test_categoryate(selected_category)
+                line_bot_api.reply_message(event.reply_token, flex_message)
             #--------------------------第二分支----------------------------------
         elif '查詢商品庫存' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -244,10 +252,18 @@ def handle_message(event):
                         ]))
                 line_bot_api.reply_message(event.reply_token, message)
             elif msg[7:] == '廠商':
-                testmanufacturers = test_manufacturers()
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試2】提取資料測試：\n%s' %(testmanufacturers)))
+                flex_message = test_manufacturers()
+                line_bot_api.reply_message(event.reply_token, flex_message)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
+        elif msg.startswith('選擇廠商'):
+                manufacturer_id = msg[5:]  # 提取廠商編號
+                flex_message = products_manufacturers(manufacturer_id)
+                line_bot_api.reply_message(event.reply_token, flex_message)
+        elif msg in ['frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
+                selected_category = msg
+                flex_message = test_categoryate(selected_category)
+                line_bot_api.reply_message(event.reply_token, flex_message)
             #--------------------------第三分支----------------------------------
         elif '查看進貨紀錄' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -287,11 +303,20 @@ def handle_message(event):
                         ]))
                 line_bot_api.reply_message(event.reply_token, message)
             elif msg[7:] == '廠商':
-                testmanufacturers = test_manufacturers()
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試3】提取資料測試：\n%s' %(testmanufacturers)))
+                flex_message = test_manufacturers()
+                line_bot_api.reply_message(event.reply_token, flex_message)
             elif msg[7:] == '時間':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='4'))
-       
+            else:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
+        elif msg.startswith('選擇廠商'):
+                manufacturer_id = msg[5:]  # 提取廠商編號
+                flex_message = products_manufacturers(manufacturer_id)
+                line_bot_api.reply_message(event.reply_token, flex_message)
+        elif msg in ['frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
+                selected_category = msg
+                flex_message = test_categoryate(selected_category)
+                line_bot_api.reply_message(event.reply_token, flex_message)
             #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
             databasetest_msg = databasetest()['databasetest_msg']
