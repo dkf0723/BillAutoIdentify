@@ -78,27 +78,9 @@ global db
 db = {}
 global msgtype
 
-#-------------------資料庫首次連線及排成重新連線----------------------
-#資料庫連線1
-def dbconnect_job(distinguish):
-    if distinguish == 0:#首次
-        check = databasetest()
-    else:
-        db['conn'] = db['conn1']#暫時更換
-        db['conn'].close()
-        check = databasetest()#3分鐘
-#資料庫連線2
-def dbconnect1_job(distinguish):
-    if distinguish == 0:#首次
-        check1 = databasetest1()
-    else:
-        db['conn1'] = db['conn']#暫時更換
-        db['conn1'].close()
-        check1 = databasetest1()#5分鐘
-
 #首次資料庫連線，最底下有排程設定
-dbconnect_job(0)
-dbconnect1_job(0)
+databasetest()
+databasetest1()
 #-----------------------------------------
 
 # 處理訊息
@@ -317,8 +299,8 @@ def handle_message(event):
         #-------------------資料庫連線測試----------------------
         elif '資料庫' in msg:
             #databasetest_msg = databasetest()['databasetest_msg']
-            databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n更新時間：\n{db['databaseup']}\n下次更新時間：\n{db['databasenext']}\n\n"
-            databasetest_msg += f"資料庫連線2：\n{db['databasetest_msg1']}\n{db['conn1']}\n更新時間：\n{db['databaseup1']}\n下次更新時間：\n{db['databasenext1']}"
+            databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n下次更新時間：\n{db['databasenext']}\n\n"
+            databasetest_msg += f"資料庫連線2：\n{db['databasetest_msg1']}\n{db['conn1']}\n下次更新時間：\n{db['databasenext1']}"
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫連線測試】結果：\n%s' %(databasetest_msg)))
         elif '測試' in msg:
             datasearch = test_datasearch()
@@ -331,14 +313,6 @@ def handle_message(event):
         else:
             if '【商品簡介】' not in msg:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
-    
-    #-------------------檢測資料庫排程是否正常運作----------------------
-    timeget = gettime()
-    formatted_millisecond = timeget['formatted_millisecond']
-    if formatted_millisecond > db['databasenext']:
-        dbconnect_job(1)
-    if formatted_millisecond > db['databasenext1']:
-        dbconnect1_job(1)
 
             
 #使用者圖片處理
@@ -378,22 +352,47 @@ def welcome(event):
         
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
-# 建立排程函式
-def task_3_minutes():
-    db['blockcheck'] = 'no'#防止兩個同時重新連線
-    while db['blockcheck1'] == 'no':
-        waiting_state = '等待資料庫線路二完成！'
-    dbconnect_job(1)
+#資料庫連線1
+def dbconnect_job():
+    db['conn'] = db['conn1']#暫時更換
+    db['conn'].close()
+    databasetest()#3分鐘
 
+#資料庫連線2
+def dbconnect1_job():
+    db['conn1'] = db['conn']#暫時更換
+    db['conn1'].close()
+    databasetest1()#5分鐘
+
+#檢測資料庫連線
+def checkdb():
+    timeget = gettime()
+    formatted_millisecond = timeget['formatted_millisecond']
+    modified_minutes = formatted_millisecond.minute
+    minutes = int(modified_minutes)
+    if minutes not in [0,15,30,45]:
+        if minutes % 3 == 0:
+            dbconnect_job()
+        if minutes % 5 == 0:
+            dbconnect1_job()
+    else:
+        dbconnect_job()
+        time.sleep(30)#秒
+        dbconnect1_job()
+
+# 建立排程函式
+def task_1_minutes():
+    checkdb()
+'''
+def task_3_minutes():
+    dbconnect1_job()
 def task_5_minutes():
-    db['blockcheck1'] = 'no'#防止兩個同時重新連線
-    while db['blockcheck'] == 'no':
-        waiting_state = '等待資料庫線路一完成！'
-    dbconnect1_job(1)
+    dbconnect1_job()'''
 
 # 啟動排程
-scheduler.add_job(task_5_minutes, 'interval', minutes=5) #分鐘
-scheduler.add_job(task_3_minutes, 'interval', minutes=3) #分鐘
+#scheduler.add_job(task_5_minutes, 'interval', minutes=5) #分鐘
+#scheduler.add_job(task_3_minutes, 'interval', minutes=3) #分鐘
+scheduler.add_job(task_1_minutes, 'interval', minutes=3) #分鐘
 scheduler.start()
 #-----------------------------------------
 import os
