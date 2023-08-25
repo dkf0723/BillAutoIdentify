@@ -91,6 +91,7 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
             elif msg[4:] == '訂單編號':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
+     #--------商品管理----------------#           
         elif '商品管理' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',
@@ -127,14 +128,13 @@ def handle_message(event):
             ))
         elif '【依類別】查詢' in msg:
                send_category_selection(event, line_bot_api)
-        elif msg in ['frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
+        elif msg in ['frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks','test']:
               selected_category = msg
               flex_message = test_categoryate(selected_category)
               line_bot_api.reply_message(event.reply_token, flex_message)
         elif '【依廠商】查詢'in msg:
               flex_message = test_manufacturers()
               line_bot_api.reply_message(event.reply_token, flex_message)
-        
         #else:
               #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
         elif  msg.startswith('選我選我'): 
@@ -213,6 +213,7 @@ def handle_message(event):
                                 QuickReplyButton(action=MessageAction(label="零食", text="snack")),
                                 QuickReplyButton(action=MessageAction(label="保健食品", text="healthy")),
                                 QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),
+                                
                         ]))
             line_bot_api.reply_message(event.reply_token, message)
         elif msg[6:] == '廠商':
@@ -299,6 +300,7 @@ def send_category_selection(event, line_bot_api):
                             QuickReplyButton(action=MessageAction(label="零食", text="snack")),
                             QuickReplyButton(action=MessageAction(label="保健食品", text="healthy")),
                             QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),
+                            QuickReplyButton(action=MessageAction(label="測試", text="test")),
                         ]))
                 line_bot_api.reply_message(event.reply_token, message)
 '''@handler.add(PostbackEvent)

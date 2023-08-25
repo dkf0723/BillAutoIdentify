@@ -217,7 +217,7 @@ def test_manufacturers():
                           "type": "text",
                           "text": f"廠商的編號 : {mid}",
                           "weight": "bold",
-                          "margin": "sm",
+                          "margin": "xs",
                           "flex": 0},
                         {
                           "type": "text",
@@ -242,7 +242,7 @@ def test_manufacturers():
                       {
                       "type": "button",
                       "style": "primary",
-                      "color": "#905c44",
+                      "color": "#BB5E00",
                       "margin": "none",
                       "action": {
                                  "type": "message",
@@ -256,47 +256,141 @@ def test_manufacturers():
                                   "spacing": "none",
                                   "margin": "none"}
                                 }
-            bubbles.append(bubble)
-        
+            bubbles.append(bubble)       
         flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "carousel", "contents": bubbles})
     else:
-      flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "text", "text": "找不到符合條件的廠商。"})
-    
+      flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "text", "text": "找不到符合條件的廠商。"})    
     cursor.close()
     conn.close()
     return flex_message
- #---------------此廠商所有商品----------------------------
+ #---------------此廠商所有商品(已變數/FM)-------------------------
 def products_manufacturers(manufacturer_id):
     testAimplement = databasetest()
     conn = testAimplement['conn']
     cursor = testAimplement['cursor']
-    query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information WHERE 廠商編號 = '{manufacturer_id}'"
+    query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information natural join Purchase_Information WHERE 廠商編號 = '{manufacturer_id}'"
     cursor.execute(query)
     result = cursor.fetchall()
     
     if result is not None:
         bubbles = []
         for row in result:
-            pid = row[9]  # '商品ID'
-            pname = row[10]  # '商品名稱'
-            stock_num = row[14]  # '庫存數量'
-            sell_unit = row[15]  #  '售出單位'
+            pid = row[0]  # '商品ID'
+            pname = row[11]  # '商品名稱'
+            stock_num = row[15]  # '庫存數量'
+            pname_unit = row[1]  #  '商品單位'
+            purchase_price = row[28] #'進貨單價'
             sell_price = row[16]  # '售出單價'
-             
-            
             bubble = {
                 "type": "bubble",
                 "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "xxl",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "【商品資訊】",
+                    "size": "xl",
+                    "weight": "bold"
+                  },
+                  {
                     "type": "box",
                     "layout": "vertical",
+                    "spacing": "xl",
                     "contents": [
-                        {"type": "text", "text": f"商品ID: {pid}"},
-                        {"type": "text", "text": f"商品名稱: {pname}"},
-                        {"type": "text", "text": f"庫存數量: {stock_num}"},
-                        {"type": "text", "text": f"售出單位: {sell_unit}"},
-                        {"type": "text", "text": f"售出單價: {sell_price}"}
-                    ]
-                },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": f"1.商品ID: {pid}",
+                            "weight": "bold",
+                            "margin": "xs"
+                          },
+                          {
+                            "type": "text",
+                            "text": f"2.商品名稱：{pname}",
+                            "flex": 0,
+                            "margin": "sm",
+                            "weight": "bold",
+                            "contents": []
+                          },
+                          {
+                            "type": "text",
+                            "text": f"3.庫存數量: {stock_num}",
+                            "weight": "bold",
+                            "margin": "sm"
+                          },
+                          {
+                            "type": "text",
+                            "text": f"4.商品單位: {pname_unit}",
+                            "weight": "bold",
+                            "margin": "sm"
+                          },
+                          {
+                            "type": "text",
+                            "text": f"5.進貨單價: {purchase_price}",
+                            "weight": "bold",
+                            "margin": "sm"
+                          },
+                          {
+                            "type": "text",
+                            "text": f"6.售出單價: {sell_price}",
+                            "weight": "bold",
+                            "margin": "sm"
+                          }
+                        ]
+                      }
+                    ],
+                    "margin": "xs"
+                  },
+                  {
+                    "type": "separator",
+                    "margin": "lg",
+                    "color": "#888888"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "button",
+                    "style": "primary",
+                    "color": "#FF7575",
+                    "margin": "none",
+                    "action": {
+                      "type": "message",
+                      "label": "停售",
+                      "text": "停售"
+                    },
+                    "height": "md",
+                    "offsetEnd": "none",
+                    "offsetBottom": "sm",
+                    "offsetStart": "none"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": "修該商品資訊",
+                      "text": "hello"
+                    },
+                    "style": "primary",
+                    "color": "#46A3FF",
+                    "margin": "none",
+                    "height": "md",
+                    "offsetBottom": "sm",
+                    "offsetEnd": "none",
+                    "offsetStart": "xs"
+                  }
+                ],
+                "spacing": "none",
+                "margin": "none"
+              }
             }
             bubbles.append(bubble)
         flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "carousel", "contents": bubbles})
@@ -311,25 +405,129 @@ def test_categoryate(selected_category):
     testBimplement = databasetest()
     conn = testBimplement['conn']
     cursor = testBimplement['cursor']
-    query = f"SELECT 商品ID, 商品名稱 FROM Product_information WHERE 商品ID LIKE '{selected_category}%'"
+    query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information NATURAL JOIN Purchase_Information WHERE 商品ID LIKE '{selected_category}%'"
     cursor.execute(query)
     result = cursor.fetchall()
     if result is not None:
         bubbles = []
         for row in result:
             pid = row[0]  # '商品ID'
-            pname = row[1]  # '商品名稱'
+            pname = row[11]  # '商品名稱'
+            stock_num = row[15]  # '庫存數量'
+            pname_unit = row[1]  #  '商品單位'
+            purchase_price = row[28] #'進貨單價'
+            sell_price = row[16]  # '售出單價'
             bubble = {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {"type": "text", "text": f"商品ID：{pid}"},
-                        {"type": "text", "text": f"商品名稱：{pname}"}
-                    ]
+                  "type": "bubble",
+                  "body": {
+                  "type": "box",
+                  "layout": "vertical",
+                  "spacing": "xxl",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "【商品資訊】",
+                      "size": "xl",
+                      "weight": "bold"
+                    },
+                    {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "xl",
+                      "contents": [
+                        {
+                          "type": "box",
+                          "layout": "vertical",
+                          "contents": [
+                            {
+                              "type": "text",
+                              "text": f"1.商品ID: {pid}",
+                              "weight": "bold",
+                              "margin": "xs"
+                            },
+                            {
+                              "type": "text",
+                              "text": f"2.商品名稱：{pname}",
+                              "flex": 0,
+                              "margin": "sm",
+                              "weight": "bold",
+                              "contents": []
+                            },
+                            {
+                              "type": "text",
+                              "text": f"3.庫存數量: {stock_num}",
+                              "weight": "bold",
+                              "margin": "sm"
+                            },
+                            {
+                              "type": "text",
+                              "text": f"4.商品單位: {pname_unit}",
+                              "weight": "bold",
+                              "margin": "sm"
+                            },
+                            {
+                              "type": "text",
+                              "text": f"5.進貨單價: {purchase_price}",
+                              "weight": "bold",
+                              "margin": "sm"
+                            },
+                            {
+                              "type": "text",
+                              "text": f"6.售出單價: {sell_price}",
+                              "weight": "bold",
+                              "margin": "sm"
+                            }
+                          ]
+                        }
+                      ],
+                      "margin": "xs"
+                    },
+                    {
+                      "type": "separator",
+                      "margin": "lg",
+                      "color": "#888888"
+                    }
+                  ]
+                },
+                "footer": {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "contents": [
+                    {
+                      "type": "button",
+                      "style": "primary",
+                      "color": "#FF7575",
+                      "margin": "none",
+                      "action": {
+                        "type": "message",
+                        "label": "停售",
+                        "text": "停售"
+                      },
+                      "height": "md",
+                      "offsetEnd": "none",
+                      "offsetBottom": "sm",
+                      "offsetStart": "none"
+                    },
+                    {
+                      "type": "button",
+                      "action": {
+                        "type": "message",
+                        "label": "修該商品資訊",
+                        "text": "hello"
+                      },
+                      "style": "primary",
+                      "color": "#46A3FF",
+                      "margin": "none",
+                      "height": "md",
+                      "offsetBottom": "sm",
+                      "offsetEnd": "none",
+                      "offsetStart": "xs"
+                    }
+                  ],
+                  "spacing": "none",
+                  "margin": "none"
                 }
-            }
+              }
             bubbles.append(bubble)
         flex_message = FlexSendMessage(
             alt_text="類別下所有商品",
