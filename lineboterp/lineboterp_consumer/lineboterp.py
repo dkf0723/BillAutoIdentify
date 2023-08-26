@@ -15,11 +15,12 @@ from product.check import *
 from database import *
 from ask_wishes.ask import *
 from ask_wishes.wishes import *
-from relevant_information import linebotinfo
+from relevant_information import linebotinfo,dbinfo
 from product.cartlist import *
 from product.orderlist import *
 from selection_screen import *
 #======python的函式庫==========
+from mysql.connector import pooling
 import tempfile, os
 from datetime import datetime, timedelta
 import schedule #排程
@@ -78,9 +79,19 @@ global db
 db = {}
 global msgtype
 
+#資料庫pool設定數量4個
+dbdata = dbinfo()
+db_pool = pooling.MySQLConnectionPool(
+            pool_name="db_pool",
+            pool_size=4,
+            host= dbdata['host'],
+            user=dbdata['user'],
+            password=dbdata['password'],
+            database=dbdata['database']
+        )
 #首次資料庫連線，最底下有排程設定
-databasetest()
-databasetest1()
+databasetest(db_pool,1) #主要1
+databasetest(db_pool,2) #備用1
 #-----------------------------------------
 
 # 處理訊息
@@ -354,15 +365,11 @@ def welcome(event):
 scheduler = BackgroundScheduler()
 #資料庫連線1
 def dbconnect_job():
-    db['conn'] = db['conn1']#暫時更換
-    db['conn'].close()
-    databasetest()#3分鐘
+    databasetest(db_pool,3)#主要1的重新連線(3分鐘)
 
 #資料庫連線2
 def dbconnect1_job():
-    db['conn1'] = db['conn']#暫時更換
-    db['conn1'].close()
-    databasetest1()#5分鐘
+    databasetest(db_pool,4)#備用1的重新連線(5分鐘)
 
 #檢測資料庫連線
 def checkdb():
@@ -378,23 +385,27 @@ def checkdb():
             dbconnect1_job()
     else:
         dbconnect_job()
-        time.sleep(30)#秒
         dbconnect1_job()
 
-# 建立排程函式
-def task_1_minutes():
-    checkdb()
-'''
+'''# 建立排程函式
 def task_3_minutes():
-    dbconnect1_job()
+    checkdb()
 def task_5_minutes():
-    dbconnect1_job()'''
-
+    checkdb()
 # 啟動排程
-#scheduler.add_job(task_5_minutes, 'interval', minutes=5) #分鐘
-#scheduler.add_job(task_3_minutes, 'interval', minutes=3) #分鐘
-scheduler.add_job(task_1_minutes, 'interval', minutes=1) #分鐘
-scheduler.start()
+scheduler.add_job(task_5_minutes, 'interval', minutes=5) #分鐘
+scheduler.add_job(task_3_minutes, 'interval', minutes=3) #分鐘
+#scheduler.add_job(task_1_minutes, 'interval', minutes=1) #分鐘
+scheduler.start()'''
+# 建立新的執行緒來運行排程函式
+def run_schedule():
+    while True:
+        checkdb()
+        schedule.run_pending()
+        time.sleep(60)  # 秒
+# 啟動排程
+schedule_thread = threading.Thread(target=run_schedule)
+schedule_thread.start()
 #-----------------------------------------
 import os
 if __name__ == "__main__":

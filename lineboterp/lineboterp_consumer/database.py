@@ -9,6 +9,7 @@ from linebot.models import *
 from relevant_information import dbinfo,imgurinfo
 import os, io, pyimgur, glob
 import lineboterp
+import time
 import random #隨機產生
 #安裝 Python 的 MySQL 連接器及其相依性>pip install mysql-connector-python
 #安裝Python 的 pyimgur套件> pip install pyimgur
@@ -24,25 +25,17 @@ def gettime():
   order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
   return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date,'formatted_millisecond':formatted_millisecond}
 #-------------------資料庫連線----------------------
-#第一個連線
-def databasetest():
+#連線
+def databasetest(db_pool, serial_number):
   db = lineboterp.db
   timeget = gettime()
   formatted_datetime = timeget['formatted_datetime']
-  #取得資料庫資訊
-  dbdata = dbinfo()  
-  config = {
-  'host': dbdata['host'],
-  'user': dbdata['user'],
-  'password': dbdata['password'],
-  'database': dbdata['database']
-  }
   #錯誤重新執行最大3次
   max_retries = 3  # 最大重試次數
   retry_count = 0  # 初始化重試計數
   while retry_count<max_retries:
     try:
-      conn = mysql.connector.connect(**config)
+      conn = db_pool.get_connection()
       databasetest_msg = '資料庫連接成功'
       break
     except mysql.connector.Error as err:
@@ -52,67 +45,64 @@ def databasetest():
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
+  
+  if serial_number == 1:
+    new_formatted_datetime = next_conn_time(formatted_datetime, 1)#取得下次執行時間
+    db['databasetest_msg'] = databasetest_msg
+    db['databaseup'] = formatted_datetime
+    db['databasenext'] = new_formatted_datetime
+    db['conn'] = conn
+  elif serial_number == 2:
+    new_formatted_datetime = next_conn_time(formatted_datetime, 2)#取得下次執行時間
+    db['databasetest_msg1'] = databasetest_msg
+    db['databaseup1'] = formatted_datetime
+    db['databasenext1'] = new_formatted_datetime
+    db['conn1'] = conn
+  elif serial_number == 3:
+    new_formatted_datetime = next_conn_time(formatted_datetime, 3)#取得下次執行時間
+    db['conn'].close()
+    db['databasetest_msg'] = databasetest_msg
+    db['databaseup'] = formatted_datetime
+    db['databasenext'] = new_formatted_datetime
+    db['conn'] = conn
+  elif serial_number == 4:
+    new_formatted_datetime = next_conn_time(formatted_datetime, 4)#取得下次執行時間
+    db['conn1'].close()
+    db['databasetest_msg1'] = databasetest_msg
+    db['databaseup1'] = formatted_datetime
+    db['databasenext1'] = new_formatted_datetime
+    db['conn1'] = conn
 
+#下次更新時間計算
+def next_conn_time(formatted_datetime, serial_number):
   nowtime = datetime.strptime(formatted_datetime, '%Y-%m-%d %H:%M:%S')
   check = nowtime.minute
-  check1 = [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57]
-  if check in [57, 58, 59]:
+  if serial_number in [1,3]:
+    check1 = [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57]
+    addhours = []#小時進位分鐘
+    for i in range(57,60):#57～59
+      addhours.append(i)
+    modified_add = next_time(check, check1, nowtime, addhours)#下次更新分鐘取得
+
+  if serial_number in [2,4]:
+    check1 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    addhours = []#小時進位分鐘
+    for i in range(55,60):#55～59
+      addhours.append(i)
+    modified_add = next_time(check, check1, nowtime, addhours)#下次更新分鐘取得
+  new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
+  return new_formatted_datetime
+
+#下次更新分鐘取得
+def next_time(check, check1,nowtime, addhours):
+  if check in addhours:
     modified_add = nowtime + timedelta(hours=1)
     modified_add = modified_add.replace(minute=0)
   else:
     next_minute = min([i for i in check1 if i > check])
     modified_add = nowtime.replace(minute=next_minute)
-  new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
+  return modified_add
 
-  db['databasetest_msg'] = databasetest_msg
-  db['databaseup'] = formatted_datetime
-  db['databasenext'] = new_formatted_datetime
-  db['conn'] = conn
-
-#第二個連線
-def databasetest1():
-  db = lineboterp.db
-  timeget = gettime()
-  formatted_datetime = timeget['formatted_datetime']
-  #取得資料庫資訊
-  dbdata = dbinfo()  
-  config = {
-  'host': dbdata['host'],
-  'user': dbdata['user'],
-  'password': dbdata['password'],
-  'database': dbdata['database']
-  }
-  #錯誤重新執行最大3次
-  max_retries = 3  # 最大重試次數
-  retry_count = 0  # 初始化重試計數
-  while retry_count<max_retries:
-    try:
-      conn = mysql.connector.connect(**config)
-      databasetest_msg = '資料庫連接成功'
-      break
-    except mysql.connector.Error as err:
-      if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        databasetest_msg = '使用者或密碼有錯'
-      elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        databasetest_msg = '資料庫不存在或其他錯誤'
-      else:
-        databasetest_msg = err
-
-  nowtime = datetime.strptime(formatted_datetime, '%Y-%m-%d %H:%M:%S')
-  check = nowtime.minute
-  check1 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
-  if check in [55, 56, 57, 58, 59]:
-    modified_add = nowtime + timedelta(hours=1)
-    modified_add = modified_add.replace(minute=0)
-  else:
-    next_minute = min([i for i in check1 if i > check])
-    modified_add = nowtime.replace(minute=next_minute)
-  new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
-
-  db['databasetest_msg1'] = databasetest_msg
-  db['databaseup1'] = formatted_datetime
-  db['databasenext1'] = new_formatted_datetime
-  db['conn1'] = conn
 #-------------------錯誤重試----------------------
 def retry(category,query):#select/notselect
   block = 0#結束點是1
@@ -121,15 +111,18 @@ def retry(category,query):#select/notselect
   while block == 0:
     if step == 0:
       conn = lineboterp.db['conn']
+      cursor = conn.cursor()#重新建立游標
     elif step == 1:
       conn = lineboterp.db['conn1']
+      cursor = conn.cursor()#重新建立游標
       stepout = 1 #第二輪標記，完成下面動作可退出
     max_retries = 3  # 最大重試次數
     retry_count = 0  # 初始化重試計數
+    if step == 1:#關閉第一輪的
+      cursor.close()#游標關閉
     while retry_count<max_retries:
       step = 0 #單輪重試恢復預設值
       stepout = 0#單輪重試恢復預設值
-      cursor = conn.cursor()#重新建立游標
       try:
         if category == 'select':
           cursor.execute(query)
@@ -145,15 +138,16 @@ def retry(category,query):#select/notselect
         stepout = 1 #不進行第二輪
         break
       except mysql.connector.Error as e:
-        cursor.close()#游標關閉
         conn.rollback()  # 撤銷操作恢復到操作前的狀態
         retry_count += 1 #重試次數累加
         result2 = 'no'#購物車新增用
         stepout = 1
         step = 1
+        time.sleep(1)
     if stepout == 1:#成功取得資料後退出
       block = 1
     if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
+      cursor.close()#游標關閉
       block = 1
   return result,result2
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
