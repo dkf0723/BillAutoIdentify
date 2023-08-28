@@ -9,7 +9,8 @@ from ask_wishes.ask import *
 from ask_wishes.wishes import *
 from database import *
 from product.cartlist import cart_list,addcart,cartrevise,checkcart
-from selection_screen import Order_phonenum_screen,Single_order_confirmation_screen,Order_establishment_message
+from selection_screen import (Order_phonenum_screen,Single_order_confirmation_screen,Order_establishment_message,
+                              Cart_join_success_message,Cancel_fail_message)
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
@@ -131,7 +132,7 @@ def orderandpreorder_check():
                     check_text = TextSendMessage(text=establishment_message)
             elif message == '2':
                 check_text = '您的商品訂/預購流程\n已經取消囉～'
-                check_text = TextSendMessage(text=check_text)
+                check_text = TextSendMessage(text=check_text),Cancel_fail_message()
                 state[id] = 'normal' #從user_state轉換普通狀態
                 #下方重置
                 message_storage[id+'num'] = 'NaN'
@@ -150,7 +151,7 @@ def orderandpreorder_check():
     else:
         if(message == "取消"):
             check_text = '您的商品現/預購流程\n已經取消囉～'
-            check_text = TextSendMessage(text=check_text)
+            check_text = TextSendMessage(text=check_text),Cancel_fail_message()
             state[id] = 'normal' #從user_state轉換普通狀態
             #下方重置
             message_storage[id+'num'] = 'NaN'
@@ -197,12 +198,16 @@ def cartnum():
     message = lineboterp.msg
     product_id = lineboterp.product[id+'cartproduct_id']
     product = lineboterp.product[id+'cartproduct']
+
+    pagemin = lineboterp.list_page[lineboterp.user_id+'現購min']
+    pagemax = lineboterp.list_page[lineboterp.user_id+'現購max']
+    continue_browsing = "【現購列表下一頁】"+ str(pagemin+1) +"～"+ str(pagemax)
+    
     if message.isdigit():#是數字
         text = cartadd(id,product_id,int(message))
         if text == 'ok':
             unit = unitsearch(product_id)
-            check_text = ('==商品成功加入購物車==\n商品名稱：%s\n加入數量： %s %s' %(product,message,unit))
-            check_text = TextSendMessage(text=check_text)
+            check_text = Cart_join_success_message(product,product_id,message,unit,continue_browsing)
             state[id] = 'normal' #結束流程將user_state轉換預設狀態
         else:
             check_text = TextSendMessage(text='購物車加入失敗！請稍後再試。')
@@ -210,12 +215,14 @@ def cartnum():
     else:
         if(message == "取消"):
             check_text = '您的商品加入購物車流程\n已經取消囉～'
-            check_text = TextSendMessage(text=check_text)
+            check_text = TextSendMessage(text=check_text),Cancel_fail_message()
             state[id] = 'normal' #結束流程將user_state轉換預設狀態
         else:
-            check_text = addcart()
+            errormsg = f"您輸入的「{message}」內容並非數字喔！請重新輸入數量。"
+            check_text = addcart(errormsg)
     return check_text
 
+#購物車數量修改
 def cartrpnum():
     id = lineboterp.user_id
     state = lineboterp.user_state

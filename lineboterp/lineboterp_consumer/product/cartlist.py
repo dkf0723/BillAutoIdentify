@@ -4,6 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import lineboterp
 from database import cartsearch,unitsearch,stock,removecart,revise,cartsubtotal
+from selection_screen import Cart_add_screen
 
 #-------------------購物車資料查詢----------------------
 def cart_list():
@@ -151,7 +152,7 @@ def cart_list():
     return cart_show
 
 #-------------------購物車商品新增----------------------
-def addcart():
+def addcart(errormsg):
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
     product_id = lineboterp.product[user_id+'cartproduct_id']
@@ -172,7 +173,6 @@ def addcart():
             #Quick Reply 按鈕數量範圍
             quantity_option = []
             unit = unitsearch(product_id)
-            quantity_option.append(QuickReplyButton(action=MessageAction(label='取消', text='取消')))
             for i in range(10):
                 if unit == '無':
                     quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
@@ -181,11 +181,8 @@ def addcart():
             #------------------------
             user_state[user_id] = 'cartnum'#從user_state轉換輸入購物車數量狀態
             # 建立 Quick Reply 按鈕
-            quick_reply_message = TextSendMessage(
-                text='商品ID：%s\n商品名稱：%s\n=>請點選此商品加入購物車的數量：' %(product_id,product),
-                quick_reply=QuickReply(items=quantity_option)
-            )
-            cart = TextSendMessage(text='加入購物車流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
+            quickreply = QuickReply(items=quantity_option)
+            cart = Cart_add_screen(product_id,product,quickreply,errormsg)
                 # 傳送回應訊息給使用者
     else:
         cart = TextSendMessage(text='您的購物車清單筆數已達5個商品上限！無法再新增商品至購物車！')

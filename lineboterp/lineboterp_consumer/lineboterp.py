@@ -167,6 +167,7 @@ def handle_message(event):
             searchresult = orderdtsearch()
             line_bot_api.reply_message(event.reply_token, searchresult)
         elif '【加入購物車】' in msg:
+            errormsg = 'no'
             original_string = msg
             # 找到"【加入購物車】"的位置
             start_index = original_string.find("【加入購物車】")
@@ -178,7 +179,7 @@ def handle_message(event):
                 product_name = substr.split("_")[1].strip() # 取出～後面的字並去除空白字元
             product[user_id+'cartproduct_id'] = product_id
             product[user_id+'cartproduct'] = product_name
-            cartadd = addcart()
+            cartadd = addcart(errormsg)
             line_bot_api.reply_message(event.reply_token, cartadd)
         elif '查看購物車' in msg:
             cart = cart_list()
