@@ -140,6 +140,7 @@ def retry(category,query):#select/notselect
       except mysql.connector.Error as e:
         conn.rollback()  # 撤銷操作恢復到操作前的狀態
         retry_count += 1 #重試次數累加
+        result = [] #錯誤回傳內容
         result2 = 'no'#購物車新增用
         stepout = 1
         step = 1
