@@ -112,24 +112,18 @@ def retry(category,query):#select/notselect
     max = 3  # 最大重試次數
     count = 0  # 初始化重試計數
     connobtain = 'ok' #檢查是否取得conn連線資料
-    if step == 0:
-      while count<max:
-        try:
+    while count<max:
+      try:
+        if step == 0:
           conn = lineboterp.db['conn']
           cursor = conn.cursor()#重新建立游標
           break
-        except mysql.connector.errors.OperationalError:#預防MySQL Connection not available
-          conn.rollback()  # 撤銷操作恢復到操作前的狀態
-          count += 1 #重試次數累加
-          connobtain = 'no'
-    elif step == 1:
-      while count<max:
-        try:
+        elif step == 1:
           conn = lineboterp.db['conn1']
           cursor = conn.cursor()#重新建立游標
           stepout = 1 #第二輪標記，完成下面動作可退出
           break
-        except mysql.connector.errors.OperationalError:#預防MySQL Connection not available
+      except mysql.connector.errors.OperationalError:#預防MySQL Connection not available
           conn.rollback()  # 撤銷操作恢復到操作前的狀態
           count += 1 #重試次數累加
           connobtain = 'no'
@@ -330,43 +324,46 @@ def order_create():
     serial_number = '00001'
     order_details,establishmentget,sort = order_detail(serial_number)
     establishment_message = establishmentget
-    if sort == '現購':
-      sorttype = '未取'
-    elif sort == '預購':
-      sorttype = '預購'
-    query3_1 = f"""
-          INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
-          """
-    category ='notselect' #重試類別select/notselect
-    result,result2 = retry(category,query3_1)
+    if establishment_message != 'ok':
+      orderinfo = []
+    else:
+      if sort == '現購':
+        sorttype = '未取'
+      elif sort == '預購':
+        sorttype = '預購'
+      query3_1 = f"""
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
+            """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query3_1)
 
-    query3_2 = f"""
-          INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
-          VALUES {order_details};
-          """
-    category ='notselect' #重試類別select/notselect
-    result,result2 = retry(category,query3_2)
+      query3_2 = f"""
+            INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+            VALUES {order_details};
+            """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query3_2)
 
-    query3_3 = f"""
-          UPDATE Order_information
-          SET 總額 = (
-              SELECT SUM(商品小計) AS 小計
-              FROM order_details
-              WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
-          )
-          WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
-          """
-    category ='notselect' #重試類別select/notselect
-    result,result2 = retry(category,query3_3)
+      query3_3 = f"""
+            UPDATE Order_information
+            SET 總額 = (
+                SELECT SUM(商品小計) AS 小計
+                FROM order_details
+                WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
+            )
+            WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
+            """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query3_3)
 
-    establishment_message = 'ok'
-    query4_1 = f"""
-              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID  
-              FROM order_details Natural Join Product_information 
-              Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
-    category ='select' #重試類別select/notselect
-    orderinfo,result2 = retry(category,query4_1)
+      establishment_message = 'ok'
+      query4_1 = f"""
+                SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID  
+                FROM order_details Natural Join Product_information 
+                Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
+      category ='select' #重試類別select/notselect
+      orderinfo,result2 = retry(category,query4_1)
 
   else:
     checkaddtime = order_result[0][0]#取得最新一筆訂單序號
@@ -379,43 +376,46 @@ def order_create():
       serial_number = '00001'
     order_details, establishmentget,sort = order_detail(serial_number)
     establishment_message = establishmentget
-    if sort == '現購':
-      sorttype = '未取'
-    elif sort == '預購':
-      sorttype = '預購'
-    addorder = f"""
-          INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-          VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
-          """
-    category ='notselect' #重試類別select/notselect
-    result,result2 = retry(category,addorder)
+    if establishment_message != 'ok':
+      orderinfo = []
+    else:
+      if sort == '現購':
+        sorttype = '未取'
+      elif sort == '預購':
+        sorttype = '預購'
+      addorder = f"""
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
+            """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,addorder)
 
-    addorderdetails = f"""
-          INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
-          VALUES {order_details};
-          """
-    category ='notselect' #重試類別select/notselect
-    result,result2 = retry(category,addorderdetails)
- 
-    addtotalcost = f"""
-          UPDATE Order_information
-          SET 總額 = (
-              SELECT SUM(商品小計) AS 小計
-              FROM order_details
-              WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
-          )
-          WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
-          """
-    category ='notselect' #重試類別select/notselect
-    result,result2 = retry(category,addtotalcost)
+      addorderdetails = f"""
+            INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
+            VALUES {order_details};
+            """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,addorderdetails)
+  
+      addtotalcost = f"""
+            UPDATE Order_information
+            SET 總額 = (
+                SELECT SUM(商品小計) AS 小計
+                FROM order_details
+                WHERE 訂單編號 = 'order{order_dateget}{serial_number}'
+            )
+            WHERE 訂單編號 = 'order{order_dateget}{serial_number}';
+            """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,addtotalcost)
 
-    establishment_message = 'ok'
-    query4_2 = f"""
-              SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID  
-              FROM order_details Natural Join Product_information 
-              Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
-    category ='select' #重試類別select/notselect
-    orderinfo,result2 = retry(category,query4_2)
+      establishment_message = 'ok'
+      query4_2 = f"""
+                SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID  
+                FROM order_details Natural Join Product_information 
+                Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
+      category ='select' #重試類別select/notselect
+      orderinfo,result2 = retry(category,query4_2)
   return orderinfo, establishment_message
 
 #檢查庫存等動作(單筆)
@@ -445,15 +445,16 @@ def order_detail(serial_number):
               order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
           else:
             order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
-        else:
-          establishment_message = f"商品id：{orderall[0]},預購數量：{str(orderall[1])},庫存剩餘數量不足！"
-        query1 =f"""
+          query1 =f"""
                 UPDATE Product_information
                 SET 庫存數量 = '{str(int(inventory)-int(orderall[1]))}'
                 WHERE 商品ID = '{orderall[0]}'
                 """
-        category ='notselect' #重試類別select/notselect
-        result,result2 = retry(category,query1)
+          category ='notselect' #重試類別select/notselect
+          result,result2 = retry(category,query1)
+          establishment_message = 'ok'
+        else:
+          establishment_message = f"商品id：{orderall[0]},現購數量：{str(orderall[1])},庫存剩餘數量不足！"
       else:
         if int(orderall[1]) >= 2:
           if price2 is not None:
@@ -462,6 +463,7 @@ def order_detail(serial_number):
             order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
         else: 
           order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
+        establishment_message = 'ok'
   else:
     establishment_message = '資料庫查無此商品資料'
   return order_details,establishment_message,sort
@@ -516,6 +518,17 @@ def unitsearch(product_id):
   return unit
 
 #單獨庫存查詢
+def stockonly(pid):
+  query = f"select 庫存數量 from Product_information where 商品ID = '{pid}'"
+  category ='select' #重試類別select/notselect
+  inventory_result,result2 = retry(category,query)
+  if inventory_result == []:
+    stocknum = '尚無庫存'
+  else:
+    stocknum = inventory_result[0][0]
+  return stocknum
+
+#單獨庫存查詢並修改
 def stock(pid,num):
   query = f"select 庫存數量 from Product_information where 商品ID = '{pid}'"
   category ='select' #重試類別select/notselect

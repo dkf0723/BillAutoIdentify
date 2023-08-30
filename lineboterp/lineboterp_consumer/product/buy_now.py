@@ -3,7 +3,7 @@ from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
 import lineboterp
-from database import buynow_list,unitsearch
+from database import buynow_list,unitsearch,stockonly
 from selection_screen import Order_buynow_preorder_screen
 
 #-------------------現購清單----------------------
@@ -259,7 +259,8 @@ def Order_buynow(errormsg):
     #Quick Reply 按鈕數量範圍
     quantity_option = []
     unit = unitsearch(product_id)
-    for i in range(10):
+    stocknum = stockonly(product_id)
+    for i in range(stocknum):
         if unit == '無':
             quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
         else:
