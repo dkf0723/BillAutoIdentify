@@ -47,15 +47,16 @@ def orderandpreorder_check():
     if message.isdigit():
             # 處理完問題後，結束等待回覆狀態
         if state[id] == 'ordering':
-            if int(message) > 0:
+            stocknum = stockonly(product_id)
+            if stocknum > 0 and int(message) > 0 and int(message) <= stocknum:
                 message_storage[id+'num'] = message
                 message_storage[id+'ordertype'] = '現購'
                 errormsg = 'no'
                 check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
                 state[id] = 'phonenum' #從user_state轉換輸入電話狀態
             else:
-                errormsg = f"您輸入的數量「{message}」有誤！請重新輸入現購數量。"
-                check_text = Order_preorder(errormsg)
+                errormsg = f"您輸入的數量「{message}」有誤！請重新輸入現購數量。\n目前庫存{stocknum}"
+                check_text = Order_buynow(errormsg)
         elif state[id] == 'preorder':
             if int(message) > 0:
                 if int(message) % storage_multiple == 0:
@@ -100,8 +101,8 @@ def orderandpreorder_check():
                 numtype = message_storage[id+'ordertype']
                 orderall[id] = [product_id,message_storage[id+'num']]#商品紀錄以便存入資料庫
                 orderinfo, establishment_message = order_create()#資料庫訂單建立
-                orderinfo = orderinfo[0]
                 if establishment_message == 'ok':
+                    orderinfo = orderinfo[0]
                     if numtype == '現購':
                         pagemin = lineboterp.list_page[lineboterp.user_id+'現購min']
                         pagemax = lineboterp.list_page[lineboterp.user_id+'現購max']
@@ -130,6 +131,16 @@ def orderandpreorder_check():
                     message_storage[id+'oderdiscount'] = 'NaN'
                 else:
                     check_text = TextSendMessage(text=establishment_message)
+                    state[id] = 'normal' #從user_state轉換普通狀態
+                    #下方重置
+                    message_storage[id+'num'] = 'NaN'
+                    message_storage[id+'phonenum'] = 'NaN'
+                    product_id = 'NaN'
+                    product = 'NaN'
+                    product_order_preorder[id] = 'NaN'
+                    message_storage[id+'ordertype'] = 'NaN'
+                    message_storage[id+'oderprice'] = 'NaN'
+                    message_storage[id+'oderdiscount'] = 'NaN'
             elif message == '2':
                 check_text = '您的商品訂/預購流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text),Cancel_fail_message(message_storage[id+'ordertype'])
