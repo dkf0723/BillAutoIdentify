@@ -16,19 +16,24 @@ def cart_list():
         cart_show = []
         buttons = []  #模塊中5筆資料
         num = 1
-        changelist = '==購物車自檢結果==\n'
+        changelist = '\n'
+        listnum = 0
         #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
+        totalcost = 0
         for totallist in db_cartshow:
             dbstock,dbrnum,order = stock(totallist[1],totallist[3])
             if dbstock == 'ok':
                 if totallist[3] == dbrnum:
                     changenum = str(totallist[3])
                     subtotal = totallist[5]
+                    add = totallist[5]
                 else:
                     changenum = str(dbrnum)
-                    changelist += f"修改購物車商品：{str(totallist[2])}，已幫您修改至目前庫存剩餘最大數量{dbrnum}{totallist[4]}！\n"
+                    listnum += 1
+                    changelist += f"{str(listnum)}.修改購物車商品：{str(totallist[2])}，已幫您修改至目前庫存剩餘最大數量{dbrnum}{totallist[4]}！\n"
                     text = revise(user_id,totallist[1],int(dbrnum))
                     subtotal = cartsubtotal(totallist[1])
+                    add = subtotal
                 text ={
                     "type": "text",
                     "text": f"商品{str(num)}",
@@ -71,8 +76,32 @@ def cart_list():
                     buttons.append(i)
                 num += 1
             elif dbstock == 'no':
-                changelist += f"移除購物車清單：{str(totallist[2])}，已無庫存！\n"
+                listnum += 1
+                changelist += f"{str(listnum)}.移除購物車清單：{str(totallist[2])}，已無庫存！\n"
                 move = removecart(user_id, totallist[1])
+                add = 0
+            totalcost += add
+        buttons.append( {
+            "type": "text",
+            "text": f"總計NT${str('{:,}'.format(totalcost))}",
+            "weight": "bold",
+            "size": "md",
+            "wrap": True,
+            "margin": "md",
+            "align": "end"
+          })
+        
+        if len(changelist) >= 2:
+            buttons.append( {
+            "type": "text",
+            "wrap": True,
+            "color": "#3b5a5f",
+            "size": "sm",
+            "flex": 5,
+            "weight": "bold",
+            "text": f"\n◎購物車自檢結果：{changelist}"
+          })
+        
         cart_show.append({
         "type": "bubble",
         "body": {
@@ -101,7 +130,7 @@ def cart_list():
                 "type": "box",
                 "layout": "vertical",
                 "margin": "md",
-                "contents": buttons[:-1]
+                "contents": buttons
             }
             ]
         },
@@ -138,11 +167,7 @@ def cart_list():
         if buttons == []:
             cart_show = TextSendMessage(text='您的購物車中尚無商品資料')
         else:
-            if len(changelist) != 12:
-                change = TextSendMessage(text=changelist)
-            else:
-                change = TextSendMessage(text='購物車自檢無誤！')
-            cart_show = change,FlexSendMessage(
+            cart_show = FlexSendMessage(
                     alt_text='我的購物車',
                     contents={
                         "type": "carousel",
@@ -189,7 +214,7 @@ def addcart(errormsg):
     return cart
 
 #-------------------修改購物車單項商品數量----------------------
-def cartrevise():
+def cartrevise(errormsg):
     user_id = lineboterp.user_id
     user_state = lineboterp.user_state
     product_id = lineboterp.product[user_id+'cartreviseproduct_id']
@@ -205,13 +230,195 @@ def cartrevise():
     #------------------------
     user_state[user_id] = 'cartrevise'#從user_state轉換輸入購物車數量狀態
     # 建立 Quick Reply 按鈕
-    quick_reply_message = TextSendMessage(
-        text='商品ID：%s\n商品名稱：%s\n=>請點選此下方小按鈕修改此商品在購物車中的數量：' %(product_id,product),
-        quick_reply=QuickReply(items=quantity_option)
-    )
-    rcart = TextSendMessage(text='購物車商品數量修改流程中，如想取消請打字輸入" 取消 "'),quick_reply_message
-        # 傳送回應訊息給使用者
-    return rcart
+    quickreply = QuickReply(items=quantity_option)
+
+    if errormsg == 'no':
+        errormsg = '無'
+    else:
+        errormsg = str(errormsg)
+    msg = {
+        "type": "text",
+        "text": f"◎錯誤：{errormsg}",
+        "wrap": True,
+        "color": "#c42149",
+        "size": "sm",
+        "flex": 5,
+        "weight": "bold"
+        }
+    
+    recart = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "高逸嚴選",
+                    "color": "#A44528",
+                    "size": "sm",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "購物車修改數量(1/1)",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center",
+                    "margin": "xl"
+                },
+                {
+                    "type": "separator",
+                    "color": "#77105b",
+                    "margin": "md"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "xs",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "◇商品編號：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ],
+                            "width": "100px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{product_id}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "◇商品名稱：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ],
+                            "width": "100px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{product}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    {
+                        "type": "text",
+                        "text": "<下方依序填寫～>",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "xl",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "=>1.請選擇修改數量：",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "sm",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "※提示：可以自行輸入更多的數量",
+                        "wrap": True,
+                        "color": "#f6b877",
+                        "size": "sm",
+                        "flex": 5,
+                        "weight": "bold"
+                    },
+                    msg
+                    ]
+                }
+                ],
+                "backgroundColor": "#FCFAF1"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                {
+                    "type": "button",
+                    "style": "link",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": "取消",
+                    "text": "取消"
+                    }
+                }
+                ],
+                "flex": 0
+            }
+            }
+    screen =FlexSendMessage(
+                            alt_text="購物車修改數量(1/1)",
+                            contents={
+                                "type": "carousel",
+                                "contents": [recart]   
+                                },
+                            quick_reply = quickreply
+                            )
+    return screen
 
 #-------------------修改購物車清單----------------------
 def editcart():
@@ -223,7 +430,9 @@ def editcart():
         buttons = []  #模塊中5筆資料
         num = 1
         #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
+        totalcost = 0 #計算總額
         for totallist in db_cartshow:
+            totalcost += totallist[5]
             text ={
                 "type": "text",
                 "text": f"商品{str(num)}",
@@ -265,6 +474,15 @@ def editcart():
             for i in [text,text1,text2,button,separator]:
                 buttons.append(i)
             num += 1
+        buttons.append( {
+            "type": "text",
+            "text": f"總計NT${str('{:,}'.format(totalcost))}",
+            "weight": "bold",
+            "size": "md",
+            "wrap": True,
+            "margin": "md",
+            "align": "end"
+          })
         edcart_show.append({
         "type": "bubble",
         "body": {
@@ -293,7 +511,7 @@ def editcart():
                 "type": "box",
                 "layout": "vertical",
                 "margin": "md",
-                "contents": buttons[:-1]
+                "contents": buttons
             }
             ]
         },
@@ -352,6 +570,7 @@ def checkcart(content,lumpsum):
                 },
                 {
                     "type": "separator",
+                    "color": "#77105b",
                     "margin": "xxl"
                 },
                 {

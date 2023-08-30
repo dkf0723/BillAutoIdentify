@@ -185,6 +185,7 @@ def handle_message(event):
             cart = cart_list()
             line_bot_api.reply_message(event.reply_token, cart)
         elif '【修改數量】' in msg:
+            errormsg = 'no'
             original_string = msg
             # 找到"【修改數量】"的位置
             start_index = original_string.find("【修改數量】")
@@ -196,7 +197,7 @@ def handle_message(event):
                 product_name = substr.split("_")[1].strip() # 取出_後面的字並去除空白字元
             product[user_id+'cartreviseproduct_id'] = product_id
             product[user_id+'cartreviseproduct_name'] = product_name
-            cartr = cartrevise()
+            cartr = cartrevise(errormsg)
             line_bot_api.reply_message(event.reply_token, cartr)
         elif '修改購物車清單' in msg:
             carted = editcart()
@@ -221,7 +222,9 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, cart_list())
         elif '【送出購物車訂單】' in msg:
             user_state[user_id] = 'cartorderphonenum'
-            line_bot_api.reply_message(event.reply_token, [TextSendMessage(text='購物車訂單流程中，如想取消請打字輸入" 取消 "'),TextSendMessage(text='購物車訂單填寫\n=>請打字輸入手機號碼：\nex.0952000000')])
+            phone = recent_phone_call(user_id)[0][0]#最近一筆電話取得
+            errormsg = 'no'
+            line_bot_api.reply_message(event.reply_token, Cart_order_screen(phone,errormsg))
         #-------------------提問及許願----------------------
         elif '問題提問' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  

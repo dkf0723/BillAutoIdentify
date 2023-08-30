@@ -1951,23 +1951,30 @@ def Cart_join_success_message(product,product_id,num,unit,continue_browsing):
     return screen
 
 #單一現預購訂單取消、加入購物車失敗或取消(推薦)
-def Cancel_fail_message():
+def Cancel_fail_message(ordertype):
     user_id = lineboterp.user_id
     list_page = lineboterp.list_page
-
-    if (user_id+'現購min') not in list_page:
+    if ordertype == '現購':
+        if (user_id+'現購min') not in list_page:
+            now_pagemin = list_page[user_id+'現購min'] = 0
+            now_pagemax = list_page[user_id+'現購max'] = 9
+        else:
+            now_pagemin = list_page[user_id+'現購min']
+            now_pagemax = list_page[user_id+'現購max']
+    else:
         now_pagemin = list_page[user_id+'現購min'] = 0
         now_pagemax = list_page[user_id+'現購max'] = 9
+        
+    if ordertype == '預購':
+        if (user_id+'預購min') not in list_page:
+            preorder_pagemin = list_page[user_id+'預購min'] = 0
+            preorder_pagemax = list_page[user_id+'預購max'] = 9
+        else:
+            preorder_pagemin = list_page[user_id+'預購min']
+            preorder_pagemax = list_page[user_id+'預購max']
     else:
-        now_pagemin = list_page[user_id+'現購min']
-        now_pagemax = list_page[user_id+'現購max']
-
-    if (user_id+'預購min') not in list_page:
         preorder_pagemin = list_page[user_id+'預購min'] = 0
         preorder_pagemax = list_page[user_id+'預購max'] = 9
-    else:
-        preorder_pagemin = list_page[user_id+'預購min']
-        preorder_pagemax = list_page[user_id+'預購max']
         
     now_continue_browsing = "【現購列表下一頁】"+ str(now_pagemin+1) +"～"+ str(now_pagemax)
     preorder_continue_browsing = "【預購列表下一頁】"+ str(preorder_pagemin+1) +"～"+ str(preorder_pagemax)
@@ -2038,6 +2045,121 @@ def Cancel_fail_message():
                             contents={
                                 "type": "carousel",
                                 "contents": [cancel_fail_message]   
+                                }
+                            )
+    return screen
+
+def Cart_order_screen(phone,errormsg):
+    if errormsg == 'no':
+        errormsg = '無'
+    else:
+        errormsg = str(errormsg)
+        
+    phone_quick_buttons = []
+    if phone != 'no':
+        quick_buttons = {
+                        "type": "button",
+                        "style": "primary",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": f"使用{phone}",
+                        "text": f"{phone}"
+                        },
+                        "color": "#A44528"
+                    }
+        phone_quick_buttons.append(quick_buttons)
+    quick_buttons = {
+                    "type": "button",
+                    "style": "link",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": "取消",
+                    "text": "取消"
+                    }
+                }
+    phone_quick_buttons.append(quick_buttons)
+
+    msg = {
+        "type": "text",
+        "text": f"◎錯誤：{errormsg}",
+        "wrap": True,
+        "color": "#c42149",
+        "size": "sm",
+        "flex": 5,
+        "weight": "bold"
+        }
+    cart_order_screen = {
+                    "type": "bubble",
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "高逸嚴選",
+                            "color": "#A44528",
+                            "size": "sm",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": "購物車訂單填寫(1/1)",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "separator",
+                            "color": "#77105b",
+                            "margin": "md"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "xs",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "=>請輸入您的行動電話：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "lg",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            },
+                            {
+                                "type": "text",
+                                "text": "※提示：請自行輸入！ex.0952025413",
+                                "wrap": True,
+                                "color": "#f6b877",
+                                "size": "sm",
+                                "flex": 5,
+                                "weight": "bold"
+                            },
+                            msg
+                            ]
+                        }
+                        ],
+                        "backgroundColor": "#FCFAF1"
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "md",
+                        "contents": phone_quick_buttons,
+                        "flex": 0
+                    }
+                    }
+    screen =FlexSendMessage(
+                            alt_text="購物車訂單填寫(1/1)",
+                            contents={
+                                "type": "carousel",
+                                "contents": [cart_order_screen]   
                                 }
                             )
     return screen

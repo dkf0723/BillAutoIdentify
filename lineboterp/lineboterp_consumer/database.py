@@ -107,49 +107,69 @@ def next_time(check, check1,nowtime, addhours):
 def retry(category,query):#select/notselect
   block = 0#結束點是1
   step = 0 #第幾輪
-  stepout = 0 #第二輪標記
+  stepout = 0 #離開標記
   while block == 0:
+    max = 3  # 最大重試次數
+    count = 0  # 初始化重試計數
+    connobtain = 'ok' #檢查是否取得conn連線資料
     if step == 0:
-      conn = lineboterp.db['conn']
-      cursor = conn.cursor()#重新建立游標
+      while count<max:
+        try:
+          conn = lineboterp.db['conn']
+          cursor = conn.cursor()#重新建立游標
+          break
+        except mysql.connector.errors.OperationalError:#預防MySQL Connection not available
+          conn.rollback()  # 撤銷操作恢復到操作前的狀態
+          count += 1 #重試次數累加
+          connobtain = 'no'
     elif step == 1:
-      conn = lineboterp.db['conn1']
-      cursor = conn.cursor()#重新建立游標
-      stepout = 1 #第二輪標記，完成下面動作可退出
-    max_retries = 3  # 最大重試次數
-    retry_count = 0  # 初始化重試計數
-    if step == 1:#關閉第一輪的
-      cursor.close()#游標關閉
-    while retry_count<max_retries:
-      step = 0 #單輪重試恢復預設值
-      stepout = 0#單輪重試恢復預設值
-      try:
-        if category == 'select':
-          cursor.execute(query)
-          result = cursor.fetchall()
-          cursor.close()#游標關閉
-          result2 = 'no'#不是購物車新增的內容
-        elif category == 'notselect':
-          cursor.execute(query)
-          conn.commit()
-          cursor.close()#游標關閉
-          result = 'ok'
-          result2 = 'ok'#購物車新增用
-        stepout = 1 #不進行第二輪
-        break
-      except mysql.connector.Error as e:
-        conn.rollback()  # 撤銷操作恢復到操作前的狀態
-        retry_count += 1 #重試次數累加
-        result = [] #錯誤回傳內容
-        result2 = 'no'#購物車新增用
-        stepout = 1
-        step = 1
-        time.sleep(1)
-    if stepout == 1:#成功取得資料後退出
-      block = 1
-    if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
-      cursor.close()#游標關閉
-      block = 1
+      while count<max:
+        try:
+          conn = lineboterp.db['conn1']
+          cursor = conn.cursor()#重新建立游標
+          stepout = 1 #第二輪標記，完成下面動作可退出
+          break
+        except mysql.connector.errors.OperationalError:#預防MySQL Connection not available
+          conn.rollback()  # 撤銷操作恢復到操作前的狀態
+          count += 1 #重試次數累加
+          connobtain = 'no'
+    count = 0  # 重試次數歸零，用於後面的步驟
+    if connobtain == 'ok':
+      while count<max:
+        step = 1 #下一輪設定
+        stepout = 0 #回合恢復
+        try:
+          if category == 'select':
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()#游標關閉
+            result2 = 'no'#不是購物車新增的內容
+          elif category == 'notselect':
+            cursor.execute(query)
+            conn.commit()
+            cursor.close()#游標關閉
+            result = 'ok'
+            result2 = 'ok'#購物車新增用
+          stepout = 1 #不進行第二輪
+          break
+        except mysql.connector.Error as e:
+          conn.rollback()  # 撤銷操作恢復到操作前的狀態
+          count += 1 #重試次數累加
+          result = [] #錯誤回傳內容
+          result2 = 'no'#購物車新增用
+          step = 1
+          stepout = 1
+          time.sleep(1)
+      if stepout == 1:#成功取得資料後退出或兩輪都失敗退出迴圈
+        block = 1
+    else:
+      if step == 1:
+        cursor.close()#關閉第一輪游標的
+      step = 1 #conn沒取到進入切換conn1
+      if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
+        block = 1
+        result = []
+        result2 = 'no'
   return result,result2
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
 def member_profile(userid):
