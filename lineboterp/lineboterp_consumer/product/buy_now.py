@@ -260,6 +260,8 @@ def Order_buynow(errormsg):
     quantity_option = []
     unit = unitsearch(product_id)
     stocknum = stockonly(product_id)
+    if stocknum >= 13:
+        stocknum = 13
     for i in range(stocknum):
         if unit == '無':
             quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
