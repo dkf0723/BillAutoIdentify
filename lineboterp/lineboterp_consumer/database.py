@@ -123,10 +123,11 @@ def retry(category,query):#select/notselect
           cursor = conn.cursor()#重新建立游標
           stepout = 1 #第二輪標記，完成下面動作可退出
           break
-      except mysql.connector.errors.OperationalError:#預防MySQL Connection not available
-          conn.rollback()  # 撤銷操作恢復到操作前的狀態
-          count += 1 #重試次數累加
-          connobtain = 'no'
+      except mysql.connector.Error as e:
+        conn.rollback()
+        count += 1 #重試次數累加
+        connobtain = 'no'
+        
     count = 0  # 重試次數歸零，用於後面的步驟
     if connobtain == 'ok':
       while count<max:
