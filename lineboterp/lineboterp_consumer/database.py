@@ -33,18 +33,22 @@ def databasetest(db_pool, serial_number):
   #錯誤重新執行最大3次
   max_retries = 3  # 最大重試次數
   retry_count = 0  # 初始化重試計數
+  conn = None
   while retry_count<max_retries:
     try:
       conn = db_pool.get_connection()
       databasetest_msg = '資料庫連接成功'
       break
     except mysql.connector.Error as err:
-      if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+      if conn:
+        conn.close()
+      elif err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         databasetest_msg = '使用者或密碼有錯'
       elif err.errno == errorcode.ER_BAD_DB_ERROR:
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
+      conn = None
   
   if serial_number == 1:
     new_formatted_datetime = next_conn_time(formatted_datetime, 1)#取得下次執行時間
@@ -60,14 +64,22 @@ def databasetest(db_pool, serial_number):
     db['conn1'] = conn
   elif serial_number == 3:
     new_formatted_datetime = next_conn_time(formatted_datetime, 3)#取得下次執行時間
-    db['conn'].close()
+    if db['conn'] is not None:
+      try:
+        db['conn'].close()
+      except mysql.connector.Error as err:
+        conn = err
     db['databasetest_msg'] = databasetest_msg
     db['databaseup'] = formatted_datetime
     db['databasenext'] = new_formatted_datetime
     db['conn'] = conn
   elif serial_number == 4:
     new_formatted_datetime = next_conn_time(formatted_datetime, 4)#取得下次執行時間
-    db['conn1'].close()
+    if db['conn'] is not None:
+      try:
+        db['conn1'].close()
+      except mysql.connector.Error as err:
+        conn = err
     db['databasetest_msg1'] = databasetest_msg
     db['databaseup1'] = formatted_datetime
     db['databasenext1'] = new_formatted_datetime
@@ -123,8 +135,9 @@ def retry(category,query):#select/notselect
           cursor = conn.cursor()#重新建立游標
           stepout = 1 #第二輪標記，完成下面動作可退出
           break
-      except mysql.connector.Error as e:
-        conn.rollback()
+      except (mysql.connector.Error,AttributeError):
+        if conn: #如果conn的值不是None(有其他值)
+          conn.rollback()
         count += 1 #重試次數累加
         connobtain = 'no'
         
