@@ -146,19 +146,64 @@ def imagetolink():
     #delete_images()#刪除images檔案圖片
   return {'imagetitle':imagetitle,'imagelink':imagelink}
 
-#-------------------取出未取名單---------------------------------
-def notpickedup_list():
-  cursor = manager.db['cursor'] 
-  query = """
+#-------------------取出預購/未取名單---------------------------------
+def order_list(queryObject):
+  cursor = manager.db['cursor']
+  query = f"""
           SELECT 訂單編號, 會員_LINE_ID, 電話, 訂單成立時間, 總額
           FROM Order_information
-			    WHERE 訂單狀態未取已取='未取';"""
+			    WHERE 訂單狀態未取已取='{queryObject}';"""
   cursor.execute(query)
-  notpickedup_result = cursor.fetchall()
-
-  if notpickedup_result != []:
-    notpickeduplist = notpickedup_result
+  result = cursor.fetchall()
+  if result != []:
+    orderlist = result
   else:
-    notpickeduplist = "找不到符合條件的資料。" 
+    orderlist = "找不到符合條件的資料。"
+  return orderlist
+#-------------------取出未取名單---------------------------------
+# def notpickedup_list():
+#   cursor = manager.db['cursor'] 
+#   query = """
+#           SELECT 訂單編號, 會員_LINE_ID, 電話, 訂單成立時間, 總額
+#           FROM Order_information
+# 			    WHERE 訂單狀態未取已取='未取';"""
+#   cursor.execute(query)
+#   notpickedup_result = cursor.fetchall()
 
-  return notpickeduplist
+#   if notpickedup_result != []:
+#     notpickeduplist = notpickedup_result
+#   else:
+#     notpickeduplist = "找不到符合條件的資料。" 
+
+#   return notpickeduplist
+#-------------------訂單詳細資料------------------------
+def orderdt():
+  userid = manager.user_id
+  ordersearch = manager.orderall[userid+'dt'] #本是使用者的ID
+  cursor = manager.db['cursor']
+  query = f"""
+          SELECT
+            Order_information.訂單編號,
+            Order_information.電話,
+            Order_information.訂單狀態未取已取,
+            Product_information.商品ID,
+            Product_information.商品名稱,
+            Product_information.商品單位,
+            order_details.訂購數量,
+            order_details.商品小計,
+            Order_information.總額,
+            Order_information.訂單成立時間,
+            Order_information.取貨完成時間
+          FROM
+            Order_information
+          JOIN
+            order_details ON Order_information.訂單編號 = order_details.訂單編號
+          JOIN
+            Product_information ON order_details.商品ID = Product_information.商品ID
+          WHERE Order_information.訂單編號 = '{ordersearch}' ;
+          """
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result == []:
+    result = '找不到符合條件的資料。'
+  return result
