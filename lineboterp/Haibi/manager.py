@@ -193,6 +193,10 @@ def handle_message(event):
                             MessageAction(
                                 label='【未取名單】',
                                 text='【未取名單】列表'
+                            ),
+                            MessageAction(
+                                label='【特徵查詢】',
+                                text='【特徵查詢】列表'
                             )
                     ]
                 )
@@ -212,7 +216,55 @@ def handle_message(event):
             orderall[user_id+'dt'] = msg[-18:]
             searchresult = orderdtsearch()
             line_bot_api.reply_message(event.reply_token, searchresult)
-    
+
+            #-------------------報表查詢----------------------
+        elif '報表查詢' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='報表選擇',
+            template=ConfirmTemplate(
+                    text='請選擇報表',
+                    actions=[
+                            MessageAction(
+                                label='【累積銷售】',
+                                text='【累積銷售】報表'
+                            )
+                    ]
+                )
+            ))
+        elif '累積銷售' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+            alt_text='範圍選擇',
+            template=ConfirmTemplate(
+                    text='請選擇範圍',
+                    actions=[
+                            MessageAction(
+                                label='【當月】',
+                                text='【月】報表'
+                            ),
+                            MessageAction(
+                                label='【當季】',
+                                text='【季】報表'
+                            ),
+                            MessageAction(
+                                label='【當年】',
+                                text='【年】報表'
+                            )
+                    ]
+                )
+            ))
+        elif '【月】報表' in msg:
+                queryObject = '月' #取當月
+                # show = manager_order_list(queryObject)
+                # line_bot_api.reply_message(event.reply_token, show)
+        elif '【季】報表' in msg:
+                queryObject = '季' #取當季
+                # show = manager_order_list(queryObject)
+                # line_bot_api.reply_message(event.reply_token, show) 
+        elif '【年】報表' in msg:
+                queryObject = '年' #取當年
+                # show = manager_order_list(queryObject)
+                # line_bot_api.reply_message(event.reply_token, show)  
+        #      
         elif 'id搜尋' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='結果：%s' %(user_id)))
         elif '發送' in msg:
