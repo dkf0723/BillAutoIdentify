@@ -3,7 +3,7 @@ from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
 import lineboterp
-from database import cartsearch,unitsearch,stock,removecart,revise,cartsubtotal
+from database import cartsearch,unitsearch,stock,removecart,revise,cartsubtotal,stockonly
 from selection_screen import Cart_add_screen
 
 #-------------------購物車資料查詢----------------------
@@ -222,7 +222,10 @@ def cartrevise(errormsg):
     #Quick Reply 按鈕數量範圍
     quantity_option = []
     unit = unitsearch(product_id)
-    for i in range(10):
+    stocknum = stockonly(product_id)
+    if stocknum >= 13:
+        stocknum = 13
+    for i in range(stocknum):
         if unit == '無':
             quantity_option.append(QuickReplyButton(action=MessageAction(label=str(i+1), text=str(i+1))))
         else:
