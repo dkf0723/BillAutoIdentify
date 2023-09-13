@@ -74,11 +74,14 @@ def orderandpreorder_check():
         elif state[id] == 'phonenum':
             if message.isdigit():
                 if(len(message) < 10):
-                    check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                    errormsg = f"輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼。"
+                    check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
                 elif (len(message) > 10):
-                    check_text = TextSendMessage(text='輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                    errormsg = f"輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼。"
+                    check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
                 elif(message[:2] != '09'):           
-                    check_text = TextSendMessage(text='輸入電話格式錯誤！(09碼)\n請重新打字輸入正確的電話號碼：'),TextSendMessage(text='取消訂/預購流程請輸入\n" 取消 "')
+                    errormsg = f"輸入電話格式錯誤！(09開頭)\n請重新打字輸入正確的電話號碼。"
+                    check_text = Order_phonenum_screen(product_order_preorder[id],product_id,product,errormsg,phone,message_storage[id+'num'])
                 else:
                     message_storage[id+'phonenum'] = message
                     state[id] = 'end'#從user_state轉換確認狀態
@@ -94,7 +97,7 @@ def orderandpreorder_check():
                                                           message_storage[id+'oderprice'],message_storage[id+'oderdiscount'],
                                                           message_storage[id+'subtotalin'])
                     else:
-                        check_text = TextSendMessage(text=localsubtotal)
+                        check_text = TextSendMessage(text="訂單確認頁面生成失敗，請輸入'取消'。")
                        
         elif state[id] =='end':
             if message == '1':
@@ -245,13 +248,18 @@ def cartrpnum():
     product_id = lineboterp.product[id+'cartreviseproduct_id']
     product = lineboterp.product[id+'cartreviseproduct_name']
     if message.isdigit():#是數字
-        text = revise(id,product_id,int(message))
-        if text == 'ok':
-            check_text = cart_list()
-            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+        stocknum = stockonly(product_id)
+        if stocknum > 0 and int(message) > 0 and int(message) <= stocknum:
+            text = revise(id,product_id,int(message))
+            if text == 'ok':
+                check_text = cart_list()
+                state[id] = 'normal' #結束流程將user_state轉換預設狀態
+            else:
+                check_text = TextSendMessage(text='購物車商品數量修改失敗！請稍後再試。')
+                state[id] = 'normal' #結束流程將user_state轉換預設狀態
         else:
-            check_text = TextSendMessage(text='購物車商品數量修改失敗！請稍後再試。')
-            state[id] = 'normal' #結束流程將user_state轉換預設狀態
+            errormsg = f"您輸入的「{message}」大於現在的庫存數量，請重新輸入。\n目前庫存{stocknum}"
+            check_text = cartrevise(errormsg)
     else:
         if(message == "取消"):
             check_text = TextSendMessage(text='您的購物車商品數量修改流程\n已經取消囉～')

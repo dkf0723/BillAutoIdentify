@@ -136,8 +136,6 @@ def retry(category,query):#select/notselect
           stepout = 1 #第二輪標記，完成下面動作可退出
           break
       except (mysql.connector.Error,AttributeError):
-        if conn: #如果conn的值不是None(有其他值)
-          conn.rollback()
         count += 1 #重試次數累加
         connobtain = 'no'
         
@@ -161,7 +159,6 @@ def retry(category,query):#select/notselect
           stepout = 1 #不進行第二輪
           break
         except mysql.connector.Error as e:
-          conn.rollback()  # 撤銷操作恢復到操作前的狀態
           count += 1 #重試次數累加
           result = [] #錯誤回傳內容
           result2 = 'no'#購物車新增用
@@ -598,6 +595,19 @@ def quickcalculation(pid,pnum):
     discount = ''
   return subtotal_result,nuit,price,discount
 
+#單獨查詢是否有售出單價或售出單價2
+def onlyprice(pid):
+  query = f"select 售出單價,售出單價2 from Product_information where 商品ID = '{pid}'"
+  category ='select' #重試類別select/notselect
+  price_result,result2 = retry(category,query)
+  if price_result != []:
+    for row in price_result:
+      price1 = row[0]
+      if row[1] is not None:
+        discount = '(優惠價)'
+      else:
+        discount = ''
+  return discount
 #-------------------未取訂單查詢(100筆)----------------------
 def ordertoplist():
   userid = lineboterp.user_id

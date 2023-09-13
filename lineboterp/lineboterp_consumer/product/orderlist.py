@@ -254,30 +254,441 @@ def orderdtsearch():
         show = TextSendMessage(text=db_orderdt)
     else:
         '''訂單編號,電話,訂單狀態未取已取,商品ID,商品名稱,商品單位,訂購數量,商品小計,總額,訂單成立時間,取貨完成時間'''
+        showdt = [] #訊息中的內容儲存
         if db_orderdt[0][10] is None:
-            pickup = '<無>'
+            pickup = '無資料'
         else:
             pickup = str(db_orderdt[0][10])
-        show = f"""===訂單詳細資料===
-*訂單編號：\n   {str(db_orderdt[0][0])}
-*訂單成立時間：\n   {str(db_orderdt[0][9])}
-*取貨完成或訂單取消時間：\n   {pickup}
-*狀態：{db_orderdt[0][2]}
-*電話號碼：{str(db_orderdt[0][1])}
+            
+        if db_orderdt[0][2] in ['未取','預購','預購未取']:
+            ordertype = db_orderdt[0][2]
+            if db_orderdt[0][2] == '未取':
+                text = '已經可以前往「店面取貨」囉～'
+            elif db_orderdt[0][2] == '預購':
+                text = '預購商品尚未到店！'
+            elif db_orderdt[0][2] == '預購未取':
+                text = '預購商品已到店囉！\n已經可以前往「店面取貨」囉～'
+            msg = {
+                        "type": "text",
+                        "text": f"\n{text}",
+                        "wrap": True,
+                        "color": "#fb5840",##顏色換
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "none",
+                        "weight": "bold",
+                        "align": "center"
+                    }
+        else:
+            ordertype = '歷史'
+            msg = {
+                        "type": "text",
+                        "text": "\n感謝您的訂購！",
+                        "wrap": True,
+                        "color": "#fb5840",##顏色換
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "none",
+                        "weight": "bold",
+                        "align": "center"
+                    }
 
-"""
-        showlater = f"""訂單總額：NT${str('{:,}'.format(db_orderdt[0][8]))}"""     
-        num = 1
+        items = len(db_orderdt)#項數
+        pieces = 0
+        for piecesadd in db_orderdt:
+            pieces += piecesadd[6]
+
+        show1 = {
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "高逸嚴選",
+                        "color": "#A44528",
+                        "size": "sm",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "訂單摘要",
+                        "weight": "bold",
+                        "size": "xl",
+                        "align": "center",
+                        "margin": "xl",
+                        "color": "#010203"
+                    },
+                    {
+                        "type": "separator",
+                        "color": "#010203",
+                        "margin": "md"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"◇訂單編號：{str(db_orderdt[0][0])}",
+                        "weight": "bold",
+                        "size": "md",
+                        "align": "start",
+                        "margin": "md",
+                        "offsetStart": "10px",
+                        "color": "#3b5a5f"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"◇成立時間：{str(db_orderdt[0][9])}",
+                        "weight": "bold",
+                        "size": "md",
+                        "align": "start",
+                        "margin": "sm",
+                        "offsetStart": "10px",
+                        "color": "#3b5a5f"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"◇訂單狀態：{db_orderdt[0][2]}",
+                        "weight": "bold",
+                        "size": "md",
+                        "align": "start",
+                        "margin": "md",
+                        "offsetStart": "10px",
+                        "color": "#3b5a5f"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"◇電話號碼：{str(db_orderdt[0][1])}",
+                        "weight": "bold",
+                        "size": "md",
+                        "align": "start",
+                        "margin": "sm",
+                        "offsetStart": "10px",
+                        "color": "#3b5a5f"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"◇商品項數：{items}項",
+                        "weight": "bold",
+                        "size": "md",
+                        "align": "start",
+                        "margin": "sm",
+                        "offsetStart": "10px",
+                        "color": "#3b5a5f"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"◇商品件數：{pieces}件",
+                        "weight": "bold",
+                        "size": "md",
+                        "align": "start",
+                        "margin": "sm",
+                        "offsetStart": "10px",
+                        "color": "#3b5a5f"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"◇訂單總計：NT${str('{:,}'.format(db_orderdt[0][8]))}",
+                        "weight": "bold",
+                        "size": "md",
+                        "align": "start",
+                        "margin": "sm",
+                        "offsetStart": "10px",
+                        "color": "#3b5a5f"
+                    },
+                    {
+                        "type": "separator",
+                        "color": "#010203",
+                        "margin": "md"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"☆取貨/取消時間：{pickup}",
+                        "weight": "bold",
+                        "size": "sm",
+                        "margin": "sm",
+                        "offsetStart": "10px"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"<<詳細資訊共{items}頁>>",
+                        "size": "sm",
+                        "align": "end",
+                        "margin": "md"
+                    },
+                    msg
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": f"繼續瀏覽{ordertype}訂單列表",
+                        "text": f"{ordertype}訂單列表"#預購/歷史
+                        },
+                        "color": "#A44528"
+                    }
+                    ],
+                    "flex": 0
+                }
+                }
+        showdt.append(show1)
+        num = 0
         while len(db_orderdt) > 0:
-            dt = f"""=>商品{num}
-品名：{db_orderdt[0][4]}
-數量：{db_orderdt[0][6]}{db_orderdt[0][5]}
-小計：{str('{:,}'.format(db_orderdt[0][7]))}
-----------------------------
-"""
-            show += dt
             num += 1
+            discount = onlyprice(db_orderdt[0][3])
+            if db_orderdt[0][6] >= 2:
+                if discount == '(優惠價)':
+                    discount = '(優惠價)'
+                else:
+                    discount = ''
+            else:
+                discount = ''
+            price = int(db_orderdt[0][7] / db_orderdt[0][6])
+
+            show2 = {
+                    "type": "bubble",
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "高逸嚴選",
+                            "color": "#A44528",
+                            "size": "sm",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"詳細資訊({num}/{items})",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center",
+                            "margin": "xl",
+                            "color": "#010203"
+                        },
+                        {
+                            "type": "separator",
+                            "color": "#010203",
+                            "margin": "md"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "xs",
+                            "contents": [
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "◇商品編號：",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ],
+                                    "width": "100px"
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"{db_orderdt[0][3]}",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ]
+                                }
+                                ]
+                            },
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "◇商品名稱：",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ],
+                                    "width": "100px"
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"{db_orderdt[0][4]}",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ]
+                                }
+                                ]
+                            },
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "◇商品單價：",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ],
+                                    "width": "100px"
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"每{db_orderdt[0][5]}{price}元{discount}",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ]
+                                }
+                                ]
+                            },
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "◇現購數量：",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ],
+                                    "width": "100px"
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"{db_orderdt[0][6]}{db_orderdt[0][5]}",
+                                        "wrap": True,
+                                        "color": "#3b5a5f",
+                                        "size": "md",
+                                        "flex": 5,
+                                        "margin": "sm",
+                                        "weight": "bold"
+                                    }
+                                    ]
+                                }
+                                ]
+                            }
+                            ]
+                        },
+                        {
+                            "type": "separator",
+                            "margin": "xl",
+                            "color": "#010203"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"小計：NT${str('{:,}'.format(db_orderdt[0][7]))}",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "lg",
+                            "flex": 5,
+                            "margin": "sm",
+                            "weight": "bold",
+                            "align": "end"
+                        }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "md",
+                        "contents": [
+                        {
+                            "type": "button",
+                            "style": "primary",
+                            "height": "sm",
+                            "action": {
+                            "type": "message",
+                            "label": f"繼續瀏覽{ordertype}訂單列表",
+                            "text": f"{ordertype}訂單列表"#預購/歷史
+                            },
+                            "color": "#A44528"
+                        }
+                        ],
+                        "flex": 0
+                    }
+                    }
             db_orderdt = db_orderdt[1:]  # 移除已取得的元素
-        show += showlater
-        show = TextSendMessage(text=show)
+            showdt.append(show2)
+
+        show = FlexSendMessage(
+            alt_text=f"{ordertype}訂單詳細資訊",
+            contents={
+                "type": "carousel",
+                "contents": showdt     
+                } 
+            )
     return show
