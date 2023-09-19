@@ -221,7 +221,7 @@ def member_profile(userid):
     serial_number = '000001'
     query4 = f"""
           INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
-          VALUES ( 'cart{order_dateget}{str(serial_number)}','{userid}','add','dd' ,'{formatted_datetimeget}');
+          VALUES ( 'cart{order_dateget}{str(serial_number)}','{userid}','add','add' ,'{formatted_datetimeget}');
           """
     category ='notselect' #重試類別select/notselect
     result,result2 = retry(category,query4)
@@ -241,7 +241,7 @@ def member_profile(userid):
         serial_number = '000001'
       query5 = f"""
         INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單狀態未取已取,訂單成立時間)
-        VALUES ( 'cart{order_dateget}{serial_number}','{userid}','add','dd' ,'{formatted_datetimeget}');
+        VALUES ( 'cart{order_dateget}{serial_number}','{userid}','add','add' ,'{formatted_datetimeget}');
         """
       category ='notselect' #重試類別select/notselect
       result,result2 = retry(category,query5)
@@ -268,9 +268,9 @@ def preorder_list():
 def buynow_list():
   query = """
           SELECT 商品ID,商品名稱,現預購商品,商品圖片,商品簡介,
-                  商品單位,售出單價,售出單價2,庫存數量 
+                  商品單位,售出單價,售出單價2,訂單剩餘 
           FROM Product_information 
-          WHERE 現預購商品='現購' and 庫存數量>0;"""
+          WHERE 現預購商品='現購' and 訂單剩餘>0;"""
   category ='select' #重試類別select/notselect
   buynow__result,result2 = retry(category,query)
 
@@ -438,14 +438,14 @@ def order_detail(serial_number):
   order_details = ''
   establishment_message = ''
   
-  query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{orderall[0]}'"
+  query = f"select 現預購商品,訂單剩餘,售出單價2 from Product_information where 商品ID = '{orderall[0]}'"
   category ='select' #重試類別select/notselect
   inventory_result,result2 = retry(category,query)
 
   if inventory_result != []:
     for row in inventory_result:
       sort = row[0] #現預購商品
-      inventory = row[1] #庫存數量
+      inventory = row[1] #訂單剩餘
       price2 = row[2] #售出單價2
       if sort != '預購':
         if int(orderall[1])<= int(inventory):#庫存檢查
@@ -458,7 +458,7 @@ def order_detail(serial_number):
             order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
           query1 =f"""
                 UPDATE Product_information
-                SET 庫存數量 = '{str(int(inventory)-int(orderall[1]))}'
+                SET 訂單剩餘 = '{str(int(inventory)-int(orderall[1]))}'
                 WHERE 商品ID = '{orderall[0]}'
                 """
           category ='notselect' #重試類別select/notselect
@@ -530,7 +530,7 @@ def unitsearch(product_id):
 
 #單獨庫存查詢
 def stockonly(pid):
-  query = f"select 庫存數量 from Product_information where 商品ID = '{pid}'"
+  query = f"select 訂單剩餘 from Product_information where 商品ID = '{pid}'"
   category ='select' #重試類別select/notselect
   inventory_result,result2 = retry(category,query)
   if inventory_result == []:
@@ -541,12 +541,12 @@ def stockonly(pid):
 
 #單獨庫存查詢並修改
 def stock(pid,num):
-  query = f"select 庫存數量 from Product_information where 商品ID = '{pid}'"
+  query = f"select 訂單剩餘 from Product_information where 商品ID = '{pid}'"
   category ='select' #重試類別select/notselect
   inventory_result,result2 = retry(category,query)
 
   if inventory_result != []:
-    inventory = inventory_result[0][0] #庫存數量
+    inventory = inventory_result[0][0] #訂單剩餘
     if inventory > 0:
       if num <=inventory:
         checkstock = 'ok'
@@ -614,7 +614,7 @@ def ordertoplist():
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
-    where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 = '未取'
+    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 = '未取' or 訂單狀態未取已取 like '現購%')
     order by 訂單成立時間 desc
     limit 100 offset 0
     """#下一頁加100改offset(目前暫無考慮)
@@ -630,7 +630,7 @@ def orderpreorderlist():
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
-    where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 = '預購'
+    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 like '預購%')
     order by 訂單成立時間 desc
     limit 100 offset 0
     """#下一頁加100改offset(目前暫無考慮)
@@ -646,7 +646,8 @@ def ordertopalllist():
   query = f"""
         select 訂單編號,總額,訂單成立時間,訂單狀態未取已取,取貨完成時間
         from `Order_information`
-        where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 <> '未取' and 訂單狀態未取已取 <> '預購' and 訂單編號 not like 'cart%'
+        where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 <> '未取' and 
+        訂單狀態未取已取 <> '預購未取' and 訂單狀態未取已取 <> '預購進貨' and 訂單狀態未取已取 <> '預購' and 訂單編號 not like 'cart%'
         order by 訂單成立時間 desc
         limit 100 offset 0
         """#下一頁加100改offset(目前暫無考慮)
@@ -723,7 +724,7 @@ def cartsubtotal(pid):
 #-------------------購物車資料新增----------------------
 def cartadd(id,product_id,num):
   conn = lineboterp.db['conn']
-  query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
+  query = f"select 現預購商品,訂單剩餘,售出單價2 from Product_information where 商品ID = '{product_id}'"
   category ='select' #重試類別select/notselect
   inventory_result,result2 = retry(category,query)
 
@@ -765,7 +766,7 @@ def cartadd(id,product_id,num):
 #-------------------購物車單商品數量修改----------------------
 def revise(id,product_id,num):
   conn = lineboterp.db['conn']
-  query = f"select 現預購商品,庫存數量,售出單價2 from Product_information where 商品ID = '{product_id}'"
+  query = f"select 現預購商品,訂單剩餘,售出單價2 from Product_information where 商品ID = '{product_id}'"
   category ='select' #重試類別select/notselect
   inventory_result,result2 = retry(category,query)
 
@@ -847,14 +848,14 @@ def cartordergo(phonenum):
   if stockcheck == 'ok':#庫存無誤執行建立訂單流程
     #修改庫存
     for totallist in dblistcart:
-      query0 = f"select 庫存數量 from Product_information where 商品ID = '{totallist[1]}'"
+      query0 = f"select 訂單剩餘 from Product_information where 商品ID = '{totallist[1]}'"
       category ='select' #重試類別select/notselect
       inventory_result,result2 = retry(category,query0)
 
-      inventory = inventory_result[0][0] #現在庫存數量
+      inventory = inventory_result[0][0] #現在訂單剩餘
       query01 =f"""
                   UPDATE Product_information
-                  SET 庫存數量 = '{str(int(inventory)-int(totallist[3]))}'
+                  SET 訂單剩餘 = '{str(int(inventory)-int(totallist[3]))}'
                   WHERE 商品ID = '{totallist[1]}'
                   """
       category ='notselect' #重試類別select/notselect
