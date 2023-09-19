@@ -34,7 +34,10 @@ def product_buynow_list():
                 name = db_preorder_list[1]#商品名稱
                 #現預購商品
                 product_name.append(name)
-                img = db_preorder_list[3]#商品圖片
+                if db_preorder_list[3] is None:
+                    img = 'https://i.imgur.com/rGlTAt3.jpg'
+                else:
+                    img = db_preorder_list[3]#商品圖片
                 product_img.append(img)
                 description = db_preorder_list[4]#商品簡介
                 product_description.append(description)
