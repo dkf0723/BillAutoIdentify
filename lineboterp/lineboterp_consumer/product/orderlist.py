@@ -9,7 +9,7 @@ from database  import *
 def ordernottaken_list():
     db_nottaken = ordertoplist()
     if db_nottaken=='找不到符合條件的資料。':
-        ordernottaken_show = TextSendMessage(text='您尚未有未取資料')
+        ordernottaken_show = TextSendMessage(text='您尚未有未取訂單資料')
     else:
         ordernottaken_show = []#發送全部
         ordernottaken_handlelist = []#處理切割db_nottaken資料10筆一組
@@ -90,7 +90,7 @@ def ordernottaken_list():
 def orderpreorder_list():
     db_nottaken = orderpreorderlist()
     if db_nottaken=='找不到符合條件的資料。':
-        orderpreorder_show = TextSendMessage(text='您尚未有未取資料')
+        orderpreorder_show = TextSendMessage(text='您尚未有預購訂單資料')
     else:
         orderpreorder_show = []#發送全部
         orderpreorder_handlelist = []#處理切割db_nottaken資料10筆一組
@@ -259,15 +259,47 @@ def orderdtsearch():
             pickup = '無資料'
         else:
             pickup = str(db_orderdt[0][10])
-            
-        if db_orderdt[0][2] in ['未取','預購','預購未取']:
+
+        add = None  
+        if db_orderdt[0][2] in ['未取','預購','預購進貨','預購未取','預購截止','現購取貨延','預購取貨延']:
             ordertype = db_orderdt[0][2]
-            if db_orderdt[0][2] == '未取':
-                text = '已經可以前往「店面取貨」囉～'
-            elif db_orderdt[0][2] == '預購':
-                text = '預購商品尚未到店！'
-            elif db_orderdt[0][2] == '預購未取':
-                text = '預購商品已到店囉！\n已經可以前往「店面取貨」囉～'
+            if db_orderdt[0][2] in  ['未取','現購取貨延','預購取貨延']:
+                if db_orderdt[0][2] == '未取':
+                    ordertype = '未取'
+                    take = '現購商品-未取'
+                    text = '已經可以前往「店面取貨」囉～'
+                elif db_orderdt[0][2] in ['現購取貨延','預購取貨延']:
+                    ordertype = '未取'
+                    if db_orderdt[0][2] == '現購取貨延':
+                        take = '現購商品-未取延長'
+                    if db_orderdt[0][2] == '預購取貨延':
+                        take = '預購商品-未取延長'
+                    text = '取貨延長一次，請於3日內到店取貨'
+            
+            elif db_orderdt[0][2] in  ['預購','預購進貨','預購截止','預購未取']:
+                ordertype = '預購'
+                if db_orderdt[0][2] == '預購':
+                    take = '預購商品-等待預購截止'
+                    text = '預購尚未截止！'
+                elif db_orderdt[0][2] in ['預購進貨','預購截止']:
+                    take = '預購商品-進貨待到店'
+                    text = '預購商品尚未到店！'
+                    ordertype = '預購'
+                elif db_orderdt[0][2] == '預購未取':
+                    take = '預購商品-未取'
+                    text = '預購商品已到店囉！\n已經可以前往「店面取貨」囉～'
+                    ordertype = '預購'
+                    add = {
+                                "type": "button",
+                                "style": "primary",
+                                "height": "sm",
+                                "action": {
+                                "type": "message",
+                                "label": f"繼續瀏覽未取訂單列表",
+                                "text": f"未取訂單列表"
+                                },
+                                "color": "#A44528"
+                            }
             msg = {
                         "type": "text",
                         "text": f"\n{text}",
@@ -281,6 +313,7 @@ def orderdtsearch():
                     }
         else:
             ordertype = '歷史'
+            take = db_orderdt[0][2]
             msg = {
                         "type": "text",
                         "text": "\n感謝您的訂購！",
@@ -292,6 +325,24 @@ def orderdtsearch():
                         "weight": "bold",
                         "align": "center"
                     }
+            
+        show0 = []
+        color = '#A44528'
+        if add is not None:
+            color = '#5F403B'
+            show0.append(add)#預購進貨及未取新增現購訂單列表按鈕
+        button = {
+                    "type": "button",
+                    "style": "primary",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": f"繼續瀏覽{ordertype}訂單列表",
+                    "text": f"{ordertype}訂單列表"#未取/預購/歷史
+                    },
+                    "color": f"{color}"
+                    }
+        show0.append(button)
 
         items = len(db_orderdt)#項數
         pieces = 0
@@ -347,7 +398,7 @@ def orderdtsearch():
                     },
                     {
                         "type": "text",
-                        "text": f"◇訂單狀態：{db_orderdt[0][2]}",
+                        "text": f"◇訂單狀態：{take}",
                         "weight": "bold",
                         "size": "md",
                         "align": "start",
@@ -422,19 +473,7 @@ def orderdtsearch():
                     "type": "box",
                     "layout": "vertical",
                     "spacing": "md",
-                    "contents": [
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "height": "sm",
-                        "action": {
-                        "type": "message",
-                        "label": f"繼續瀏覽{ordertype}訂單列表",
-                        "text": f"{ordertype}訂單列表"#預購/歷史
-                        },
-                        "color": "#A44528"
-                    }
-                    ],
+                    "contents": show0,
                     "flex": 0
                 }
                 }
@@ -612,7 +651,7 @@ def orderdtsearch():
                                     "contents": [
                                     {
                                         "type": "text",
-                                        "text": "◇現購數量：",
+                                        "text": f"◇購買數量：",
                                         "wrap": True,
                                         "color": "#3b5a5f",
                                         "size": "md",
@@ -665,19 +704,7 @@ def orderdtsearch():
                         "type": "box",
                         "layout": "vertical",
                         "spacing": "md",
-                        "contents": [
-                        {
-                            "type": "button",
-                            "style": "primary",
-                            "height": "sm",
-                            "action": {
-                            "type": "message",
-                            "label": f"繼續瀏覽{ordertype}訂單列表",
-                            "text": f"{ordertype}訂單列表"#預購/歷史
-                            },
-                            "color": "#A44528"
-                        }
-                        ],
+                        "contents": show0,#按鈕
                         "flex": 0
                     }
                     }
