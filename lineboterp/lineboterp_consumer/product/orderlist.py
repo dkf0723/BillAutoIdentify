@@ -261,20 +261,12 @@ def orderdtsearch():
             pickup = str(db_orderdt[0][10])
 
         add = None  
-        if db_orderdt[0][2] in ['未取','預購','預購進貨','預購未取','預購截止','現購取貨延','預購取貨延']:
+        if db_orderdt[0][2] in ['現購未取','預購','預購進貨','預購未取','預購截止']:
             ordertype = db_orderdt[0][2]
-            if db_orderdt[0][2] in  ['未取','現購取貨延','預購取貨延']:
-                if db_orderdt[0][2] == '未取':
-                    ordertype = '未取'
-                    take = '現購商品-未取'
-                    text = '已經可以前往「店面取貨」囉～'
-                elif db_orderdt[0][2] in ['現購取貨延','預購取貨延']:
-                    ordertype = '未取'
-                    if db_orderdt[0][2] == '現購取貨延':
-                        take = '現購商品-未取延長'
-                    if db_orderdt[0][2] == '預購取貨延':
-                        take = '預購商品-未取延長'
-                    text = '取貨延長一次，請於3日內到店取貨'
+            if db_orderdt[0][2] == '現購未取':
+                ordertype = '未取'
+                take = '現購商品-未取'
+                text = '已經可以前往「店面取貨」囉～'
             
             elif db_orderdt[0][2] in  ['預購','預購進貨','預購截止','預購未取']:
                 ordertype = '預購'
