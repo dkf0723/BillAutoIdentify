@@ -339,7 +339,7 @@ def order_create():
       orderinfo = []
     else:
       if sort == '現購':
-        sorttype = '未取'
+        sorttype = '現購未取'
       elif sort == '預購':
         sorttype = '預購'
       query3_1 = f"""
@@ -391,7 +391,7 @@ def order_create():
       orderinfo = []
     else:
       if sort == '現購':
-        sorttype = '未取'
+        sorttype = '現購未取'
       elif sort == '預購':
         sorttype = '預購'
       addorder = f"""
@@ -614,9 +614,9 @@ def ordertoplist():
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
-    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 = '未取' or 訂單狀態未取已取 like '現購%')
+    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 ='預購未取' or 訂單狀態未取已取 like '現購%')
     order by 訂單成立時間 desc
-    limit 100 offset 0
+    limit 100 offset 0;
     """#下一頁加100改offset(目前暫無考慮)
   category ='select' #重試類別select/notselect
   nottaken_result,result2 = retry(category,query)
@@ -632,7 +632,7 @@ def orderpreorderlist():
     from `Order_information` 
     where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 like '預購%')
     order by 訂單成立時間 desc
-    limit 100 offset 0
+    limit 100 offset 0;
     """#下一頁加100改offset(目前暫無考慮)
   category ='select' #重試類別select/notselect
   preorder_result,result2 = retry(category,query)
@@ -646,8 +646,13 @@ def ordertopalllist():
   query = f"""
         select 訂單編號,總額,訂單成立時間,訂單狀態未取已取,取貨完成時間
         from `Order_information`
-        where 會員_LINE_ID = '{userid}' and 訂單狀態未取已取 <> '未取' and 
-        訂單狀態未取已取 <> '預購未取' and 訂單狀態未取已取 <> '預購進貨' and 訂單狀態未取已取 <> '預購' and 訂單編號 not like 'cart%'
+        where 會員_LINE_ID = '{userid}' and 
+          訂單狀態未取已取 <> '預購未取' and 
+          訂單狀態未取已取 <> '預購進貨' and 
+          訂單狀態未取已取 <> '預購' and 
+          訂單狀態未取已取 <> '預購截止' and
+          訂單狀態未取已取 <> '現購未取' and
+          訂單編號 not like 'cart%'
         order by 訂單成立時間 desc
         limit 100 offset 0
         """#下一頁加100改offset(目前暫無考慮)
@@ -873,7 +878,7 @@ def cartordergo(phonenum):
       serial_number = '00001'
       query3_1 = f"""
             INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','現購未取');
             """
       category ='notselect' #重試類別select/notselect
       result,result2 = retry(category,query3_1)
@@ -920,7 +925,7 @@ def cartordergo(phonenum):
         serial_number = '00001'
       addorder = f"""
             INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','未取');
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','現購未取');
             """
       category ='notselect' #重試類別select/notselect
       result,result2 = retry(category,addorder)
