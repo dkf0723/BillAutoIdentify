@@ -1,0 +1,7 @@
+line-bot-sdk
+flask
+gunicorn
+mysql-connector-python
+pyimgur
+schedule
+apscheduler
