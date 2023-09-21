@@ -908,8 +908,8 @@ def cartordergo(phonenum):
 
       establishment_message = 'ok'
       query4_1 = f"""
-                SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
-                FROM order_details Natural Join Product_information 
+                SELECT 訂單編號, 商品名稱, 現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID , 電話, 總額
+                FROM Product_information natural join order_details natural join Order_information 
                 Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
       category ='select' #重試類別select/notselect
       orderinfo,result2 = retry(category,query4_1)
@@ -955,8 +955,8 @@ def cartordergo(phonenum):
 
       establishment_message = 'ok'
       query4_2 = f"""
-                SELECT 訂單編號,商品名稱,現預購商品, 訂購數量, 商品小計, 商品單位  
-                FROM order_details Natural Join Product_information 
+                SELECT 訂單編號, 商品名稱, 現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID , 電話, 總額
+                FROM Product_information natural join order_details natural join Order_information
                 Where 訂單編號 = 'order{order_dateget}{serial_number}';""" #回傳資訊
       category ='select' #重試類別select/notselect
       orderinfo,result2 = retry(category,query4_2)

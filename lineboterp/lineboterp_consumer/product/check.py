@@ -10,7 +10,7 @@ from ask_wishes.wishes import *
 from database import *
 from product.cartlist import cart_list,addcart,cartrevise,checkcart
 from selection_screen import (Order_phonenum_screen,Single_order_confirmation_screen,Order_establishment_message,
-                              Cart_join_success_message,Cancel_fail_message,Cart_order_screen)
+                              Cart_join_success_message,Cancel_fail_message,Cart_order_screen,Cartorder_establishment_message)
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
@@ -297,11 +297,26 @@ def cartorder():
                     num = 1
                     tnum = 0#總額
                     #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
+                    cartodinfo_id = []
+                    cartodinfo_name = []
+                    cartodinfo_num = []
+                    cartodinfo_unit = []
+                    cartodinfo_subtotal = []
                     for totallist in db_cartshow:
+                        cartodinfo_id.append(totallist[1])
+                        cartodinfo_name.append(totallist[2])
+                        cartodinfo_num.append(totallist[3])
+                        cartodinfo_unit.append(totallist[4])
+                        cartodinfo_subtotal.append(totallist[5])
                         showp += f"<<商品{num}>>\n商品ID：{totallist[1]}\n商品名稱：{totallist[2]}\n數量：{totallist[3]}{totallist[4]}\n小計：{str('{:,}'.format(totallist[5]))}\n---\n"
                         num += 1
                         tnum += totallist[5]
-                    message_storage[id+'showp'] = showp[:-4] #訂單資訊
+                    message_storage[id+'showp'] = showp[:-4] #訂單資訊(之後刪)
+                    message_storage[id+'cartodinfo_id'] = cartodinfo_id #商品ID
+                    message_storage[id+'cartodinfo_name'] = cartodinfo_name #商品名稱
+                    message_storage[id+'cartodinfo_num'] = cartodinfo_num #商品數量
+                    message_storage[id+'cartodinfo_unit'] = cartodinfo_unit #商品單位
+                    message_storage[id+'cartodinfo_subtotal'] = cartodinfo_subtotal #商品小計
                     message_storage[id+'shownum'] = tnum #總額
                     message_storage[id+'phonenum'] = message
                     ##購物車列表
@@ -309,28 +324,36 @@ def cartorder():
         elif state[id] == 'cartorderrun':
             if message == '1':
                 orderinfo, establishment_message = cartordergo(message_storage[id+'phonenum'])#執行購物車訂單建立
-                number = 1
-                total = 0
+                '''訂單編號, 商品名稱, 現預購商品, 訂購數量, 商品小計, 商品單位, 商品ID , 電話, 總額'''
                 if establishment_message == 'ok':
-                    check_text = f"您的購物車訂單已成立！\n訂單編號：{str(orderinfo[0][0])}"
-                    for orderlistinfo in orderinfo:
-                        check_text += f"商品{number}名稱：{orderlistinfo[1]}\n數量：{str(orderlistinfo[3])}{str(orderlistinfo[5])}\n小計：{str('{:,}'.format(orderlistinfo[4]))}\n---\n"
-                        number += 1
-                        total += orderlistinfo[4]
-                    check_text += f"總額：{str('{:,}'.format(total))}元\n已經可以前往「店面取貨」囉～"
-                    check_text = TextSendMessage(text=check_text),Company_location()
-                    state[id] = 'normal' #從user_state轉換普通狀態
+                    check_text = Cartorder_establishment_message(orderinfo)
                 else:
-                    check_text = cart_list()
+                    check_text = TextSendMessage(text='購物車訂單成立異常，請稍後再試！'),cart_list()
             elif message == '2':
                 check_text = '您的購物車訂單流程\n已經取消囉～'
                 check_text = TextSendMessage(text=check_text),cart_list()
-                state[id] = 'normal' #從user_state轉換普通狀態
             else:
                 check_text = TextSendMessage(text='購物車訂單流程中，如想取消請打字輸入" 取消 "'),checkcart(message_storage[id+'showp'],message_storage[id+'shownum'])
+            message_storage[id+'showp'] = 'NaN' #訂單資訊(之後刪)####
+            message_storage[id+'cartodinfo_id'] = 'NaN' #商品ID
+            message_storage[id+'cartodinfo_name'] = 'NaN' #商品名稱
+            message_storage[id+'cartodinfo_num'] = 'NaN' #商品數量
+            message_storage[id+'cartodinfo_unit'] = 'NaN' #商品單位
+            message_storage[id+'cartodinfo_subtotal'] = 'NaN' #商品小計
+            message_storage[id+'shownum'] = 'NaN' #總額
+            message_storage[id+'phonenum'] = 'NaN'#電話
+            state[id] = 'normal' #從user_state轉換普通狀態
     else:
         if(message == "取消"):
             check_text = '您的購物車訂單流程\n已經取消囉～'
+            message_storage[id+'showp'] = 'NaN' #訂單資訊(之後刪)####
+            message_storage[id+'cartodinfo_id'] = 'NaN' #商品ID
+            message_storage[id+'cartodinfo_name'] = 'NaN' #商品名稱
+            message_storage[id+'cartodinfo_num'] = 'NaN' #商品數量
+            message_storage[id+'cartodinfo_unit'] = 'NaN' #商品單位
+            message_storage[id+'cartodinfo_subtotal'] = 'NaN' #商品小計
+            message_storage[id+'shownum'] = 'NaN' #總額
+            message_storage[id+'phonenum'] = 'NaN'
             errormsg = 'no'
             check_text = TextSendMessage(text=check_text)
             check_text = check_text,cart_list()
