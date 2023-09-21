@@ -113,6 +113,15 @@ def handle_message(event):
         storage[user_id+'img'] = 'NaN'
     if (user_id+'multiple') not in storage:
         storage[user_id+'multiple'] = 'NaN'
+
+    if (user_id+'現購min') not in list_page:
+        list_page[user_id+'現購min'] = 0
+    if (user_id+'現購max') not in list_page:
+        list_page[user_id+'現購max'] = 9
+    if (user_id+'預購min') not in list_page:
+        list_page[user_id+'預購min'] = 0
+    if (user_id+'預購max') not in list_page:
+        list_page[user_id+'預購max'] = 9
     #-------------------確認使用者狀態進行處理----------------------
     #使用者狀態不屬於normal，不允許進行其他動作
     if user_state[user_id] != 'normal':
