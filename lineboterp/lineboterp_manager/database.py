@@ -2,7 +2,6 @@ from linebot.models import FlexSendMessage
 import mysql.connector
 import requests
 from datetime import datetime, timedelta
-import time
 from mysql.connector import errorcode
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import (InvalidSignatureError)
@@ -11,6 +10,8 @@ from linebot.models import *
 from relevant_information import imgurinfo
 import os, io, pyimgur, glob
 import manager
+import time
+import random #隨機產生
 
 #-------------------取得現在時間----------------------
 def gettime():
@@ -42,7 +43,7 @@ def databasetest(db_pool, serial_number):
         databasetest_msg = '資料庫不存在或其他錯誤'
       else:
         databasetest_msg = err
-
+  
   if serial_number == 1:
     new_formatted_datetime = next_conn_time(formatted_datetime, 1)#取得下次執行時間
     db['databasetest_msg'] = databasetest_msg
@@ -70,7 +71,7 @@ def databasetest(db_pool, serial_number):
     db['databasenext1'] = new_formatted_datetime
     db['conn1'] = conn
 
-    #下次更新時間計算
+#下次更新時間計算
 def next_conn_time(formatted_datetime, serial_number):
   nowtime = datetime.strptime(formatted_datetime, '%Y-%m-%d %H:%M:%S')
   check = nowtime.minute
@@ -104,413 +105,181 @@ def next_time(check, check1,nowtime, addhours):
 def retry(category,query):#select/notselect
   block = 0#結束點是1
   step = 0 #第幾輪
-  stepout = 0 #第二輪標記
+  stepout = 0 #離開標記
   while block == 0:
-    if step == 1:#關閉第一輪的
-      cursor.close()#游標關閉
-    if step == 0:
-      conn = manager.db['conn']
-      cursor = conn.cursor()#重新建立游標
-    elif step == 1:
-      conn = manager.db['conn1']
-      cursor = conn.cursor()#重新建立游標
-      stepout = 1 #第二輪標記，完成下面動作可退出
-    max_retries = 3  # 最大重試次數
-    retry_count = 0  # 初始化重試計數
-    while retry_count<max_retries:
-      step = 0 #單輪重試恢復預設值
-      stepout = 0#單輪重試恢復預設值
+    max = 3  # 最大重試次數
+    count = 0  # 初始化重試計數
+    connobtain = 'ok' #檢查是否取得conn連線資料
+    while count<max:
       try:
-        if category == 'select':
-          cursor.execute(query)
-          result = cursor.fetchall()
-          cursor.close()#游標關閉
-        elif category == 'notselect':
-          cursor.execute(query)
-          conn.commit()
-          cursor.close()#游標關閉
-          result = 'ok'
-        stepout = 1 #不進行第二輪
-        break
+        if step == 0:
+          conn = manager.db['conn']
+          cursor = conn.cursor()#重新建立游標
+          break
+        elif step == 1:
+          conn = manager.db['conn1']
+          cursor = conn.cursor()#重新建立游標
+          stepout = 1 #第二輪標記，完成下面動作可退出
+          break
       except mysql.connector.Error as e:
-        conn.rollback()  # 撤銷操作恢復到操作前的狀態
-        retry_count += 1 #重試次數累加
-        result = [] #錯誤回傳內容
-        stepout = 1
-        step = 1
-        time.sleep(1)
-    if stepout == 1:#成功取得資料後退出
-      block = 1
-    if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
-      cursor.close()#游標關閉
-      block = 1
+        conn.rollback()
+        count += 1 #重試次數累加
+        connobtain = 'no'
+        
+    count = 0  # 重試次數歸零，用於後面的步驟
+    if connobtain == 'ok':
+      while count<max:
+        step = 1 #下一輪設定
+        stepout = 0 #回合恢復
+        try:
+          if category == 'select':
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()#游標關閉
+          elif category == 'notselect':
+            cursor.execute(query)
+            conn.commit()
+            cursor.close()#游標關閉
+            result = 'ok'
+          stepout = 1 #不進行第二輪
+          break
+        except mysql.connector.Error as e:
+          conn.rollback()  # 撤銷操作恢復到操作前的狀態
+          count += 1 #重試次數累加
+          result = [] #錯誤回傳內容
+          step = 1
+          stepout = 1
+          time.sleep(1)
+      if stepout == 1:#成功取得資料後退出或兩輪都失敗退出迴圈
+        block = 1
+    else:
+      if step == 1:
+        cursor.close()#關閉第一輪游標的
+      step = 1 #conn沒取到進入切換conn1
+      if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
+        block = 1
+        result = []
   return result
 
-#----------------所有廠商名稱--------------------
-def test_manufacturers():
-    query = "SELECT * FROM Manufacturer_Information;"
-    category ='select' #重試類別select/notselect
-    result = retry(category,query)
-    
-    if result is not None:
-        bubbles = []
-        for row in result:
-            mid = row[0]
-            mname = row[1]
-            bubble = {               
-              "type": "bubble",
-              "body": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "md",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "廠商查詢",
-                    "size": "xl",
-                    "weight": "bold"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": f"【廠商編號】: {mid}",
-                            "weight": "bold",
-                            "margin": "sm",
-                            "flex": 0
-                          },
-                          {
-                            "type": "text",
-                            "text": f"【廠商名稱】: {mname}",
-                            "flex": 0,
-                            "margin": "sm",
-                            "weight": "bold"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "separator",
-                    "margin": "lg",
-                    "color": "#888888"
-                  }
-                ]
-              },
-              "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                  {
-                    "type": "button",
-                    "style": "primary",
-                    "color": "#905c44",
-                    "margin": "none",
-                    "action": {
-                      "type": "message",
-                      "label": "選擇此廠商",
-                      "text": f"庫存-選擇廠商 {mid}"
-                    },
-                    "height": "md",
-                    "offsetEnd": "none",
-                    "offsetBottom": "sm"
-                  }
-                ],
-                "spacing": "none",
-                "margin": "none"
-              }
-            }
-            bubbles.append(bubble)
-        flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "carousel", "contents": bubbles})
-    else:
-        flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "text", "text": "找不到符合條件的廠商。"})
-    
-    return flex_message
-
-#----------------所有廠商名稱--------------------
-def testAA_manufacturers():
-    query = "SELECT * FROM Manufacturer_Information;"
-    category ='select' #重試類別select/notselect
-    result = retry(category,query)
-    
-    if result is not None:
-        bubbles = []
-        for row in result:
-            mid = row[0]
-            mname = row[1]
-            bubble = {               
-                      
-                    
-              "type": "bubble",
-              "body": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "md",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "廠商查詢",
-                    "size": "xl",
-                    "weight": "bold"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": f"【廠商編號】: {mid}",
-                            "weight": "bold",
-                            "margin": "sm",
-                            "flex": 0
-                          },
-                          {
-                            "type": "text",
-                            "text": f"【廠商名稱】: {mname}",
-                            "flex": 0,
-                            "margin": "sm",
-                            "weight": "bold"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "separator",
-                    "margin": "lg",
-                    "color": "#888888"
-                  }
-                ]
-              },
-              "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                  {
-                    "type": "button",
-                    "style": "primary",
-                    "color": "#905c44",
-                    "margin": "none",
-                    "action": {
-                      "type": "message",
-                      "label": "選擇此廠商",
-                      "text": f"進貨-選擇廠商 {mid}"
-                    },
-                    "height": "md",
-                    "offsetEnd": "none",
-                    "offsetBottom": "sm"
-                  }
-                ],
-                "spacing": "none",
-                "margin": "none"
-              }
-            }
-            bubbles.append(bubble)
-        flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "carousel", "contents": bubbles})
-    else:
-        flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "text", "text": "找不到符合條件的廠商。"})
-    return flex_message
+#----------------新增-依廠商查詢所有廠商名稱--------------------
+def alln_manufacturers_name():
+  query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------新增->依廠商查詢所有商品的商品ID及商品名稱-----------------
+def nm_pur_info(manufacturerR_id):
+  query = f"SELECT 商品ID,商品名稱 FROM  Product_information natural join Manufacturer_Information where 廠商編號 ='{manufacturerR_id}'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------新增->依分類查詢所有商品的商品ID及商品名稱-----------------
+def nc_pur_info(selectedr_category):
+  query = f"SELECT 商品ID,商品名稱 FROM  Product_information where 商品ID like'{selectedr_category}%'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
 
 
 
-#--------------此廠商所有商品&該商品庫存等資訊---------------
-def products_manufacturers(manufacturer_id):
-    query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information WHERE 廠商編號 = '{manufacturer_id}'"
-    category ='select' #重試類別select/notselect
-    result = retry(category,query)
-    if result:
-        bubbles = []
-        for row in result:
-            pid = row[9]  # '商品ID'
-            pname = row[10]  # '商品名稱'
-            stock_num = row[14]  # '庫存數量'
-            sell_price = row[16]  # '售出單價'
 
-            bubble = {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {"type": "text", "text": f"商品ID: {pid}"},
-                        {"type": "text", "text": f"商品名稱: {pname}"},
-                        {"type": "text", "text": f"庫存數量: {stock_num}"},
-                        {"type": "text", "text": f"售出單價: {sell_price}"}
-                    ]
-                },
-            }
-            bubbles.append(bubble)
-        flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "carousel", "contents": bubbles})
-    else:
-        flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
-    return flex_message
+#----------------修改-依廠商查詢所有廠商名稱--------------------
+def allr_manufacturers_name():
+  query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------修改->依廠商查詢所有商品的商品ID及商品名稱-----------------
+def revm_pur_info(manufacturerR_id):
+  query = f"SELECT 商品ID,商品名稱 FROM  Product_information natural join Manufacturer_Information where 廠商編號 ='{manufacturerR_id}'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------修改->依分類查詢所有商品的商品ID及商品名稱-----------------
+def revc_pur_info(selectedr_category):
+  query = f"SELECT 商品ID,商品名稱 FROM  Product_information where 商品ID like'{selectedr_category}%'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#----------------庫存-查詢所有廠商編號及廠商名--------------------
+def alls_manufacturers_name():
+  query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#--------------依廠商->庫存資訊---------------
+def stock_manufacturers(manufacturer_id):
+  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM Product_information WHERE 廠商編號 = '{manufacturer_id}'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------依分類->庫存資訊-----------------
+def stock_categoryate(selected_category):
+  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM  Product_information WHERE 商品ID LIKE '{selected_category}%'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------依廠商->進貨資訊---------------
+def purchase_manufacturers(manufacturerA_id):
+  query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Purchase_Information NATURAL JOIN Product_information WHERE 廠商編號 = '{manufacturerA_id}'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------依分類->進貨資訊-----------------
+def purchase_categoryate(selectedA_category):
+  query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Purchase_Information NATURAL JOIN Product_information WHERE 商品ID LIKE '{selectedA_category}%'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#----------------進貨-查詢所有廠商編號及廠商名稱--------------------
+def allp_manufacturers_name():
+  query = "SELECT * FROM Manufacturer_Information;"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------新增->依分類查詢所有商品的廠商編號及商品ID-----------------
+def new_pur_info(product_name):
+  query = f"SELECT * FROM Product_information natural join Manufacturer_Information WHERE 商品名稱 LIKE '%{product_name}%'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------抓取進貨中商品-----------------
+def puring_pro():
+  query = f"SELECT 商品ID,商品名稱,進貨狀態 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='進貨中'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------抓取已到貨商品-----------------
+def pured_pro():
+  query = f"SELECT 商品ID,商品名稱,進貨狀態 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='已到貨'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#------------------更改進貨中的商品狀態-----------
+def puring_trastate(manufacturerV_id):
+  query = f"UPDATE Purchase_Information SET 進貨狀態 = '已到貨' WHERE 商品ID = '{manufacturerV_id}'"
+  category ='notselect' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------抓取消費者訂單編號----------------
+def order_inf():
+  query = f"SELECT 商品ID,訂單編號,訂單狀態未取已取 FROM order_details natural join Order_information"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
 
-#-----------------分類下的所有商品&該商品庫存等資訊-----------------
-def test_categoryate(selected_category):
-    query = f"SELECT* FROM Manufacturer_Information NATURAL JOIN Product_information WHERE 商品ID LIKE '{selected_category}%'"
-    category ='select' #重試類別select/notselect
-    result = retry(category,query)
-
-    if result is not None:
-        bubbles = []
-        for row in result:
-            pid = row[0]  # '商品ID'
-            pname = row[1]  # '商品名稱'
-            stock_num = row[14]  # '庫存數量'
-            sell_price = row[16]  # '售出單價'
-
-            bubble = {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {"type": "text", "text": f"商品ID：{pid}"},
-                        {"type": "text", "text": f"商品名稱：{pname}"},
-                        {"type": "text", "text": f"庫存數量：{stock_num}"},
-                        {"type": "text", "text": f"售出單價：{sell_price}"},
-                    ]
-                }
-            }
-            bubbles.append(bubble)
-
-        flex_message = FlexSendMessage(
-            alt_text="類別下所有商品",
-            contents={
-                "type": "carousel",
-                "contents": bubbles
-            }
-        )
-    else:
-        flex_message = FlexSendMessage(
-            alt_text="類別下所有商品",
-            contents={
-                "type": "text",
-                "text": "找不到符合條件的資料。"
-            }
-        )
-    return flex_message
-
-#--------------此廠商所有商品&該商品進貨資訊---------------
-def productsA_manufacturers(manufacturerA_id):
-    query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information WHERE 廠商編號 = '{manufacturerA_id}'"
-    category ='select' #重試類別select/notselect
-    result = retry(category,query)
-
-    if result:
-        bubbles = []
-        for row in result:
-            pid = row[1]  # '商品ID'
-            pname = row[19]  # '商品名稱'
-            purch_num = row[13]  # '進貨數量'
-            purch_price = row[14]  # '進貨單價'
-
-            bubble = {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {"type": "text", "text": f"商品ID: {pid}"},
-                        {"type": "text", "text": f"商品名稱: {pname}"},
-                        {"type": "text", "text": f"進貨數量: {purch_num}"},
-                        {"type": "text", "text": f"進貨單價: {purch_price}"}
-                    ]
-                },
-            }
-            bubbles.append(bubble)
-        flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "carousel", "contents": bubbles})
-    else:
-        flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
-    return flex_message
-
-#-----------------分類下的所有商品&該商品進貨資訊-----------------
-def testA_categoryate(selectedA_category):
-    query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information WHERE 廠商編號 = '{selectedA_category}'"
-    category ='select' #重試類別select/notselect
-    result = retry(category,query)
-
-    if result is not None:
-            bubbles = []
-            for row in result:
-                pid = row[1]  # '商品ID'
-                pname = row[19]  # '商品名稱'
-                purch_num = row[13]  # '進貨數量'
-                purch_price = row[14]  # '進貨單價'
-
-                bubble = {
-                    "type": "bubble",
-                    "body": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                            {"type": "text", "text": f"商品ID: {pid}"},
-                            {"type": "text", "text": f"商品名稱: {pname}"},
-                            {"type": "text", "text": f"進貨數量: {purch_num}"},
-                            {"type": "text", "text": f"進貨單價: {purch_price}"}
-                        ]
-                    },
-                }
-                bubbles.append(bubble)
-            flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "carousel", "contents": bubbles})
-    else:
-        flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
-    return flex_message
-
-
-'''#查詢資料SELECT
-def test_datasearch():
-  #測試讀取資料庫願望清單(所有)
-  implement = databasetest()
-  conn = implement['conn']
-  cursor = implement['cursor']
-  query = "SELECT * FROM wishlist;"
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if result is not None:
-    testmsg = "願望清單讀取內容：\n"
-    for row in result:
-      # 透過欄位名稱獲取資料
-      uid = row[0]#'UID'
-      name = row[1]#'商品名稱'
-      #商品圖片
-      reason = row[3]#'推薦原因'
-      time = row[4]#'願望建立時間'
-      member = row[5]#'會員_LINE_ID'
-      # 在這裡進行資料處理或其他操作
-      testmsg += ('第%s筆\n推薦會員:\n%s\n商品名稱：\n%s\n推薦原因：\n%s\n願望建立時間：\n%s\n---\n' %(uid,member,name,reason,time))
-  else:
-    testmsg = "找不到符合條件的資料。"
-  # 關閉游標與連線
-  testmsg += "(end)"
-  cursor.close()
-  conn.close()
-  return testmsg
-
-
+"""
 #-------------------圖片取得並發送----------------------
 def imagesent():
     implement = databasetest()  # 定義 databasetest() 函式並返回相關物件 #要
     img = []
     send = []
-    conn = implement['conn'] #要
-    cursor = implement['cursor'] #要
+    conn = implement['conn'] 
+    cursor = implement['cursor'] 
     #query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 1 OFFSET 0;"#0開始1筆
     query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 2 OFFSET 0;" #要
-    cursor.execute(query) #要
-    result = cursor.fetchall() #要
+    cursor.execute(query) 
+    result = cursor.fetchall() 
     
     if result is not None:
         for row in result:
@@ -570,6 +339,4 @@ def imagetolink():
     imagelink = uploaded_image.link
     print( imagetitle + "連結：" + imagelink)
     #delete_images()#刪除images檔案圖片
-  return {'imagetitle':imagetitle,'imagelink':imagelink}'''
-
-
+  return {'imagetitle':imagetitle,'imagelink':imagelink}"""
