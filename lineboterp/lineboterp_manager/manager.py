@@ -12,6 +12,7 @@ from flexmsg import *
 from database import *
 #from repurinf import *
 from relevant_information import linebotinfo,dbinfo
+from nepurinf import *
 #from pdf_utils import create_pdf
 #======python的函式庫==========
 from mysql.connector import pooling
@@ -90,9 +91,9 @@ def handle_message(event):
     #-------------------確認使用者狀態進行處理----------------------
     #使用者狀態不屬於normal，不允許進行其他動作
     if user_state[user_id] != 'normal':
-        #check_text = purchase_check(manager)
-        #line_bot_api.reply_message(event.reply_token, check_text)
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='煩死了'))
+        check_text = purchase_check()
+        line_bot_api.reply_message(event.reply_token, check_text)
+        #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='煩死了'))
     else:
         if '顧客取貨' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -189,6 +190,7 @@ def handle_message(event):
                                     QuickReplyButton(action=MessageAction(label="查詢商品庫存", text="查詢商品庫存")),
                                     QuickReplyButton(action=MessageAction(label="進貨商品狀態查詢", text="進貨商品狀態查詢")),
                                     QuickReplyButton(action=MessageAction(label="預購狀態查詢", text="預購狀態查詢")),
+    
                             ]))
             line_bot_api.reply_message(event.reply_token, message)
             #--------------------------新增及修改進貨商品----------------------------------
@@ -211,7 +213,9 @@ def handle_message(event):
             ))
         elif '【進貨商品】' in msg:
             if msg[6:] == '新增':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='新增'))  
+                user_state[user_id] = 'purchase_ck'
+                user_state1[user_id] = 'num'
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='=>請輸入進貨數量：'))  
             elif msg[6:] == '修改':
                 line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                                 alt_text='商品查詢選擇',
@@ -258,10 +262,10 @@ def handle_message(event):
             flex_message = rev_pur_info_flex_msg(result)
             line_bot_api.reply_message(event.reply_token, flex_message)
         elif msg.startswith('修改-商品'):
-            #user_state[user_id] = 'purchase_ck'
-            #check_text = repurchase_info(manager)
-            #line_bot_api.reply_message(event.reply_token, check_text)
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入進貨數量：'))
+            '''user_state[user_id] = 'purchase_ck'
+            check_text = repurchase_info(manager)
+            line_bot_api.reply_message(event.reply_token, check_text)'''
+            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入進貨數量：'))
         elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
             selectedr_category = msg.rstrip("1")
             result = revc_pur_info(selectedr_category)
@@ -272,19 +276,37 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='商品庫存查詢選擇',
                 template= ButtonsTemplate(
-                    text='請選擇商品庫存查詢方式：\n【類別】或是【廠商】',
+                    text='請選擇商品庫存查詢方式：\n【庫存警示】或是【所有庫存】',
                     actions=[
                         MessageAction(
-                            label='【類別】',
-                            text='【庫存查詢】類別',
+                            label='【庫存警示】',
+                            text='【查詢】庫存警示',
                         ),
                         MessageAction(
-                            label='【廠商】',
-                            text='【庫存查詢】廠商'
+                            label='【所有庫存】',
+                            text='【查詢】所有庫存'
                         )
                     ]
                 )
             ))
+        elif '【查詢】所有庫存' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+                alt_text='商品所有庫存查詢選擇',
+                template= ButtonsTemplate(
+                    text='請選擇商品庫存查詢方式：\n【廠商】或是【類別】',
+                    actions=[
+                        MessageAction(
+                            label='【庫存查詢廠商】',
+                            text='【庫存查詢】廠商',
+                        ),
+                        MessageAction(
+                            label='【庫存查詢類別】',
+                            text='【庫存查詢】類別'
+                        )
+                    ]
+                )
+            )) 
+
         elif '【庫存查詢】' in msg:
             if msg[6:] == '廠商':
                 result = alls_manufacturers_name()
@@ -308,6 +330,8 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, message)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
+        elif '【查詢】庫存警示' in msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='庫存警示'))
         elif msg.startswith('庫存-選擇廠商'):
             manufacturer_id = msg[8:] 
             result = stock_manufacturers(manufacturer_id)
