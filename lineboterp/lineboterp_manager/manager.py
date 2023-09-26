@@ -188,6 +188,7 @@ def handle_message(event):
                                     QuickReplyButton(action=MessageAction(label="新增及修改進貨商品", text="新增及修改進貨商品")),
                                     QuickReplyButton(action=MessageAction(label="查詢商品庫存", text="查詢商品庫存")),
                                     QuickReplyButton(action=MessageAction(label="進貨商品狀態查詢", text="進貨商品狀態查詢")),
+                                    QuickReplyButton(action=MessageAction(label="預購狀態查詢", text="預購狀態查詢")),
                             ]))
             line_bot_api.reply_message(event.reply_token, message)
             #--------------------------新增及修改進貨商品----------------------------------
@@ -352,7 +353,15 @@ def handle_message(event):
             manufacturerV_id = msg[6:] 
             result = puring_trastate(manufacturerV_id)
             line_bot_api.reply_message(event.reply_token, result)
-
+            #-------------------預購狀態查詢----------------------
+        elif '預購狀態查詢' in msg:
+            result = preorder_end()
+            flex_message = preorder_end_flex_msg(result)
+            line_bot_api.reply_message(event.reply_token, flex_message)
+        elif msg.startswith('預購進貨'):
+            manufacturerP_id = msg[5:]
+            result = endtopur_upd(manufacturerP_id)
+            line_bot_api.reply_message(event.reply_token, result)
             #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
             databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n更新時間：\n{db['databaseup']}\n下次更新時間：\n{db['databasenext']}\n\n"

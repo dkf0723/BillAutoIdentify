@@ -629,39 +629,49 @@ def revc_pur_info_flex_msg(result):
     return flex_message'''
 
 def puring_pro_flex_msg(result):
-    if result is not None:
+    if result is not None and len(result) > 0:
         bubbles = []
         for row in result:
             pid = row[0]  # '商品ID'
             pname = row[1]  # '商品名稱'
-            purstate = row[2]  # '進貨狀態'
+            mid = row[2] # '廠商編號'
+            mname = row[3] # '廠商名'
+            purnum = row[4] # '進貨數量'
+            purstate = row[5]  # '進貨狀態'
+            purtime = row[6] # '進貨時間'
+
+            # 创建商品信息卡片
             bubble = {
                 "type": "bubble",
                 "body": {
                     "type": "box",
                     "layout": "vertical",
+                    "spacing": "md",
                     "contents": [
-                        {"type": "text", "text": f"商品ID: {pid}"},
-                        {"type": "text", "text": f"商品名稱: {pname}"},
-                        {"type": "text", "text": f"進貨狀態: {purstate}"}
+                        {"type": "text", "text": f"商品ID: {pid}", "weight": "bold", "size": "xl"},
+                        {"type": "text", "text": f"商品名稱: {pname}", "weight": "bold", "size": "xl"},
+                        {"type": "text", "text": f"廠商編號: {mid}", "size": "md"},
+                        {"type": "text", "text": f"廠商名: {mname}", "size": "md"},
+                        {"type": "text", "text": f"進貨數量: {purnum}", "size": "md"},
+                        {"type": "text", "text": f"進貨狀態: {purstate}", "size": "md"},
+                        {"type": "text", "text": f"進貨時間: {purtime}", "size": "md"}
                     ]
                 },
-            }
-
-            # 添加一个额外的按钮选项
-            bubble["footer"] = {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                    {
-                        "type": "button",
-                        "action": {
-                            "type": "message",
-                            "label": "商品已到貨",
-                            "text": f"商品已到貨 {pid}"  # 根据需要调整文本
+                "footer": {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "button",
+                            "style": "primary",
+                            "action": {
+                                "type": "message",
+                                "label": "商品已到貨",
+                                "text": f"商品已到貨 {pid}"  # 根据需要调整文本
+                            }
                         }
-                    }
-                ]
+                    ]
+                }
             }
 
             bubbles.append(bubble)
@@ -669,25 +679,38 @@ def puring_pro_flex_msg(result):
         flex_message = FlexSendMessage(alt_text="此商品進貨中列表", contents={"type": "carousel", "contents": bubbles})
     else:
         flex_message = FlexSendMessage(alt_text="此商品進貨中列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
+    
     return flex_message
 
 
+
 def pured_pro_flex_msg(result):
-    if result is not None:
+    if result is not None and len(result) > 0:
         bubbles = []
         for row in result:
             pid = row[0]  # '商品ID'
             pname = row[1]  # '商品名稱'
-            purstate = row[2]  # '進貨狀態'
+            mid = row[2] # '廠商編號'
+            mname = row[3] # '廠商名'
+            purnum = row[4] # '進貨數量'
+            purstate = row[5]  # '進貨狀態'
+            purtime = row[6] # '進貨時間'
+
+            # 创建商品信息卡片
             bubble = {
                 "type": "bubble",
                 "body": {
                     "type": "box",
                     "layout": "vertical",
+                    "spacing": "md",
                     "contents": [
-                        {"type": "text", "text": f"商品ID: {pid}"},
-                        {"type": "text", "text": f"商品名稱: {pname}"},
-                        {"type": "text", "text": f"進貨狀態: {purstate}"}
+                        {"type": "text", "text": f"商品ID: {pid}", "weight": "bold", "size": "xl"},
+                        {"type": "text", "text": f"商品名稱: {pname}", "weight": "bold", "size": "xl"},
+                        {"type": "text", "text": f"廠商編號: {mid}", "size": "md"},
+                        {"type": "text", "text": f"廠商名: {mname}", "size": "md"},
+                        {"type": "text", "text": f"進貨數量: {purnum}", "size": "md"},
+                        {"type": "text", "text": f"進貨狀態: {purstate}", "size": "md"},
+                        {"type": "text", "text": f"進貨時間: {purtime}", "size": "md"}
                     ]
                 },
             }
@@ -722,6 +745,49 @@ def order_inf_flex_msg(result):
         flex_message = FlexSendMessage(alt_text="此商品已到貨列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
     return flex_message
 
+def preorder_end_flex_msg(result):
+    if result is not None and len(result) > 0:
+        bubbles = []
+        for row in result:
+            pid = row[0]  # '商品ID'
+            pname = row[1]  # '商品名稱'
+            nowprepro = row[2] # '現預購商品'
+    
+
+            # 创建商品信息卡片
+            bubble = {
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                        {"type": "text", "text": f"商品ID: {pid}","size": "md" },
+                        {"type": "text", "text": f"商品名稱: {pname}","size": "md" },
+                        {"type": "text", "text": f"現預購商品: {nowprepro}", "size": "md"},
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "button",
+                            "style": "primary",
+                            "action": {
+                                "type": "message",
+                                "label": "預購進貨",
+                                "text": f"預購進貨 {pid}"  # 根据需要调整文本
+                            }
+                        }
+                    ]
+                }
+            }
+            bubbles.append(bubble)
+        flex_message = FlexSendMessage(alt_text="此商品已到貨列表", contents={"type": "carousel", "contents": bubbles})
+    else:
+        flex_message = FlexSendMessage(alt_text="此商品已到貨列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
+    return flex_message
 
 
 

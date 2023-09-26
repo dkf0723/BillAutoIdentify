@@ -245,13 +245,13 @@ def new_pur_info(product_name):
   return result
 #-----------------抓取進貨中商品-----------------
 def puring_pro():
-  query = f"SELECT 商品ID,商品名稱,進貨狀態 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='進貨中'"
+  query = f"SELECT 商品ID,商品名稱,廠商編號,廠商名,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information natural join Manufacturer_Information WHERE 進貨狀態 ='進貨中'"
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
 #-----------------抓取已到貨商品-----------------
 def pured_pro():
-  query = f"SELECT 商品ID,商品名稱,進貨狀態 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='已到貨'"
+  query = f"SELECT 商品ID,商品名稱,廠商編號,廠商名,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information natural join Manufacturer_Information WHERE 進貨狀態 ='已到貨'"
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
@@ -267,6 +267,25 @@ def order_inf():
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
+#-----------------抓取預購截止的商品---------------
+def preorder_end():
+  query = f"SELECT 商品ID,商品名稱,現預購商品 FROM Product_information WHERE 現預購商品 = '預購截止'"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#-----------------修改現預購商品欄位為預購進貨---------------
+def endtopur_upd(manufacturerP_id):
+  query = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{manufacturerP_id}'"
+  category ='notselect' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+
+#def AA_BB():
+  #query = f"SELECT 訂單編號 from order_details where 商品ID = '{manufacturerP_id}'"
+  #category ='select' #重試類別select/notselect
+  #result = retry(category,query)
+  #return result
+
 
 """
 #-------------------圖片取得並發送----------------------
