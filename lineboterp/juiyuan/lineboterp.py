@@ -422,7 +422,10 @@ def checkdb():
     else:
         dbconnect_job()
         dbconnect1_job()
-
+    #-----
+    if minutes % 30 == 0:
+        Connection_timeout()#連線逾時 1200 and ip 216
+        
 '''# 建立排程函式
 def task_3_minutes():
     checkdb()

@@ -205,6 +205,20 @@ def manufacturer(name,principal,localcalls,phonenum,Payment,bankid,bankname,bank
   return result2,info
 #-----------------------------------------
 
+#-------------------檢查連線超時----------------------
+def Connection_timeout():
+  query = """SELECT ID,TIME,HOST
+            FROM INFORMATION_SCHEMA.PROCESSLIST;""" 
+  category ='select' #重試類別select/notselect
+  resulttimeout,result2 = retry(category,query)
+  if resulttimeout != []:
+    for i in resulttimeout:
+      if (i[1] > 1200) and (i[2].split('.')[0] == '216'):
+        query =f"""KILL '{i[0]}';"""
+        category ='notselect' #重試類別select/notselect
+        result,result2 = retry(category,query)
+#----------------------------------------- 
+
 
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
 def member_profile(userid):
