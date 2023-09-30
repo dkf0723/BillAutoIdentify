@@ -176,6 +176,50 @@ def retry(category,query):#select/notselect
         result = []
         result2 = 'no'
   return result,result2
+
+#-------------------廠商管理建立----------------------
+def manufacturer(name,principal,localcalls,phonenum,Payment,bankid,bankname,bankaccount):
+  timeget = gettime()
+  formatted_datetimeget = timeget['formatted_datetime']
+
+  query = """SELECT 廠商編號 FROM Manufacturer_Information order by 建立時間 desc limit 1;"""
+  category ='select' #重試類別select/notselect
+  manufacturernum_result,result2 = retry(category,query)
+
+  if manufacturernum_result == []:
+    addnum = '000001'
+  else:
+    add = int(str(manufacturernum_result[0][0])[12:])+1
+    addnum = '00000' + str(add)
+  if len(addnum) != 6:
+    addnum = addnum[-6:]
+
+  query = f"""
+        INSERT INTO Manufacturer_Information (廠商編號,廠商名,負責或對接人,市話,電話,付款方式,行庫代號,行庫名,匯款帳號,建立時間)
+        VALUES ('manufacturer{addnum}','{name}','{principal}','{localcalls}','{phonenum}','{Payment}','{bankid}','{bankname}','{bankaccount}','{formatted_datetimeget}');
+        """
+  category ='notselect' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  if result2 == 'ok':
+    info = f"manufacturer{addnum}"
+  return result2,info
+#-----------------------------------------
+
+#-------------------檢查連線超時----------------------
+def Connection_timeout():
+  query = """SELECT ID,TIME,HOST
+            FROM INFORMATION_SCHEMA.PROCESSLIST;""" 
+  category ='select' #重試類別select/notselect
+  resulttimeout,result2 = retry(category,query)
+  if resulttimeout != []:
+    for i in resulttimeout:
+      if (i[1] > 1200) and (i[2].split('.')[0] == '216'):
+        query =f"""KILL '{i[0]}';"""
+        category ='notselect' #重試類別select/notselect
+        result,result2 = retry(category,query)
+#----------------------------------------- 
+
+
 #-------------------檢查userid是否在資料庫即是否有購物車基本資料----------------------
 def member_profile(userid):
   member = lineboterp.member
@@ -492,6 +536,8 @@ def recent_phone_call(user_id):
   phone_result,result2 = retry(category,query)
   if phone_result == []:
     phone_result = 'no'#都沒有成立過訂單
+  else:
+    phone_result = phone_result[0][0]
   return phone_result
 
 #預購倍數查詢
@@ -630,7 +676,7 @@ def orderpreorderlist():
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
-    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 like '預購%')
+    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 like '預購%') and 訂單狀態未取已取 <> '預購已取'
     order by 訂單成立時間 desc
     limit 100 offset 0;
     """#下一頁加100改offset(目前暫無考慮)

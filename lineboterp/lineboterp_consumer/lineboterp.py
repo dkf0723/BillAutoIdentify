@@ -231,7 +231,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, cart_list())
         elif '【送出購物車訂單】' in msg:
             user_state[user_id] = 'cartorderphonenum'
-            phone = recent_phone_call(user_id)[0][0]#最近一筆電話取得
+            phone = recent_phone_call(user_id)#最近一筆電話取得
             errormsg = 'no'
             line_bot_api.reply_message(event.reply_token, Cart_order_screen(phone,errormsg))
         #-------------------提問及許願----------------------
@@ -333,6 +333,29 @@ def handle_message(event):
         elif '圖片' in msg:
             imgsend = imagesent()
             line_bot_api.reply_message(event.reply_token, imgsend)
+        #-------------------廠商管理-新增廠商----------------------
+        elif '廠商管理' in msg:
+            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+                alt_text='廠商管理功能選擇',
+                template=ButtonsTemplate(
+                    text='請選擇廠商管理功能：\n【廠商列表】或是【建立廠商】',
+                    actions=[
+                        MessageAction(
+                            label='【廠商列表】',
+                            text='【管理廠商】廠商列表',
+                        ),
+                        MessageAction(
+                            label='【建立廠商】',
+                            text='【管理廠商】建立廠商',
+                        )
+                    ]
+                )
+            ))
+        elif '【管理廠商】廠商列表' in msg:
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='show廠商列表'))
+        elif '【管理廠商】建立廠商' in msg:
+            user_state[user_id] = 'manufacturer_name'
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='===建立廠商===\n=>1.請打字輸入廠商名稱：\n(20字內)'))
         #-------------------非上方功能的所有回覆----------------------
         else:
             if '【商品簡介】' not in msg:
@@ -399,7 +422,10 @@ def checkdb():
     else:
         dbconnect_job()
         dbconnect1_job()
-
+    #-----
+    if minutes % 30 == 0:
+        Connection_timeout()#連線逾時 1200 and ip 216
+        
 '''# 建立排程函式
 def task_3_minutes():
     checkdb()
