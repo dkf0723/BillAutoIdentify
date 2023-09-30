@@ -12,6 +12,7 @@ from product.cartlist import cart_list,addcart,cartrevise,checkcart
 from selection_screen import (Order_phonenum_screen,Single_order_confirmation_screen,Order_establishment_message,
                               Cart_join_success_message,Cancel_fail_message,Cart_order_screen,Cartordercheck_establishment_message,
                               Cartorder_establishment_message)
+from relevant_information import bank
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
@@ -30,7 +31,271 @@ def product_check():
         check_text = ask()
     elif state[id] in ['wishes','wishesreason','wishessource','wishesimg','wishescheck']:#願望清單
         check_text = wishes()
+    #-------------------廠商管理-新增廠商----------------------
+    elif state[id] in ['manufacturer_name','other_manufacturer_add','manufacturer_principal',
+                       'manufacturer_localcalls','manufacturer_phonenum','manufacturer_Payment',
+                       'manufacturer_bank','manufacturer_bankaccount','manufacturer_end']:#新增廠商
+        check_text = new_manufacturer()#single_manufacturer_num單獨建立；other_manufacturer新商品新廠商過來的
+    #-----------------------------------------
     return check_text
+
+#-------------------廠商管理-新增廠商----------------------
+def new_manufacturer():
+    id = lineboterp.user_id
+    state = lineboterp.user_state
+    message = lineboterp.msg
+    message_storage = lineboterp.storage
+    addtype = 'single'
+    if state[id] == 'other_manufacturer_add':
+        addtype = 'other'#最後判斷是否狀態回給新商品建立下一步狀態
+        state[id] = 'manufacturer_name'
+        check_text = TextSendMessage(text='===建立廠商===\n=>1.請打字輸入廠商名稱：\n(20字內)')
+    elif message == '取消':
+        state[id] = 'normal'
+        message_storage[id+'manufacturer_name'] = 'NAN'
+        message_storage[id+'manufacturer_principal'] = 'NAN'
+        message_storage[id+'manufacturer_localcalls'] = 'NAN'
+        message_storage[id+'manufacturer_phonenum'] = 'NAN'
+        message_storage[id+'manufacturer_Payment'] = 'NAN'
+        message_storage[id+'manufacturer_bankid'] = 'NAN'
+        message_storage[id+'manufacturer_bankname'] = 'NAN'
+        message_storage[id+'manufacturer_bankaccount'] = 'NAN'
+        message_storage[id+'manufacturer_all'] = 'NAN'
+        check_text = TextSendMessage(text="取消新增廠商流程囉！")
+    elif state[id] == 'manufacturer_name':
+        if len(message) <= 20:
+            message_storage[id+'manufacturer_name'] = message #廠商名暫存
+            message_storage[id+'manufacturer_all'] = f"===建立廠商===\n1.廠商名稱：{message_storage[id+'manufacturer_name']}"
+            state[id] = 'manufacturer_principal' #狀態負責人
+            check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>2.請打字輸入負責人或對接人名稱：\n(10字內)")
+        else:
+            check_text = TextSendMessage(text=f"===建立廠商===\n=>1.請打字輸入廠商名稱：\n(20字內)\n錯誤訊息：輸入的「{message}」名稱大於20字喔！")
+    elif state[id] == 'manufacturer_principal':
+        if len(message) <= 10:
+            message_storage[id+'manufacturer_principal'] = message #負責人暫存
+            message_storage[id+'manufacturer_all'] += f"\n2.負責人或對接人名稱：{message_storage[id+'manufacturer_principal']}"
+            state[id] = 'manufacturer_localcalls' #狀態市話
+            check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過")
+        else:
+            check_text = TextSendMessage(text=f"===建立廠商===\n=>2.請打字輸入負責人或對接人名稱：\n(10字內)\n錯誤訊息：輸入的「{message}」名稱大於10字喔！")
+    elif state[id] == 'manufacturer_localcalls':
+        areacode = ['02','03','037','04','049','05','06','07','08','089','082','0826','0836']#所有區碼
+        if message.isdigit():
+            check_areacode = 'no'
+            if len(message) in [9,10,11]:
+                if len(message) == 9:
+                    cut_areacode = message[:2]
+                    if cut_areacode in areacode:
+                        check_areacode = 'ok'
+                elif len(message) == 10:
+                    cut_areacode = message[:3]
+                    if cut_areacode in areacode:
+                        check_areacode = 'ok'
+                elif len(message) == 11:
+                    cut_areacode = message[:4]
+                    if cut_areacode in areacode:
+                        check_areacode = 'ok'
+                
+                if check_areacode == 'ok':
+                    message_storage[id+'manufacturer_localcalls'] = message #市話暫存
+                    message_storage[id+'manufacturer_all'] += f"\n3.公司市話：{message_storage[id+'manufacturer_localcalls']}"
+                    state[id] = 'manufacturer_phonenum' #狀態電話
+                    check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>4.請打字輸入行動電話：\nex.0952025413、略過")
+                else:
+                    check_text = TextSendMessage(text=f"===建立廠商===\n=>3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過'\n錯誤訊息：輸入的「{message}」區碼錯誤喔！")
+            else:
+                check_text = TextSendMessage(text=f"===建立廠商===\n=>3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過'\n錯誤訊息：輸入的「{message}」不是市話的規則喔！")
+        else:
+            if message == '略過':
+                state[id] = 'manufacturer_phonenum' #狀態電話
+                message_storage[id+'manufacturer_localcalls'] = message #市話暫存
+                message_storage[id+'manufacturer_all'] += f"\n3.公司市話：{message_storage[id+'manufacturer_localcalls']}"
+                check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>4.請打字輸入行動電話：\nex.0952025413、略過")
+            else:
+                check_text = TextSendMessage(text=f"===建立廠商===\n=>3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234'\n錯誤訊息：輸入的「{message}」不是市話的規則喔！")
+    elif state[id] == 'manufacturer_phonenum':
+        if message.isdigit():
+                if(len(message) < 10):
+                    check_text =  TextSendMessage(text=f"輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼。")
+                elif (len(message) > 10):
+                    check_text =  TextSendMessage(text=f"輸入電話格式錯誤！(10碼)\n請重新打字輸入正確的電話號碼。")
+                elif(message[:2] != '09'):           
+                    check_text =  TextSendMessage(text=f"輸入電話格式錯誤！(09開頭)\n請重新打字輸入正確的電話號碼。")
+                else:
+                    message_storage[id+'manufacturer_phonenum'] = message #行動電話暫存
+                    state[id] = 'manufacturer_Payment' #狀態付款方式
+                    message_storage[id+'manufacturer_all'] += f"\n4.行動電話：{message_storage[id+'manufacturer_phonenum']}"
+                    check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>5.請打字輸入付款方式：\nex.現金、匯款")
+        else:
+            if message == '略過':
+                state[id] = 'manufacturer_Payment' #狀態付款方式
+                message_storage[id+'manufacturer_phonenum'] = message #行動電話暫存
+                message_storage[id+'manufacturer_all'] += f"\n4.行動電話：{message_storage[id+'manufacturer_phonenum']}"
+                check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>5.請打字輸入付款方式：\nex.現金、匯款")
+            else:
+                check_text = TextSendMessage(text=f"===建立廠商===\n=>4.請打字輸入行動電話：\nex.0952025413、略過\n錯誤訊息：輸入的「{message}」不是行動電話的規則喔！")
+    elif state[id] == 'manufacturer_Payment':
+        if message in ['現金','匯款']:
+            message_storage[id+'manufacturer_Payment'] = message #付款方式暫存
+            message_storage[id+'manufacturer_all'] += f"\n5.付款方式：{message_storage[id+'manufacturer_Payment']}"
+            if message == '匯款':
+                state[id] = 'manufacturer_bank' #狀態行庫
+                check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，則一即可：")
+            else:
+                state[id] = 'manufacturer_end' #狀態確認
+                message_storage[id+'manufacturer_bankid'] = "略過"
+                message_storage[id+'manufacturer_bankname'] = "略過"
+                message_storage[id+'manufacturer_bankaccount'] = "略過"
+                check_text = TemplateSendMessage(
+                                alt_text='廠商新增資料確認',
+                                template=ButtonsTemplate(
+                                    text= message_storage[id+'manufacturer_all'],
+                                    actions=[
+                                        MessageAction(
+                                            label='【新增廠商】',
+                                            text='1',
+                                        ),
+                                        MessageAction(
+                                            label='【取消】',
+                                            text='2',
+                                        )
+                                    ]
+                                )
+                            )
+            
+            
+        else:
+            check_text = TextSendMessage(text=f"===建立廠商===\n=>5.請打字輸入付款方式：\nex.現金、匯款\n錯誤訊息：輸入的「{message}」不是現金或匯款喔！")
+    
+    elif state[id] == 'manufacturer_bank':
+        bankdata = bank()
+        checkbank = 'no'
+        if message.isdigit():
+            if len(message) <= 3:
+                for bankcheck in bankdata:
+                    if message == bankcheck['code']:
+                        message_storage[id+'manufacturer_bankid'] = message #行庫代號暫存
+                        message_storage[id+'manufacturer_all'] += f"\n6.行庫代號：{message_storage[id+'manufacturer_bankid']}"
+                        message_storage[id+'manufacturer_bankname'] = bankcheck['name'] #行庫名稱暫存
+                        message_storage[id+'manufacturer_all'] += f"\n7.行庫名稱：{message_storage[id+'manufacturer_bankname']}"
+                        checkbank = 'yes'
+                        break
+                if checkbank == 'yes':
+                    state[id] = 'manufacturer_bankaccount' #狀態行庫帳號
+                    check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>8.請打字輸入行庫帳號：\n(數字14碼內)")
+                else:
+                    check_text = TextSendMessage(text=f"===建立廠商===\n=>6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，則一即可：\n錯誤訊息：輸入的代號「{message}」查無銀行！")      
+            else:
+                check_text = TextSendMessage(text=f"===建立廠商===\n=>6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，則一即可：\n錯誤訊息：輸入的「{message}」不是銀行代號數字3碼！")
+        else:       
+            if len(message) <= 30:
+                for bankcheck in bankdata:
+                    if message in bankcheck['name']:
+                        message_storage[id+'manufacturer_bankid'] = bankcheck['code'] #行庫代號暫存
+                        message_storage[id+'manufacturer_all'] += f"\n6.行庫代號：{message_storage[id+'manufacturer_bankid']}"
+                        message_storage[id+'manufacturer_bankname'] = bankcheck['name'] #行庫名稱暫存
+                        message_storage[id+'manufacturer_all'] += f"\n7.行庫名稱：{message_storage[id+'manufacturer_bankname']}"
+                        checkbank = 'yes'
+                        break
+                if checkbank == 'yes':
+                    state[id] = 'manufacturer_bankaccount' #狀態行庫帳號
+                    check_text = TextSendMessage(text=f"{message_storage[id+'manufacturer_all']}\n=>8.請打字輸入行庫帳號：\n(數字14碼內)")
+                else:
+                    check_text = TextSendMessage(text=f"===建立廠商===\n=>6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，則一即可：\n錯誤訊息：輸入的行庫名「{message}」查無銀行！")      
+            else:
+                check_text = TextSendMessage(text=f"===建立廠商===\n=>6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，則一即可：\n錯誤訊息：輸入的「{message}」銀行行庫名大於30字！")
+
+    elif state[id] == 'manufacturer_bankaccount':
+        if message.isdigit():
+            if len(message) <= 14:
+                if len(message) < 14:
+                    while len(message) < 14:
+                        message = '0'+ message
+                message_storage[id+'manufacturer_bankaccount'] = message #行庫帳號暫存
+                state[id] = 'manufacturer_end' #狀態新增確認
+                message_storage[id+'manufacturer_all'] += f"\n8.行庫帳號：{message_storage[id+'manufacturer_bankaccount']}"
+                check_text = TemplateSendMessage(
+                                alt_text='廠商新增資料確認',
+                                template=ButtonsTemplate(
+                                    text= message_storage[id+'manufacturer_all'],
+                                    actions=[
+                                        MessageAction(
+                                            label='【新增廠商】',
+                                            text='1',
+                                        ),
+                                        MessageAction(
+                                            label='【取消】',
+                                            text='2',
+                                        )
+                                    ]
+                                )
+                            )
+            else:
+                check_text = TextSendMessage(text=f"===建立廠商===\n=>6.請打字輸入行庫名稱：\n(數字3碼)\n錯誤訊息：輸入的「{message}」不是數字3碼！")
+        else:
+            check_text = TextSendMessage(text=f"===建立廠商===\n=>6.請打字輸入行庫名稱：\n(數字3碼)\n錯誤訊息：輸入的「{message}」不是數字3碼！")
+    elif state[id] == 'manufacturer_end':
+        if message.isdigit():
+            if message in ['1','2']:
+                if message == '1':
+                    check,info = manufacturer(message_storage[id+'manufacturer_name'],message_storage[id+'manufacturer_principal'],
+                                              message_storage[id+'manufacturer_localcalls'],message_storage[id+'manufacturer_phonenum'],
+                                              message_storage[id+'manufacturer_Payment'],message_storage[id+'manufacturer_bankid'],
+                                              message_storage[id+'manufacturer_bankname'],message_storage[id+'manufacturer_bankaccount'])
+                    if check == 'ok':
+                        check_text = TextSendMessage(text=f"{info}廠商建立成功！")
+                    else:
+                        check_text = TextSendMessage(text=f"{info}廠商建立流程失敗！")
+                    #check_text = TextSendMessage(text=f"廠商建立成功！")
+                elif message == '2':
+                    check_text = TextSendMessage(text="取消新增廠商流程囉！")
+                state[id] = 'normal'
+                message_storage[id+'manufacturer_name'] = 'NAN'
+                message_storage[id+'manufacturer_principal'] = 'NAN'
+                message_storage[id+'manufacturer_localcalls'] = 'NAN'
+                message_storage[id+'manufacturer_phonenum'] = 'NAN'
+                message_storage[id+'manufacturer_Payment'] = 'NAN'
+                message_storage[id+'manufacturer_bankid'] = 'NAN'
+                message_storage[id+'manufacturer_bankname'] = 'NAN'
+                message_storage[id+'manufacturer_bankaccount'] = 'NAN'
+                message_storage[id+'manufacturer_all'] = 'NAN'
+            else:
+                check_text = TemplateSendMessage(
+                                alt_text='廠商新增資料確認',
+                                template=ButtonsTemplate(
+                                    text= message_storage[id+'manufacturer_all'],
+                                    actions=[
+                                        MessageAction(
+                                            label='【新增廠商】',
+                                            text='1',
+                                        ),
+                                        MessageAction(
+                                            label='【取消】',
+                                            text='2',
+                                        )
+                                    ]
+                                )
+                            )
+        else:
+            check_text = TemplateSendMessage(
+                                alt_text='廠商新增資料確認',
+                                template=ButtonsTemplate(
+                                    text= message_storage[id+'manufacturer_all'],
+                                    actions=[
+                                        MessageAction(
+                                            label='【新增廠商】',
+                                            text='1',
+                                        ),
+                                        MessageAction(
+                                            label='【取消】',
+                                            text='2',
+                                        )
+                                    ]
+                                )
+                            )
+    return check_text
+
+#-----------------------------------------
 
 #-------------------訂單檢查----------------------
 def orderandpreorder_check():
@@ -44,7 +309,7 @@ def orderandpreorder_check():
     message_storage = lineboterp.storage
     orderall = lineboterp.orderall
     storage_multiple = lineboterp.storage[id+'multiple']
-    phone = recent_phone_call(id)[0][0]#最近一筆電話取得
+    phone = recent_phone_call(id)#最近一筆電話取得
     if message.isdigit():
             # 處理完問題後，結束等待回覆狀態
         if state[id] == 'ordering':
@@ -278,7 +543,7 @@ def cartorder():
     message = lineboterp.msg
     message_storage = lineboterp.storage
     check_text = ''
-    phone = recent_phone_call(id)[0][0]#最近一筆電話取得
+    phone = recent_phone_call(id)#最近一筆電話取得
     if message.isdigit():
         if state[id] == 'cartorderphonenum':
             if message.isdigit():
