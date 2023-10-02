@@ -158,9 +158,11 @@ def retry(category,query):#select/notselect
       step = 1 #conn沒取到進入切換conn1
       if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
         block = 1
-        result = []
+        if category == 'notselect':
+          result = 'no'
+        else:
+          result = []
   return result
-
 #----------------新增-依廠商查詢所有廠商名稱--------------------
 def alln_manufacturers_name():
   query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
@@ -214,8 +216,8 @@ def stock_manufacturers(manufacturer_id):
   result = retry(category,query)
   return result
 #-----------------依分類->庫存資訊-----------------
-def stock_categoryate(selected_category):
-  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM  Product_information WHERE 商品ID LIKE '{selected_category}%'"
+def stock_categoryate(selectedD_category):
+  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM  Product_information WHERE 商品ID LIKE '{selectedD_category}%'"
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
@@ -273,21 +275,41 @@ def preorder_end():
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
-#-----------------修改現預購商品欄位為預購進貨---------------
-def endtopur_upd(manufacturerP_id):
-  query = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{manufacturerP_id}'"
+#-----------------抓取未有進貨資訊的商品ID---------------
+def nopur_inf():
+  query = f"SELECT P.商品ID,P.商品名稱,P.商品單位 FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID WHERE PI.商品ID IS NULL;"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
+#----------------將使用者輸入的新增進貨資訊存到資料庫-------------
+def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
+  query = f"""INSERT INTO Purchase_Information (商品ID,進貨數量, 進貨單價, 商品單位, 進貨狀態, 進貨時間, 匯款金額,匯款時間) 
+            VALUES ('{purchase_pid}','{purchase_num}','{purchase_cost}','{purchase_unit}','進貨中','{purchase_time}','{give_money}','{money_time}');"""
+  category ='notselect' #重試類別select/notselect
+  result = retry(category, query)
+  return result
+#先做後面程序，上面的要問
+#----------------當使用者確定新增後更改商品資訊的現預購商品狀態---------------
+def entnewpur_upd(manufacturerY_id):
+  query = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{manufacturerY_id}'"
   category ='notselect' #重試類別select/notselect
   result = retry(category,query)
   return result
+#----------------用商品ID查詢出所有有這個預購商品的所有訂單筆數，取得訂單編號的值---------------
+def select_oid(manufacturerI_id):
+  query = f"select 訂單編號 from order_details where 商品ID = '{manufacturerI_id}';"
+  category ='select' #重試類別select/notselect
+  result = retry(category,query)
+  return result
 
-#def AA_BB():
-  #query = f"SELECT 訂單編號 from order_details where 商品ID = '{manufacturerP_id}'"
-  #category ='select' #重試類別select/notselect
-  #result = retry(category,query)
-  #return result
 
 
-"""
+
+
+
+
+
+
 #-------------------圖片取得並發送----------------------
 def imagesent():
     implement = databasetest()  # 定義 databasetest() 函式並返回相關物件 #要
@@ -358,4 +380,4 @@ def imagetolink():
     imagelink = uploaded_image.link
     print( imagetitle + "連結：" + imagelink)
     #delete_images()#刪除images檔案圖片
-  return {'imagetitle':imagetitle,'imagelink':imagelink}"""
+  return {'imagetitle':imagetitle,'imagelink':imagelink}
