@@ -1,4 +1,5 @@
 from linebot.models import FlexSendMessage
+from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent
 import mysql.connector
 import requests
 from datetime import datetime, timedelta
@@ -347,8 +348,8 @@ def stock_categoryate_flex_msg(result):
         for row in result:
             pid = row[0]  # '商品ID'
             pname = row[1]  # '商品名稱'
-            stock_num = row[5]  # '庫存數量'
-            sell_price = row[7]  # '售出單價'
+            stock_num = row[2]  # '庫存數量'
+            sell_price = row[3]  # '售出單價'
 
             bubble = {
                 "type": "bubble",
@@ -790,4 +791,91 @@ def preorder_end_flex_msg(result):
     return flex_message
 
 
+from linebot.models import BubbleContainer, BoxComponent, TextComponent, FlexSendMessage, ButtonComponent
 
+# def nopur_inf_flex_msg(result):
+#     if result:
+#         #product_ids = [row[0] for row in result]
+#         product_ids = [f'{row[0]} - {row[1]}' for row in result]
+
+#         bubble = BubbleContainer(
+#             direction='ltr',
+#             body=BoxComponent(
+#                 layout='vertical',
+#                 contents=[
+#                     TextComponent(text='新增進貨資訊商品ID列表', weight='bold', size='lg'),
+#                 ],
+#             ),
+#         )
+
+#         # 将每个商品ID创建为按钮
+#         for product_id in product_ids:
+#             button = ButtonComponent(
+#                 style='link',
+#                 height='sm',
+#                 #action=MessageAction(label=product_id, text=f"新增進貨資訊 {product_id}")  # 点击按钮后发送商品ID的文本
+#                 action=MessageAction(label=product_id, text={product_id})  # 点击按钮后发送商品ID的文本
+#             )
+#             bubble.body.contents.append(button)
+
+#         flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
+#         return flex_message
+
+# def nopur_inf_flex_msg(result):
+#     if result:
+#         #product_ids = [row[0] for row in result]
+#         product_ids = [f'{row[0]} - {row[1]}' for row in result]
+
+#         bubble = BubbleContainer(
+#             direction='ltr',
+#             body=BoxComponent(
+#                 layout='vertical',
+#                 contents=[
+#                     TextComponent(text='新增進貨資訊商品ID列表', weight='bold', size='lg'),
+#                 ],
+#             ),
+#         )
+
+#         # 将每个商品ID创建为按钮
+#         for product_id in product_ids:
+#             button = ButtonComponent(
+#                 style='link',
+#                 height='sm',
+#                 action=MessageAction(label=product_id, text=f"商品ID：{product_id}")
+#                 #action=MessageAction(label=product_id, text=product_id)  # 点击按钮后发送商品ID的文本
+#             )
+#             bubble.body.contents.append(button)
+
+#         flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
+#         return flex_message
+
+def nopur_inf_flex_msg(result):
+    if result:
+        bubble = BubbleContainer(
+            direction='ltr',
+            body=BoxComponent(
+                layout='vertical',
+                contents=[
+                    TextComponent(text='新增進貨資訊商品ID列表', weight='bold', size='lg'),
+                ],
+            ),
+        )
+
+        # 将每个商品ID创建为按钮，选项显示为row[1]，但按钮的文本为row[0]
+        for row in result:
+            button = ButtonComponent(
+                style='link',
+                height='sm',
+                action=MessageAction(label=row[1], text=f"商品ID:{str(row[0])+str(row[2])}")
+            )
+            bubble.body.contents.append(button)
+
+        flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
+        return flex_message
+
+    
+
+
+
+
+       
