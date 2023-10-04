@@ -321,19 +321,13 @@ def order_details():
   return testmsg
 
 def getPhoneNumberByPhoneNumberLastThreeYard(phoneNumber):
-    implement = databasetest()  # 定義 databasetest() 函式並返回相關物件
-    conn = implement['conn']
-    cursor = implement['cursor']
     query = f"SELECT 電話 FROM Order_information WHERE 電話 LIKE '%{phoneNumber}';"
-    cursor.execute(query)
-    result = cursor.fetchall() 
+    result = retry('select',query)
     send = []
     if result is not None:
         for row in result:
             send.append(row[0])       
     # 關閉游標與連線
-    cursor.close()
-    conn.close()
     return send
 
 # send = getOrderByPhoneNumber(input("電話號碼："))
@@ -343,7 +337,7 @@ def setOrderByPhoneNumber(phoneNumber):
     # query = f"SELECT 電話 FROM Order_information WHERE 訂單編號 = 'cart20230724000001';"
     retry('notselect',query)
     # 關閉游標與連線
-    print(result)
+    # print(result)
     return 0
 
 # setOrderByPhoneNumber(471)
@@ -361,56 +355,32 @@ def getOrderByPhoneNumber(phoneNumber):
     return send
 
 def getOrderDetailByPhoneNumber(phoneNumber):
-    implement = databasetest()  # 定義 databasetest() 函式並返回相關物件
-    conn = implement['conn']
-    cursor = implement['cursor']
     query = f"SELECT o.訂單編號,p.商品名稱 ,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 in( select 訂單編號 from Order_information where 電話 = '{phoneNumber}');"
-    cursor.execute(query)
-    result = cursor.fetchall() 
+    result = retry('select', query)
     test =''
+    send = []
+    a=[]
     for i in result:
         if i[0] == test:
-          i[0] = 'pass'
+          a.append(i)
         else :
-          test = i[0] 
-    # send = []
-    # if result is not None:
-    #     for row in result:
-    #         send.append(row[0])
-    #         send.append(row[1])     
-    #         send.append(row[2])  
-    # 關閉游標與連線
-    cursor.close()
-    conn.close()
-    return result
+          test = i[0]  
+          send.append(a)
+          a =[]
+          a.append(i)
+    send.append(a)
+    send.pop(0)
+    return send
 def getOrderDetailByOrder(order):
-    implement = databasetest()  # 定義 databasetest() 函式並返回相關物件
-    conn = implement['conn']
-    cursor = implement['cursor']
-    query = f"SELECT p.商品名稱,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 = '{order}';"
-    cursor.execute(query)
-    result = cursor.fetchall() 
-    # if result is not None:
-    #     for row in result:
-    #         send.append(row[0])       
+    query = f"SELECT o.訂單編號,p.商品名稱,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 = '{order}';"
+    result = retry('select', query)
+    send=[]    
+    send.append(result)
     # 關閉游標與連線
-    cursor.close()
-    conn.close()
-    return result
+    return send
 def getTotalByOrder(order):
-    implement = databasetest()  # 定義 databasetest() 函式並返回相關物件
-    conn = implement['conn']
-    cursor = implement['cursor']
     query = f"SELECT 總額 FROM Order_information WHERE 訂單編號 = '{order}';"
-    cursor.execute(query)
-    result = cursor.fetchall() 
-    # send = []
-    # if result is not None:
-    #     for row in result:
-    #         send.append(row[0])       
-    # 關閉游標與連線
-    cursor.close()
-    conn.close()
+    result = retry('select', query)
     return result[0][0]
 # orders =getOrderDetailByPhoneNumber('0978215471')
 # text = '請確認訂單資料：'

@@ -4,6 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import manager
 import database
+import FM
 #-------------------使用者狀態檢查----------------------
 message_storage = {}
 def inventory_check():
@@ -135,45 +136,46 @@ def searchingOrderByPhoneNumber():
             
         else:
             if message[:4]== '全部領取':
-                orders = database.getOrderDetailByPhoneNumber(message[4:])
-                text = '請確認訂單資料：'
-                sum =0 
-                for i in orders:
-                    if i[0] != 'pass':
-                        num = database.getTotalByOrder(i[0])
-                        sum += num
-                        # text += '\n '+i[0] + '\n  總額:' + str( num) +'元'
-                    text += '\n  '+i[1]+'*'+str(i[2]) + ' 金額:'+str(i[3]) +'元'
-                text += '\n總額 '+str(sum)    +'元'                     
+                orderdetails = database.getOrderDetailByPhoneNumber(message[4:])
+                # text = '請確認訂單資料：'
+                # sum =0 
+                # for i in orders:
+                #     if i[0] != 'pass':
+                #         num = database.getTotalByOrder(i[0])
+                #         sum += num
+                #         # text += '\n '+i[0] + '\n  總額:' + str( num) +'元'
+                #     text += '\n  '+i[1]+'*'+str(i[2]) + ' 金額:'+str(i[3]) +'元'
+                # text += '\n總額 '+str(sum)    +'元'                     
             else:
                 orderdetails = database.getOrderDetailByOrder(message)
-                text = '請確認訂單資料：\n ' + message + '\n   總額:' + str(database.getTotalByOrder(message)) +'元'
-                for i in orderdetails:
-                    # text +='\n  '+i[0]+'   數量:'+ str(i[1])+'件' + ' 金額:'+str(i[2]) + '元'
-                    text +='\n  '+i[0]+'*'+ str(i[1]) + ' 金額:'+str(i[2]) + '元'
-                # text += '\n  ' + '總額:' + str(database.getTotalByOrder(message))+ '元'
+                # text = '請確認訂單資料：\n ' + message + '\n   總額:' + str(database.getTotalByOrder(message)) +'元'
+                # for i in orderdetails:
+                #     # text +='\n  '+i[0]+'   數量:'+ str(i[1])+'件' + ' 金額:'+str(i[2]) + '元'
+                #     text +='\n  '+i[0]+'*'+ str(i[1]) + ' 金額:'+str(i[2]) + '元'
+                # # text += '\n  ' + '總額:' + str(database.getTotalByOrder(message))+ '元'
+            check_text = FM.showOrder(orderdetails)
                 
                      
-            check_text=TemplateSendMessage(
-                    alt_text='訂單資料',
-                    template=ConfirmTemplate(
-                        # data = database.getorderDetailByOrder(order)
-                        text=text,
-                        actions=[
-                            MessageAction(
-                                label='【是】',
-                                text='【是】',
-                            ),
-                            MessageAction(
-                                label='【否】',
-                                text='【否】'
-                            )
-                        ]
-                    )
-                )
+            # check_text=TemplateSendMessage(
+            #         alt_text='訂單資料',
+            #         template=ConfirmTemplate(
+            #             # data = database.getorderDetailByOrder(order)
+            #             text=text,
+            #             actions=[
+            #                 MessageAction(
+            #                     label='【是】',
+            #                     text='【是】',
+            #                 ),
+            #                 MessageAction(
+            #                     label='【否】',
+            #                     text='【否】'
+            #                 )
+            #             ]
+            #         )
+            #     )
             state1[id] = 'end'
     elif state1[id] == 'end':
-        if '【是】' in message:
+        if '【確認】' in message:
             check_text = TextSendMessage(text='取貨成功')
         else:
             check_text = TextSendMessage(text='取貨取消')

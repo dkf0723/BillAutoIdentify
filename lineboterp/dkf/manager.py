@@ -19,7 +19,6 @@ import tempfile, os
 import datetime
 import time
 import requests
-import datetime
 from mysql.connector import pooling
 #======python的函數庫==========
 
@@ -59,6 +58,8 @@ global duplicate_save
 duplicate_save = {}
 #資料庫pool設定數量4個
 dbdata = dbinfo()
+global db
+db = {}
 db_pool = pooling.MySQLConnectionPool(
             pool_name="db_pool",
             pool_size=4,
