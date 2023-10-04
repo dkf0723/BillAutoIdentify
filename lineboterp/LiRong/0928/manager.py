@@ -9,9 +9,7 @@ from linebot.models import *
 #======這裡是呼叫的檔案內容=====
 from FM import *
 from database import *
-from FM import test_categoryate_FM
-from FM import test_manufacturers_FM
-from FM import products_manufacturers_FM
+from FM import test_categoryate_FM,test_manufacturers_FM,products_manufacturers_FM
 from test_check import *
 from relevant_information import linebotinfo,dbinfo
 #======python的函式庫==========
@@ -80,8 +78,9 @@ databasetest(db_pool,2) #備用1
 def handle_message(event):
     global user_id
     global msg
+    global user_state
     msg = event.message.text
-    user_id = event.source.user_id 
+    user_id = event.source.user_id
     if user_id not in user_state:
         user_state[user_id] = 'normal'
     #-------------------確認使用者狀態進行處理----------------------
@@ -89,6 +88,13 @@ def handle_message(event):
     if user_state[user_id] != 'normal':
         check_text = inventory_check()
         line_bot_api.reply_message(event.reply_token, check_text)
+    # if user_state[user_id] != 'normal':
+    #     check_text = inventory_check()
+    #     if check_text is not None:
+    #         line_bot_api.reply_message(event.reply_token, check_text)
+    #     else:
+    #         default_message = TextSendMessage(text='收到了但無法處理')
+    #         line_bot_api.reply_message(event.reply_token, default_message)
     else:
         if '顧客取貨' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -194,50 +200,27 @@ def handle_message(event):
         elif msg.startswith('選我選我'):
             manufacturer_id = msg[5:]  # 提取廠商編號
             # 检查消息格式
-            if not manufacturer_id:
+            if manufacturer_id == '':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text="格式不正確，请重新输入。"))
-                return
-
-            product[user_id + 'Product_Modification_manufacturer_id'] = manufacturer_id
-            
-            result = products_manufacturers(manufacturer_id)  #套進db函數 
-            if result:
+            else:
+                product[user_id + 'Product_Modification_manufacturer_id'] = manufacturer_id
+                result = products_manufacturers(manufacturer_id)  #套進db函數 
                 flex_message = products_manufacturers_FM(result)  #套進FM 
                 line_bot_api.reply_message(event.reply_token, flex_message)
-            else:
-               line_bot_api.reply_message(event.reply_token, TextSendMessage(text="未找到相關產品資訊或發生了錯誤，請重試。"))
 
-        # elif '【修改商品資訊】' in msg:
-        #     pid = msg[13:]#【修改商品資訊】商品ID:{pid}
-        #     product[str(id) + 'Product_Modification_Product_Name'] = pid
-        #     result = test_Product_Modification(pid)
-        #     #product[str(id) + 'Product_Modification_manufacturer_id'] = msg[13:]#【修改商品資訊】商品ID:{pid}
-        #     if result:
-        #        product_status = result[0]
-        #        if product_status == '現購':
-        #           flex_message = Now_Product_Modification_FM(result)
-        #           line_bot_api.reply_message(event.reply_token, flex_message)
-        #        elif product_status == '預購':
-        #           flex_message = Pre_Product_Modification_FM(result)
-        #           line_bot_api.reply_message(event.reply_token, flex_message)
-        #        else:
-        #           line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的回覆：「'+msg+'」\n不在功能中！\n請重新輸入。')) 
-        #     else:
-        #           line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '商品ID不存在'))  
-
-       # 在消息处理函数中调用 test_Product_Modification
         elif '【修改商品資訊】' in msg:
-            id = msg[8:]
+            id = msg[8:]#【修改商品資訊】{pid}
             product[user_id + 'Product_Modification_Product_id'] = id
-            user_state[user_id] = 'Product_Modification_Product'
-            product_status = test_Product_Modification(id)
+            product_status = test_Product_Modification()
             product[user_id + 'Product_Modification_Product_status'] = product_status
             if product_status == '現購':
                 flex_message = Now_Product_Modification_FM(id)
             elif product_status == '預購':
                 flex_message = Pre_Product_Modification_FM(id)
             elif product_status == '查無':
+                user_state = 'normal'
                 flex_message = TextSendMessage(text='商品有誤！')
+            user_state[user_id] = 'Product_Modification_Product'
             line_bot_api.reply_message(event.reply_token, flex_message)
         # elif '【現購】依廠商修改'in msg:
         #     user_state[user_id] = 'Product_Modification_Pname'
@@ -308,22 +291,23 @@ def welcome(event):
     name = profile.display_name
     message = TextSendMessage(text=f'{name}歡迎加入')
     line_bot_api.reply_message(event.reply_token, message)
+
 def send_category_selection(event, line_bot_api):
-                message = TextSendMessage(text='請點選查詢類別',
-                        quick_reply=QuickReply(items=[
-                            QuickReplyButton(action=MessageAction(label="測試", text="test")),
-                            QuickReplyButton(action=MessageAction(label="冷凍食品", text="frozen")),
-                            QuickReplyButton(action=MessageAction(label="日常用品", text="dailyuse")),
-                            QuickReplyButton(action=MessageAction(label="甜點", text="dessert")),
-                            QuickReplyButton(action=MessageAction(label="地方特產", text="local")),
-                            QuickReplyButton(action=MessageAction(label="主食", text="staplefood")),
-                            QuickReplyButton(action=MessageAction(label="常溫食品", text="generally")),
-                            QuickReplyButton(action=MessageAction(label="美妝保養", text="beauty")),
-                            QuickReplyButton(action=MessageAction(label="零食", text="snack")),
-                            QuickReplyButton(action=MessageAction(label="保健食品", text="healthy")),
-                            QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),   
-                        ]))
-                line_bot_api.reply_message(event.reply_token, message)
+    message = TextSendMessage(text='請點選查詢類別',
+            quick_reply=QuickReply(items=[
+                QuickReplyButton(action=MessageAction(label="測試", text="test")),
+                QuickReplyButton(action=MessageAction(label="冷凍食品", text="frozen")),
+                QuickReplyButton(action=MessageAction(label="日常用品", text="dailyuse")),
+                QuickReplyButton(action=MessageAction(label="甜點", text="dessert")),
+                QuickReplyButton(action=MessageAction(label="地方特產", text="local")),
+                QuickReplyButton(action=MessageAction(label="主食", text="staplefood")),
+                QuickReplyButton(action=MessageAction(label="常溫食品", text="generally")),
+                QuickReplyButton(action=MessageAction(label="美妝保養", text="beauty")),
+                QuickReplyButton(action=MessageAction(label="零食", text="snack")),
+                QuickReplyButton(action=MessageAction(label="保健食品", text="healthy")),
+                QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),   
+            ]))
+    line_bot_api.reply_message(event.reply_token, message)
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
 #資料庫連線1
@@ -377,7 +361,6 @@ def checkdb():
     else:
         dbconnect_job()
         dbconnect1_job()
-
 # 建立新的執行緒來運行排程函式
 def run_schedule():
     while True:

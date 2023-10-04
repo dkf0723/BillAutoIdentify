@@ -173,7 +173,10 @@ def retry(category,query):#select/notselect
       step = 1 #conn沒取到進入切換conn1
       if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
         block = 1
-        result = []
+        if category == 'select':
+          result = []
+        else:
+          result = 'no'
         result2 = 'no'
   return result
 #-------------所有廠商名稱列出---------------
@@ -221,8 +224,10 @@ def test_categoryate(selected_category):
 #   result = retry(category, query)
 #   return result
 
-def test_Product_Modification(pid):
-  query = f"SELECT 現預購商品,商品名稱,商品ID FROM Product_information WHERE 商品ID = '{pid}'"
+def test_Product_Modification():
+  user_id = manager.user_id
+  pid = manager.product[user_id + 'Product_Modification_Product_id']
+  query = f"SELECT 現預購商品,商品名稱,商品ID FROM `Product_information` WHERE 商品ID = '{pid}'"
   category = 'select'  # 重試類別 select/notselect
   result = retry(category, query)
   if result != []:
@@ -230,6 +235,13 @@ def test_Product_Modification(pid):
   else:
     product_status = '查無'
   return product_status
+
+# def test_Product_Modification(pid):
+#     # 在這裡直接返回一個固定的值，例如 '現購'
+#     # 這將有助於確定問題是否在資料庫查詢部分
+#     return '現購'
+
+
                                                                     
 # #-------------------查詢資料SELECT-------------
 # def test_datasearch():

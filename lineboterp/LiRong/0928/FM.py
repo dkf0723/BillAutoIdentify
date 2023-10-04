@@ -12,7 +12,7 @@ import manager
 from database import product_info
 #-------------所有廠商名稱列出(FM)---------------
 def test_manufacturers_FM(result):
-  if result is not None:
+  if result != []:
     bubbles = []
     for row in result:
       mid = row[0] #廠商的編號
@@ -84,11 +84,11 @@ def test_manufacturers_FM(result):
       bubbles.append(bubble)       
     flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "carousel", "contents": bubbles})
   else:
-    flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "text", "text": "找不到符合條件的廠商。"})     
+    flex_message = TextSendMessage(text ="找不到符合條件的廠商。")     
   return flex_message
 #---------------此廠商所有商品(已變數/FM)-------------------------
 def products_manufacturers_FM(result):
-  if result is not None:
+  if result != []:
     bubbles = []
     for row in result:
       pid = row[0]  # '商品ID'
@@ -205,7 +205,7 @@ def products_manufacturers_FM(result):
               "action": {
                 "type": "message",
                 "label": "修改商品資訊",
-                "text": f"【修改商品資訊】{pid} "
+                "text": f"【修改商品資訊】{pid}"
               },
               "style": "primary",
               "color": "#46A3FF",
@@ -223,12 +223,11 @@ def products_manufacturers_FM(result):
       bubbles.append(bubble)
     flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "carousel", "contents": bubbles})
   else:
-    flex_message = FlexSendMessage(alt_text="此廠商商品列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
-
+    flex_message = TextSendMessage(text =  "找不到符合條件的廠商商品。")
   return flex_message
 #----------------分類下所有商品列表(已變數)------------------------------
 def test_categoryate_FM(result):
-  if result is not None:
+  if result != []:
     bubbles = []
     for row in result:
       pid = row[0]  # '商品ID'

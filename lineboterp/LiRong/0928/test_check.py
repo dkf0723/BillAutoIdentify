@@ -88,6 +88,11 @@ def product_modification():
             flex_message = TextSendMessage(text='修改商品簡介')
         elif '商品售出單價' == info:
             flex_message = TextSendMessage(text='修改商品售出單價')
+        elif message == '取消':
+            state [id] = 'normal'
+            flex_message = TextSendMessage(text=f"已經取消囉！")
+        else:
+            flex_message = TextSendMessage(text=f"「{message}」錯誤內容指令")
     
     elif state[id] == 'Product_Modification_Product_Pname':#修改商品名稱
         if message != '取消':
