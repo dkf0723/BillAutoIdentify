@@ -536,6 +536,8 @@ def recent_phone_call(user_id):
   phone_result,result2 = retry(category,query)
   if phone_result == []:
     phone_result = 'no'#都沒有成立過訂單
+  else:
+    phone_result = phone_result[0][0]
   return phone_result
 
 #預購倍數查詢
