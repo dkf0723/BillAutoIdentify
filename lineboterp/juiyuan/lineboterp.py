@@ -231,7 +231,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, cart_list())
         elif '【送出購物車訂單】' in msg:
             user_state[user_id] = 'cartorderphonenum'
-            phone = recent_phone_call(user_id)[0][0]#最近一筆電話取得
+            phone = recent_phone_call(user_id)#最近一筆電話取得
             errormsg = 'no'
             line_bot_api.reply_message(event.reply_token, Cart_order_screen(phone,errormsg))
         #-------------------提問及許願----------------------
@@ -356,6 +356,27 @@ def handle_message(event):
         elif '【管理廠商】建立廠商' in msg:
             user_state[user_id] = 'manufacturer_name'
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text='===建立廠商===\n=>1.請打字輸入廠商名稱：\n(20字內)'))
+        elif '【廠商修改】廠商' in msg:
+            check = msg[8:]
+            if check == '名稱':
+                show = check_manufacturer_name()#廠商名稱
+            elif check == '負責人或對接人':
+                show = check_manufacturer_principal()#廠商負責人或對接人
+            elif check == '市話':
+                show = check_manufacturer_localcalls()#廠商市話
+            elif check == '電話':
+                show = check_manufacturer_phonenum()#廠商電話
+            elif check == '付款方式':
+                show = check_manufacturer_Payment()#廠商付款方式
+            elif check == '行庫/行庫代號':
+                show = check_manufacturer_bank()#廠商行庫/行庫代號
+            elif check == '付款帳號':
+                show = check_manufacturer_bankaccount()#廠商付款帳號
+            else:
+                show = TextSendMessage(text='===廠商資料修改===\n=>1.請打字輸入廠商名稱：\n(20字內)')
+            line_bot_api.reply_message(event.reply_token,show)
+    
+            
         #-------------------非上方功能的所有回覆----------------------
         else:
             if '【商品簡介】' not in msg:
