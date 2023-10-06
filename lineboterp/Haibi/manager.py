@@ -211,6 +211,29 @@ def handle_message(event):
                     "contents": show      
                     } 
                 ))
+        elif '【庫存列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【庫存列表下一頁】"的位置
+            start_index = original_string.find("【庫存列表下一頁】")
+            if start_index != -1:
+                # 從"【庫存列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【庫存列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'庫存min'] = min-1
+            list_page[user_id+'庫存max'] = max
+            show = manager_inquiry_list()
+            if 'TextSendMessage' in show:
+                line_bot_api.reply_message(event.reply_token,show)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【庫存】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
             #-------------------報表查詢----------------------
         elif '報表查詢' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
