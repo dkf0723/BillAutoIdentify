@@ -143,12 +143,4 @@ def manager_inquiry_list():
                     ]
                 }
             })
-    show = FlexSendMessage(
-            alt_text='【庫存查詢】列表',
-            contents= {
-                  "type": "carousel",
-                  "contents": inquiry_show
-                  }
-            )
-
-    return show
+    return inquiry_show
