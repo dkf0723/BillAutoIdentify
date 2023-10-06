@@ -193,10 +193,6 @@ def handle_message(event):
                             MessageAction(
                                 label='【未取名單】',
                                 text='【未取名單】列表'
-                            ),
-                            MessageAction(
-                                label='【特徵查詢】',
-                                text='【特徵查詢】列表'
                             )
                     ]
                 )
@@ -216,7 +212,12 @@ def handle_message(event):
             orderall[user_id+'dt'] = msg[-18:]
             searchresult = orderdtsearch()
             line_bot_api.reply_message(event.reply_token, searchresult)
-
+            #-------------------庫存查詢----------------------
+        elif '庫存查詢' in msg:
+            list_page[user_id+'庫存min'] = 0
+            list_page[user_id+'庫存max'] = 9
+            show = manager_inquiry_list()
+            line_bot_api.reply_message(event.reply_token, show)
             #-------------------報表查詢----------------------
         elif '報表查詢' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -244,10 +245,6 @@ def handle_message(event):
                             MessageAction(
                                 label='【當季】',
                                 text='【季】報表'
-                            ),
-                            MessageAction(
-                                label='【當年】',
-                                text='【年】報表'
                             )
                     ]
                 )
