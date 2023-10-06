@@ -13,6 +13,7 @@ from test_check import *
 from relevant_information import *
 from DidnotPickedUp import *
 from selection_screen import *
+from Inventoryinquiry import *
 from test import *
 #======python的函數庫==========
 import tempfile, os
@@ -203,7 +204,13 @@ def handle_message(event):
             list_page[user_id+'庫存min'] = 0
             list_page[user_id+'庫存max'] = 9
             show = manager_inquiry_list()
-            line_bot_api.reply_message(event.reply_token, show)
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【庫存查詢】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
             #-------------------報表查詢----------------------
         elif '報表查詢' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
