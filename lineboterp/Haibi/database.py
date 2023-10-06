@@ -207,3 +207,18 @@ def orderdt():
   if result == []:
     result = '找不到符合條件的資料。'
   return result
+#-------------------取出庫存---------------------------------
+def inquiry_list():
+  cursor = manager.db['cursor']
+  query = """
+    SELECT 商品名稱, 商品ID, 庫存數量
+    FROM Product_information
+    WHERE 現預購商品='現購'
+    order by 庫存數量 asc;"""
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result != []:
+    report = result
+  else:
+    report = "找不到符合條件的資料。"
+  return report
