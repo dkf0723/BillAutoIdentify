@@ -12,6 +12,7 @@ from database import *
 from test_check import *
 from relevant_information import *
 from DidnotPickedUp import *
+from selection_screen import *
 from test import *
 #======python的函數庫==========
 import tempfile, os
@@ -181,22 +182,7 @@ def handle_message(event):
             
 
         elif '預購/未取名單' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='預購/未取名單選擇',
-            template=ConfirmTemplate(
-                    text='請選擇名單：\n【預購名單】或是【未取名單】',
-                    actions=[
-                            MessageAction(
-                                label='【預購名單】',
-                                text='【預購名單】列表'
-                            ),
-                            MessageAction(
-                                label='【未取名單】',
-                                text='【未取名單】列表'
-                            )
-                    ]
-                )
-            ))
+            line_bot_api.reply_message(event.reply_token, Order_preorder_selectionscreen())
         elif '【預購名單】列表' in msg:
                 queryObject = '預購'
                 # querylist = '預購名單'
