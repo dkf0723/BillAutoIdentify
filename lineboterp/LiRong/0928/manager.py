@@ -88,13 +88,6 @@ def handle_message(event):
     if user_state[user_id] != 'normal':
         check_text = inventory_check()
         line_bot_api.reply_message(event.reply_token, check_text)
-    # if user_state[user_id] != 'normal':
-    #     check_text = inventory_check()
-    #     if check_text is not None:
-    #         line_bot_api.reply_message(event.reply_token, check_text)
-    #     else:
-    #         default_message = TextSendMessage(text='收到了但無法處理')
-    #         line_bot_api.reply_message(event.reply_token, default_message)
     else:
         if '顧客取貨' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -155,51 +148,18 @@ def handle_message(event):
             ))
         elif '【依類別】查詢' in msg:
             send_category_selection(event, line_bot_api)
-        elif msg in ['frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks','test']:
+        elif msg in ['test','frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
             selected_category = msg
             result = test_categoryate(selected_category)
             flex_message = test_categoryate_FM(result)
             line_bot_api.reply_message(event.reply_token, flex_message)
-        # elif '修改商品資訊' in msg:
-        #     # extra_info = msg[8:23]  #【修改商品資訊】商品ID:{pid}
-        #     line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-        #         alt_text='查詢選擇',
-        #         template=ButtonsTemplate(
-        #             text='目前商品狀態為：\n【現購】或【預購】',
-        #             actions=[
-        #                 MessageAction(
-        #                     label='【現購】',
-        #                     text='【現購】依類別修改'
-        #                 ),
-        #                 MessageAction(
-        #                     label='【預購】',
-        #                     text='【預購】依類別修改',
-        #                 )
-        #             ]
-        #         )
-        #     ))
-        # elif '【現購】依類別修改' in msg:
-        #     flex_message = Now_Product_Modification_CFM()
-        #     line_bot_api.reply_message(event.reply_token, flex_message)
-        #     user_state[user_id] = 'Product_Modification_Pname'
-        #     product[user_id + 'Product_Modification_Product_Name'] = msg[9:] 
-        #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = f"商品ID：{msg[9:]}\n請輸入想修改的商品名稱："))
-        # elif '【預購】依類別修改' in msg:
-        #     flex_message = Pre_Product_Modification_CFM()
-        #     line_bot_api.reply_message(event.reply_token, flex_message)
         elif '【依廠商】查詢'in msg:
             result = test_manufacturers()
             flex_message = test_manufacturers_FM(result)
             line_bot_api.reply_message(event.reply_token, flex_message)
-        # elif msg.startswith('選我選我'):
-        #     manufacturer_id = msg[5:]  # 提取廠商編號
-        #     product[user_id + 'Product_Modification_manufacturer_id'] = manufacturer_id
-        #     result = products_manufacturers(manufacturer_id) #套進db函數
-        #     flex_message = products_manufacturers_FM(result) #套進FM
-        #     line_bot_api.reply_message(event.reply_token, flex_message)
         elif msg.startswith('選我選我'):
             manufacturer_id = msg[5:]  # 提取廠商編號
-            # 检查消息格式
+            # 檢查格式
             if manufacturer_id == '':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text="格式不正確，请重新输入。"))
             else:
@@ -207,11 +167,10 @@ def handle_message(event):
                 result = products_manufacturers(manufacturer_id)  #套進db函數 
                 flex_message = products_manufacturers_FM(result)  #套進FM 
                 line_bot_api.reply_message(event.reply_token, flex_message)
-
         elif '【修改商品資訊】' in msg:
             id = msg[8:]#【修改商品資訊】{pid}
             product[user_id + 'Product_Modification_Product_id'] = id
-            product_status = test_Product_Modification()
+            product_status = Product_status()# Product_status()開頭是大寫不要搞錯
             product[user_id + 'Product_Modification_Product_status'] = product_status
             if product_status == '現購':
                 flex_message = Now_Product_Modification_FM(id)
@@ -222,17 +181,7 @@ def handle_message(event):
                 flex_message = TextSendMessage(text='商品有誤！')
             user_state[user_id] = 'Product_Modification_Product'
             line_bot_api.reply_message(event.reply_token, flex_message)
-        # elif '【現購】依廠商修改'in msg:
-        #     user_state[user_id] = 'Product_Modification_Pname'
-        #     product[user_id + 'Product_Modification_Product_Name'] = msg[9:] 
-        #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = f"商品ID：{msg[9:]}\n請輸入想修改的商品名稱："))
-        # elif '修改商品名稱'in msg:
-        #      user_state[user_id] = 'Product_Modification_Pname'
-        #      product[user_id + 'Product_Modification_Product_Name'] = extra_info 
-        #      line_bot_api.reply_message(event.reply_token, TextSendMessage(text = f"商品ID：{extra_info}\n請輸入想修改的商品名稱："))
-        # elif '【預購】依廠商修改' in msg:
-        #     flex_message = Pre_Product_Modification_FM()
-        #     line_bot_api.reply_message(event.reply_token, flex_message)    
+            return   
         elif '【新增上架】' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',

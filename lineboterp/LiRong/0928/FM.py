@@ -92,12 +92,12 @@ def products_manufacturers_FM(result):
     bubbles = []
     for row in result:
       pid = row[0]  # '商品ID'
-      pname = row[12]  # '商品名稱'
-      pphoto = row[14] # '商品圖片'
-      stock_num = row[16]  # '庫存數量'
-      pname_unit = row[1]  #  '商品單位'
-      purchase_price = row[30] #'進貨單價'
-      sell_price = row[17]  # '售出單價'
+      pname = row[1]  # '商品名稱'
+      pphoto = row[2] # '商品圖片'
+      stock_num = row[3]  # '庫存數量'
+      pname_unit = row[4]  #  '商品單位'
+      purchase_price = row[5] #'進貨單價'
+      sell_price = row[6]  # '售出單價'
       bubble = {
           "type": "bubble",
           "hero": {
@@ -231,12 +231,12 @@ def test_categoryate_FM(result):
     bubbles = []
     for row in result:
       pid = row[0]  # '商品ID'
-      pname = row[12]  # '商品名稱'
-      pphoto = row[14] # '商品圖片'
-      stock_num = row[16]  # '庫存數量'
-      pname_unit = row[1]  #  '商品單位'
-      purchase_price = row[30] #'進貨單價'
-      sell_price = row[17]  # '售出單價'
+      pname = row[1]  # '商品名稱'
+      pphoto = row[2] # '商品圖片'
+      stock_num = row[3]  # '庫存數量'
+      pname_unit = row[4]  #  '商品單位'
+      purchase_price = row[5] #'進貨單價'
+      sell_price = row[6]  # '售出單價'
       bubble = {
             "type": "bubble",
             "hero": {
@@ -344,7 +344,7 @@ def test_categoryate_FM(result):
                 "action": {
                   "type": "message",
                   "label": "修該商品資訊",
-                  "text":f"【修改商品資訊】商品ID:{pid} "
+                  "text":f"【修改商品資訊】{pid}"
                 },
                 "style": "primary",
                 "color": "#46A3FF",
@@ -375,131 +375,426 @@ def test_categoryate_FM(result):
             "text": "找不到符合條件的資料。"
         }
     )
-  
   return flex_message
 
-#------該商品所有資訊(現購/依廠商查詢)--------------------
+#------該商品所有資訊(現購/依廠商或類別查詢)--------------------
+# def Now_Product_Modification_FM(product_id):
+#   bubble = {
+#             "type": "bubble",
+#             "body": {
+#               "type": "box",
+#               "layout": "vertical",
+#               "contents": [
+#                 {
+#                   "type": "text",
+#                   "text": "該商品所有資訊",
+#                   "weight": "bold",
+#                   "size": "xl",
+#                   "margin": "sm",
+#                   "style": "normal",
+#                   "contents": []
+#                 },
+#                 {
+#                   "type": "separator",
+#                   "margin": "sm"
+#                 },
+#                 {
+#                   "type": "box",
+#                   "layout": "vertical",
+#                   "margin": "md",
+#                   "contents": [
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品名稱",
+#                         "text": "【修改商品資訊】商品名稱"
+#                       },
+#                       "color": "#B1D3C5",
+#                       "style": "secondary"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品簡介",
+#                         "text": "【修改商品資訊】商品簡介"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#B1D3C5"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品售出單價",
+#                         "text": "【修改商品資訊】售出單價"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#B1D3C5"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品售出單價2",
+#                         "text": "【修改商品資訊】售出單價2"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#B1D3C5"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "更換商品圖片",
+#                         "text": "【修改商品資訊】更換商品圖片"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#B1D3C5"
+#                     }
+#                   ],
+#                   "spacing": "xs"
+#                 }
+#               ]
+#             },
+#             "footer": {
+#               "type": "box",
+#               "layout": "vertical",
+#               "contents": [
+#                 {
+#                   "type": "button",
+#                   "action": {
+#                     "type": "message",
+#                     "label": "取消修改動作",
+#                     "text": "取消"
+#                   },
+#                   "style": "secondary",
+#                   "color": "#EAD880"
+#                 }
+#               ],
+#               "spacing": "xs",
+#               "margin": "md"
+#             },
+#             "styles": {
+#               "footer": {
+#                 "separator": True
+#               }
+#             }
+#           }
+#   return FlexSendMessage(alt_text="產品修改選項", contents=bubble)
+#------該商品所有資訊(預購/依廠商或類別查詢)---------------------
+# def Pre_Product_Modification_FM(product_id):
+#   bubble = {        
+#             "type": "bubble",
+#             "body": {
+#               "type": "box",
+#               "layout": "vertical",
+#               "contents": [
+#                 {
+#                   "type": "text",
+#                   "text": "該商品所有資訊",
+#                   "weight": "bold",
+#                   "size": "xl",
+#                   "margin": "sm",
+#                   "style": "normal",
+#                   "contents": []
+#                 },
+#                 {
+#                   "type": "separator",
+#                   "margin": "sm"
+#                 },
+#                 {
+#                   "type": "box",
+#                   "layout": "vertical",
+#                   "margin": "md",
+#                   "contents": [
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品名稱",
+#                         "text": "【修改商品資訊】商品名稱"
+#                       },
+#                       "color": "#CE8467",
+#                       "style": "secondary"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品簡介",
+#                         "text": "【修改商品資訊】商品簡介"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#CE8467"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品售出單價",
+#                         "text": "【修改商品資訊】售出單價"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#CE8467"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品售出單價2",
+#                         "text": "【修改商品資訊】售出單價2"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#CE8467"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品預購倍數",
+#                         "text": "【修改商品資訊】預購倍數"
+#                       },
+#                       "style": "secondary",
+#                       "color": "#CE8467"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "修改商品預購截止時間",
+#                         "text": "【修改商品資訊】預購截止時間"
+#                       },
+#                       "color": "#CE8467",
+#                       "style": "secondary"
+#                     },
+#                     {
+#                       "type": "button",
+#                       "action": {
+#                         "type": "message",
+#                         "label": "更換商品圖片",
+#                         "text": "【修改商品資訊】更換商品圖片"
+#                       },
+#                       "color": "#CE8467",
+#                       "style": "secondary"
+#                     }
+#                   ],
+#                   "spacing": "xs"
+#                 }
+#               ]
+#             },
+#             "footer": {
+#               "type": "box",
+#               "layout": "vertical",
+#               "contents": [
+#                 {
+#                   "type": "button",
+#                   "action": {
+#                     "type": "message",
+#                     "label": "取消修改動作",
+#                     "text": "取消"
+#                   },
+#                   "style": "secondary",
+#                   "color": "#EAD880"
+#                 }
+#               ],
+#               "spacing": "xs",
+#             },
+#              "styles": {
+#                "footer": {
+#                  "separator": True
+#                }
+#              }
+#            }
+#   return FlexSendMessage(alt_text="產品修改選項", contents=bubble)
+#---------該商品所有資訊(現購/依廠商或類別查詢)測試---------------------
 def Now_Product_Modification_FM(product_id):
+    bubble =  {
+              "type": "bubble",
+              # "hero": {
+              #   "type": "image",
+              #   "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png",
+              #   "size": "full",
+              #   "aspectRatio": "20:13",
+              #   "aspectMode": "cover"
+              # },
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "現購商品所有資訊",
+                    "weight": "bold",
+                    "size": "xl",
+                    "margin": "none",
+                    "style": "normal",
+                    "contents": [],
+                    "align": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1.商品名稱：",
+                    "margin": "md",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2.商品簡介：",
+                    "margin": "sm",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "text",
+                    "text": "4.商品單價：",
+                    "weight": "bold",
+                    "margin": "sm"
+                  },
+                  {
+                    "type": "text",
+                    "text": "4.商品單價2：",
+                    "margin": "sm",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "separator",
+                    "margin": "sm"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "md",
+                    "contents": [
+                      {
+                        "type": "button",
+                        "action": {
+                          "type": "message",
+                          "label": "修改商品名稱",
+                          "text":"【修改商品資訊】商品名稱"
+                        },
+                        "color": "#B1D3C5",
+                        "style": "secondary"
+                      },
+                      {
+                        "type": "button",
+                        "action": {
+                          "type": "message",
+                          "label": "修改商品簡介",
+                          "text": "【修改商品資訊】商品簡介"
+                        },
+                        "style": "secondary",
+                        "color": "#B1D3C5"
+                      },
+                      {
+                        "type": "button",
+                        "action": {
+                          "type": "message",
+                          "label": "修改商品售出單價",
+                          "text": "【修改商品資訊】售出單價"
+                        },
+                        "style": "secondary",
+                        "color": "#B1D3C5"
+                      },
+                      {
+                        "type": "button",
+                        "action": {
+                          "type": "message",
+                          "label": "修改商品售出單價2",
+                          "text": "【修改商品資訊】售出單價2"
+                        },
+                        "style": "secondary",
+                        "color": "#B1D3C5"
+                      },
+                      {
+                        "type": "button",
+                        "action": {
+                          "type": "message",
+                          "label": "更換商品圖片",
+                          "text": "【修改商品資訊】更換商品圖片"
+                        },
+                        "style": "secondary",
+                        "color": "#B1D3C5"
+                      }
+                    ],
+                    "spacing": "xs"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": "取消修改動作",
+                      "text": "取消"
+                    },
+                    "style": "secondary",
+                    "color": "#EAD880"
+                  }
+                ],
+                "spacing": "xs",
+                "margin": "md"
+              },
+              "styles": {
+                "footer": {
+                  "separator": True
+                }
+              }
+            }
+    return FlexSendMessage(alt_text="產品修改選項", contents=bubble)
+#------該商品所有資訊(預購/依廠商或類別查詢)測試---------------------
+def Pre_Product_Modification_FM(product_id):
   bubble = {
             "type": "bubble",
+            # "hero": {
+            #   "type": "image",
+            #   "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png",
+            #   "size": "full",
+            #   "aspectMode": "cover",
+            #   "aspectRatio": "20:13"
+            # },
             "body": {
               "type": "box",
               "layout": "vertical",
               "contents": [
                 {
                   "type": "text",
-                  "text": "該商品所有資訊",
+                  "text": "預購商品所有資訊",
                   "weight": "bold",
                   "size": "xl",
-                  "margin": "sm",
+                  "margin": "none",
                   "style": "normal",
-                  "contents": []
+                  "contents": [],
+                  "decoration": "none",
+                  "align": "center"
                 },
                 {
-                  "type": "separator",
+                  "type": "text",
+                  "text": "1.商品名稱 :",
+                  "weight": "bold",
+                  "margin": "md"
+                },
+                {
+                  "type": "text",
+                  "text": "2.商品簡介 :",
+                  "weight": "bold",
                   "margin": "sm"
                 },
                 {
-                  "type": "box",
-                  "layout": "vertical",
-                  "margin": "md",
-                  "contents": [
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品名稱",
-                        "text": "【修改商品資訊】商品名稱"
-                      },
-                      "color": "#B1D3C5",
-                      "style": "secondary"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品簡介",
-                        "text": "【修改商品資訊】商品簡介"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品售出單價",
-                        "text": "【修改商品資訊】售出單價"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品售出單價2",
-                        "text": "【修改商品資訊】售出單價2"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "更換商品圖片",
-                        "text": "【修改商品資訊】更換商品圖片"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    }
-                  ],
-                  "spacing": "xs"
-                }
-              ]
-            },
-            "footer": {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "message",
-                    "label": "取消修改動作",
-                    "text": "取消修改動作"
-                  },
-                  "style": "secondary",
-                  "color": "#EAD880"
-                }
-              ],
-              "spacing": "xs",
-              "margin": "md"
-            },
-            "styles": {
-              "footer": {
-                "separator": True
-              }
-            }
-          }
-  return FlexSendMessage(alt_text="產品修改選項", contents=bubble)
-#------該商品所有資訊(預購/依廠商查詢)---------------------
-def Pre_Product_Modification_FM(product_id):
-  bubble = {        
-            "type": "bubble",
-            "body": {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
+                  "type": "text",
+                  "text": "3.商品售出單價 :",
+                  "weight": "bold",
+                  "margin": "sm"
+                },
                 {
                   "type": "text",
-                  "text": "該商品所有資訊",
+                  "text": "4.商品售出單價2:",
                   "weight": "bold",
-                  "size": "xl",
-                  "margin": "sm",
-                  "style": "normal",
-                  "contents": []
+                  "margin": "sm"
                 },
                 {
                   "type": "separator",
@@ -594,239 +889,7 @@ def Pre_Product_Modification_FM(product_id):
                   "action": {
                     "type": "message",
                     "label": "取消修改動作",
-                    "text": "取消修改動作"
-                  },
-                  "style": "secondary",
-                  "color": "#EAD880"
-                }
-              ],
-              "spacing": "xs",
-              "margin": "md"
-            },
-            "styles": {
-              "footer": {
-                "separator": True
-              }
-            }
-          }
-  return FlexSendMessage(alt_text="產品修改選項", contents=bubble)
-#------該商品所有資訊(現購/依類別查詢)--------------------
-def Now_Product_Modification_CFM():
-  bubble = {
-            "type": "bubble",
-            "body": {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
-                {
-                  "type": "text",
-                  "text": "該商品所有資訊",
-                  "weight": "bold",
-                  "size": "xl",
-                  "margin": "sm",
-                  "style": "normal",
-                  "contents": []
-                },
-                {
-                  "type": "separator",
-                  "margin": "sm"
-                },
-                {
-                  "type": "box",
-                  "layout": "vertical",
-                  "margin": "md",
-                  "contents": [
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品名稱",
-                        "text": "修改商品名稱"
-                      },
-                      "color": "#B1D3C5",
-                      "style": "secondary"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品簡介",
-                        "text": "修改商品簡介"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品售出單價",
-                        "text": "修改商品售出單價"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品售出單價2",
-                        "text": "修改商品售出單價2"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "更換商品圖片",
-                        "text": "更換商品圖片"
-                      },
-                      "style": "secondary",
-                      "color": "#B1D3C5"
-                    }
-                  ],
-                  "spacing": "xs"
-                }
-              ]
-            },
-            "footer": {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "message",
-                    "label": "取消修改動作",
-                    "text": "取消修改動作"
-                  },
-                  "style": "secondary",
-                  "color": "#EAD880"
-                }
-              ],
-              "spacing": "xs",
-              "margin": "md"
-            },
-            "styles": {
-              "footer": {
-                "separator": True
-              }
-            }
-          }
-  return FlexSendMessage(alt_text="產品修改選項", contents=bubble)
-#------該商品所有資訊(預購/依類別查詢)--------------------
-def Pre_Product_Modification_CFM():
-  bubble = {
-            "type": "bubble",
-            "body": {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
-                {
-                  "type": "text",
-                  "text": "該商品所有資訊",
-                  "weight": "bold",
-                  "size": "xl",
-                  "margin": "sm",
-                  "style": "normal",
-                  "contents": []
-                },
-                {
-                  "type": "separator",
-                  "margin": "sm"
-                },
-                {
-                  "type": "box",
-                  "layout": "vertical",
-                  "margin": "md",
-                  "contents": [
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品名稱",
-                        "text": "修改商品名稱"
-                      },
-                      "color": "#CE8467",
-                      "style": "secondary"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品簡介",
-                        "text": "修改商品簡介"
-                      },
-                      "style": "secondary",
-                      "color": "#CE8467"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品售出單價",
-                        "text": "修改商品售出單價"
-                      },
-                      "style": "secondary",
-                      "color": "#CE8467"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品售出單價2",
-                        "text": "修改商品售出單價2"
-                      },
-                      "style": "secondary",
-                      "color": "#CE8467"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品預購倍數",
-                        "text": "修改商品預購倍數"
-                      },
-                      "style": "secondary",
-                      "color": "#CE8467"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "修改商品預購截止時間",
-                        "text": "修改商品預購截止時間"
-                      },
-                      "color": "#CE8467",
-                      "style": "secondary"
-                    },
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "message",
-                        "label": "更換商品圖片",
-                        "text": "更換商品圖片"
-                      },
-                      "color": "#CE8467",
-                      "style": "secondary"
-                    }
-                  ],
-                  "spacing": "xs"
-                }
-              ]
-            },
-            "footer": {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "message",
-                    "label": "取消修改動作",
-                    "text": "取消修改動作"
+                    "text": "取消"
                   },
                   "style": "secondary",
                   "color": "#EAD880"

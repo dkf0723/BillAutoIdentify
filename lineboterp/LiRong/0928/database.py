@@ -185,64 +185,61 @@ def test_manufacturers():
   category = 'select' #重試類別 select/notselect
   result = retry(category,query)
   return result
-#---------------此廠商所有商品----------------
-# def products_manufacturers(manufacturer_id):
-#   query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information natural join Purchase_Information WHERE 廠商編號 = '{manufacturer_id}'"
-#   category = 'select' #重試類別 select/notselect
-#   result = retry(category,query)
-#   return result
+#--------------此廠商所有商品----------------
 def products_manufacturers(manufacturer_id):
-  query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information natural join Purchase_Information WHERE 廠商編號 = '{manufacturer_id}'"
+  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價 FROM Product_information NATURAL JOIN Purchase_Information WHERE 廠商編號 = '{manufacturer_id}'"
   category = 'select'  # 重試類別 select/notselect
   result = retry(category, query)
   return result
-
+#-------------分類下所有商品列表------------
+def test_categoryate(selected_category):
+  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價 FROM Product_information NATURAL JOIN Purchase_Information WHERE 商品ID LIKE '{selected_category}%'"
+  category = 'select' #重試類別 select/notselect
+  result = retry(category,query)
+  return result
+#---------------圓圓打得----------------
 def product_info(product_id):
   query = f"SELECT * FROM Product_information WHERE 商品ID = '{product_id}'"
   category = 'select'  # 重試類別 select/notselect
   result = retry(category, query)
   return result
-#---------------此廠商下商品所有資訊----------------
-def MP_information(product_name): 
-  id = manager.user_id
-  pid = manager.product[id + 'Product_Modification_Product_Name']
-  query =f"UPDATE Product_information SET 商品名稱 = '{product_name}' WHERE 商品ID = '{pid}'"
-  category = 'notselect' #重試類別 select/notselect
-  result = retry(category,query) #成功回傳ok
+#---------------修改商品名稱-----------------
+def MP_information_Pname(product_name, pid): 
+  query = f"UPDATE Product_information SET 商品名稱 = '{product_name}' WHERE 商品ID = '{pid}'"
+  category = 'notselect' # 重試類別 select/notselect
+  result = retry(category, query) # 成功回傳 ok
   return result
-#----------------分類下所有商品列表------------
-def test_categoryate(selected_category):
-  query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Product_information NATURAL JOIN Purchase_Information WHERE 商品ID LIKE '{selected_category}%'"
-  category = 'select' #重試類別 select/notselect
-  result = retry(category,query)
+#---------------修改商品簡介-----------------
+def MP_information_Pintroduction(product_introduction, pid): 
+  query = f"UPDATE Product_information SET 商品簡介 = '{product_introduction}' WHERE 商品ID = '{pid}'"
+  category = 'notselect' # 重試類別 select/notselect
+  result = retry(category, query) # 成功回傳 ok
   return result
-
-#-----------------正在測試中------------
-# def test_Product_Modification(pid):
-#   query = f"SELECT 現預購商品,商品名稱,商品ID FROM Product_information WHERE 商品ID = '{pid}'"
-#   category = 'select'  # 重試類別 select/notselect
-#   result = retry(category, query)
-#   return result
-
-def test_Product_Modification():
+#--------------辨識商品狀態進而選擇FM------------
+def Product_status():
   user_id = manager.user_id
   pid = manager.product[user_id + 'Product_Modification_Product_id']
-  query = f"SELECT 現預購商品,商品名稱,商品ID FROM `Product_information` WHERE 商品ID = '{pid}'"
+  query = f"SELECT 現預購商品,商品名稱,商品ID FROM Product_information WHERE 商品ID = '{pid}'"
   category = 'select'  # 重試類別 select/notselect
   result = retry(category, query)
   if result != []:
     product_status = result[0][0]
   else:
     product_status = '查無'
-  return product_status
-
-# def test_Product_Modification(pid):
-#     # 在這裡直接返回一個固定的值，例如 '現購'
-#     # 這將有助於確定問題是否在資料庫查詢部分
-#     return '現購'
-
-
-                                                                    
+  return product_status    
+#--------------現購FM函數------------------------
+def Now_Product(pname):
+  user_id = manager.user_id
+  pid = manager.product[user_id + 'Product_Modification_Product_id']
+  query = f"SELECT 商品名稱,商品ID FROM Product_information natural join Purchase_Information WHERE 商品名稱 = '{pname}'AND 商品ID = '{pid}' "
+  category = 'select'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result  
+# def Now_Product(pname,introduction,sell_price,sell_price2,pphoto):
+#   query = f"SELECT 商品名稱,商品簡介,售出單價,售出單價2,商品圖片 FROM Product_information natural join Purchase_Information WHERE 商品名稱 = '{pname}' AND 商品簡介 = '{introduction}' AND 售出單價 = '{sell_price}' AND 售出單價2 = '{sell_price2}' AND 商品圖片 = '{pphoto}'"
+#   category = 'select'  # 重試類別 select/notselect
+#   result = retry(category, query)
+#   return result                                              
 # #-------------------查詢資料SELECT-------------
 # def test_datasearch():
 #   #測試讀取資料庫願望清單(所有)
