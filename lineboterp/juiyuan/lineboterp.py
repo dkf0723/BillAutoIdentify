@@ -19,6 +19,7 @@ from relevant_information import linebotinfo,dbinfo
 from product.cartlist import *
 from product.orderlist import *
 from selection_screen import *
+from FM import Manufacturer_fillin_and_check_screen #廠商建立用，未來拔掉
 #======python的函式庫==========
 from mysql.connector import pooling
 import tempfile, os
@@ -355,7 +356,9 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text='show廠商列表'))
         elif '【管理廠商】建立廠商' in msg:
             user_state[user_id] = 'manufacturer_name'
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='===建立廠商===\n=>1.請打字輸入廠商名稱：\n(20字內)'))
+            storage[user_id+'Manufacturer_edit_step'] = 0
+            show = Manufacturer_fillin_and_check_screen('')
+            line_bot_api.reply_message(event.reply_token,show)
         elif '【廠商修改】廠商' in msg:
             check = msg[8:]
             if check == '名稱':
