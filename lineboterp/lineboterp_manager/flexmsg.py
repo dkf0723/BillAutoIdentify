@@ -635,11 +635,11 @@ def puring_pro_flex_msg(result):
         for row in result:
             pid = row[0]  # '商品ID'
             pname = row[1]  # '商品名稱'
-            mid = row[2] # '廠商編號'
-            mname = row[3] # '廠商名'
-            purnum = row[4] # '進貨數量'
-            purstate = row[5]  # '進貨狀態'
-            purtime = row[6] # '進貨時間'
+            #mid = row[2] # '廠商編號'
+            #mname = row[3] # '廠商名'
+            purnum = row[2] # '進貨數量'
+            purstate = row[3]  # '進貨狀態'
+            purtime = row[4] # '進貨時間'
 
             # 创建商品信息卡片
             bubble = {
@@ -651,8 +651,8 @@ def puring_pro_flex_msg(result):
                     "contents": [
                         {"type": "text", "text": f"商品ID: {pid}", "weight": "bold", "size": "xl"},
                         {"type": "text", "text": f"商品名稱: {pname}", "weight": "bold", "size": "xl"},
-                        {"type": "text", "text": f"廠商編號: {mid}", "size": "md"},
-                        {"type": "text", "text": f"廠商名: {mname}", "size": "md"},
+                        #{"type": "text", "text": f"廠商編號: {mid}", "size": "md"},
+                        #{"type": "text", "text": f"廠商名: {mname}", "size": "md"},
                         {"type": "text", "text": f"進貨數量: {purnum}", "size": "md"},
                         {"type": "text", "text": f"進貨狀態: {purstate}", "size": "md"},
                         {"type": "text", "text": f"進貨時間: {purtime}", "size": "md"}
@@ -691,11 +691,11 @@ def pured_pro_flex_msg(result):
         for row in result:
             pid = row[0]  # '商品ID'
             pname = row[1]  # '商品名稱'
-            mid = row[2] # '廠商編號'
-            mname = row[3] # '廠商名'
-            purnum = row[4] # '進貨數量'
-            purstate = row[5]  # '進貨狀態'
-            purtime = row[6] # '進貨時間'
+            #mid = row[2] # '廠商編號'
+            #mname = row[3] # '廠商名'
+            purnum = row[2] # '進貨數量'
+            purstate = row[3]  # '進貨狀態'
+            purtime = row[4] # '進貨時間'
 
             # 创建商品信息卡片
             bubble = {
@@ -707,8 +707,8 @@ def pured_pro_flex_msg(result):
                     "contents": [
                         {"type": "text", "text": f"商品ID: {pid}", "weight": "bold", "size": "xl"},
                         {"type": "text", "text": f"商品名稱: {pname}", "weight": "bold", "size": "xl"},
-                        {"type": "text", "text": f"廠商編號: {mid}", "size": "md"},
-                        {"type": "text", "text": f"廠商名: {mname}", "size": "md"},
+                        #{"type": "text", "text": f"廠商編號: {mid}", "size": "md"},
+                        #{"type": "text", "text": f"廠商名: {mname}", "size": "md"},
                         {"type": "text", "text": f"進貨數量: {purnum}", "size": "md"},
                         {"type": "text", "text": f"進貨狀態: {purstate}", "size": "md"},
                         {"type": "text", "text": f"進貨時間: {purtime}", "size": "md"}
@@ -754,8 +754,6 @@ def preorder_end_flex_msg(result):
             pname = row[1]  # '商品名稱'
             nowprepro = row[2] # '現預購商品'
     
-
-            # 创建商品信息卡片
             bubble = {
                 "type": "bubble",
                 "body": {
@@ -778,7 +776,7 @@ def preorder_end_flex_msg(result):
                             "action": {
                                 "type": "message",
                                 "label": "預購進貨",
-                                "text": f"預購進貨 {pid}"  # 根据需要调整文本
+                                "text": f"預購進貨 {pid}" 
                             }
                         }
                     ]
@@ -789,65 +787,6 @@ def preorder_end_flex_msg(result):
     else:
         flex_message = FlexSendMessage(alt_text="此商品已到貨列表", contents={"type": "text", "text": "找不到符合條件的廠商商品。"})
     return flex_message
-
-
-from linebot.models import BubbleContainer, BoxComponent, TextComponent, FlexSendMessage, ButtonComponent
-
-# def nopur_inf_flex_msg(result):
-#     if result:
-#         #product_ids = [row[0] for row in result]
-#         product_ids = [f'{row[0]} - {row[1]}' for row in result]
-
-#         bubble = BubbleContainer(
-#             direction='ltr',
-#             body=BoxComponent(
-#                 layout='vertical',
-#                 contents=[
-#                     TextComponent(text='新增進貨資訊商品ID列表', weight='bold', size='lg'),
-#                 ],
-#             ),
-#         )
-
-#         # 将每个商品ID创建为按钮
-#         for product_id in product_ids:
-#             button = ButtonComponent(
-#                 style='link',
-#                 height='sm',
-#                 #action=MessageAction(label=product_id, text=f"新增進貨資訊 {product_id}")  # 点击按钮后发送商品ID的文本
-#                 action=MessageAction(label=product_id, text={product_id})  # 点击按钮后发送商品ID的文本
-#             )
-#             bubble.body.contents.append(button)
-
-#         flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
-#         return flex_message
-
-# def nopur_inf_flex_msg(result):
-#     if result:
-#         #product_ids = [row[0] for row in result]
-#         product_ids = [f'{row[0]} - {row[1]}' for row in result]
-
-#         bubble = BubbleContainer(
-#             direction='ltr',
-#             body=BoxComponent(
-#                 layout='vertical',
-#                 contents=[
-#                     TextComponent(text='新增進貨資訊商品ID列表', weight='bold', size='lg'),
-#                 ],
-#             ),
-#         )
-
-#         # 将每个商品ID创建为按钮
-#         for product_id in product_ids:
-#             button = ButtonComponent(
-#                 style='link',
-#                 height='sm',
-#                 action=MessageAction(label=product_id, text=f"商品ID：{product_id}")
-#                 #action=MessageAction(label=product_id, text=product_id)  # 点击按钮后发送商品ID的文本
-#             )
-#             bubble.body.contents.append(button)
-
-#         flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
-#         return flex_message
 
 def nopur_inf_flex_msg(result):
     if result:
@@ -861,7 +800,6 @@ def nopur_inf_flex_msg(result):
             ),
         )
 
-        # 将每个商品ID创建为按钮，选项显示为row[1]，但按钮的文本为row[0]
         for row in result:
             button = ButtonComponent(
                 style='link',
@@ -873,9 +811,54 @@ def nopur_inf_flex_msg(result):
         flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
         return flex_message
 
-    
-
-
-
-
-       
+def check_ok(purchase_pid):
+    bubble = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "weight": "bold",
+                    "size": "xl",
+                    "margin": "none",
+                    "text": "您已成功新增進貨商品",
+                    "gravity": "center",
+                    "align": "center"
+                },
+                {
+                    "type": "separator",
+                    "margin": "sm"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "message",
+                        "label": "完成",
+                        "text": f"您已成功新增進貨商品 {purchase_pid}"
+                        },
+                        "margin": "xs",
+                        "position": "relative",
+                        "style": "primary",
+                        "gravity": "center"
+                    }
+                    ],
+                    "spacing": "xs"
+                }
+                ],
+                "margin": "none",
+                "spacing": "none"
+            },
+            "styles": {
+                "footer": {
+                "separator": True
+                }
+            }
+            }
+    return FlexSendMessage(alt_text="新增確認選項", contents = bubble)

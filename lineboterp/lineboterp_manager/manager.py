@@ -93,7 +93,6 @@ def handle_message(event):
     if user_state[user_id] != 'normal':
         check_text = purchase_check()
         line_bot_api.reply_message(event.reply_token, check_text)
-        #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='煩死了'))
     else:
         if '顧客取貨' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -216,9 +215,6 @@ def handle_message(event):
                 result = nopur_inf()
                 flex_message = nopur_inf_flex_msg(result)
                 line_bot_api.reply_message(event.reply_token, flex_message)
-                #user_state[user_id] = 'purchase_ck'
-                #user_state1[user_id] = 'num'
-                #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='=>請輸入進貨數量：'))  
             elif msg[6:] == '修改':
                 line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                                 alt_text='商品查詢選擇',
@@ -246,13 +242,10 @@ def handle_message(event):
             check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
             user_state1[user_id] = 'num'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-        #先做後面程序，上面的要問
-        # elif msg.startswith('確認新增'):
-        #     manufacturerY_id = msg[5:] 
-        #     result = entnewpur_upd(manufacturerY_id)
-        #     text_message = "新增完畢"
-        #     combined_messages = [TextSendMessage(text=text_message),result]
-        #     line_bot_api.reply_message(event.reply_token, combined_messages)
+        ##1008
+        elif msg.startswith('您已成功新增進貨商品'):
+            suc_np_pid = msg[11:]
+            np_statechange(suc_np_pid)
         elif '【商品查詢】' in msg:
             if msg[6:] == '類別':
                 message = TextSendMessage(text='請點選查詢類別',
@@ -281,10 +274,14 @@ def handle_message(event):
             result = revm_pur_info(manufacturerR_id)
             flex_message = rev_pur_info_flex_msg(result)
             line_bot_api.reply_message(event.reply_token, flex_message)
+        ##1004
         elif msg.startswith('修改-商品'):
-            '''user_state[user_id] = 'purchase_ck'
-            check_text = repurchase_info(manager)
-            line_bot_api.reply_message(event.reply_token, check_text)'''
+            # ppid = msg[5:]
+            # user_state[user_id] = 'repurchase_ck'
+            # message_storage[user_id + 'purchase_pid'] = pid
+            # check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
+            # user_state1[user_id] = 'num'
+            # line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='修改-商品'))
         elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
             selectedr_category = msg.rstrip("1")
@@ -382,15 +379,13 @@ def handle_message(event):
             ))
         elif '【進貨狀態】' in msg:
             if msg[6:] == '進貨中':
-                #result = puring_pro()
-                #flex_message = puring_pro_flex_msg(result)
-                #line_bot_api.reply_message(event.reply_token, flex_message)
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='進貨中'))
+                result = puring_pro()
+                flex_message = puring_pro_flex_msg(result)
+                line_bot_api.reply_message(event.reply_token, flex_message)
             elif msg[6:] == '已到貨':
-                #result = pured_pro()
-                #flex_message = pured_pro_flex_msg(result)
-                #line_bot_api.reply_message(event.reply_token, flex_message)
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='已到貨'))
+                result = pured_pro()
+                flex_message = pured_pro_flex_msg(result)
+                line_bot_api.reply_message(event.reply_token, flex_message)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
         elif msg.startswith('商品已到貨'):

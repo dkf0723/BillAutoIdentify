@@ -247,22 +247,33 @@ def new_pur_info(product_name):
   return result
 #-----------------抓取進貨中商品-----------------
 def puring_pro():
-  query = f"SELECT 商品ID,商品名稱,廠商編號,廠商名,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information natural join Manufacturer_Information WHERE 進貨狀態 ='進貨中'"
+  query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='進貨中'"
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
 #-----------------抓取已到貨商品-----------------
 def pured_pro():
-  query = f"SELECT 商品ID,商品名稱,廠商編號,廠商名,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information natural join Manufacturer_Information WHERE 進貨狀態 ='已到貨'"
+  query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='已到貨'"
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
-#------------------更改進貨中的商品狀態-----------
+##1004
+#------------------1. 更改進貨中進貨狀態為已到貨 2. 已到貨後更改現預購商品狀態為預購未取及增加庫存量-----------
 def puring_trastate(manufacturerV_id):
   query = f"UPDATE Purchase_Information SET 進貨狀態 = '已到貨' WHERE 商品ID = '{manufacturerV_id}'"
   category ='notselect' #重試類別select/notselect
   result = retry(category,query)
+
+  query = f"UPDATE Product_information NATURAL JOIN Purchase_Information SET 現預購商品 = '預購未取' AND 庫存數量 = (SELECT 庫存數量 FROM Product_information WHERE 商品ID='frozen000003') + num<進貨數量> WHERE 商品ID = 'frozen000003' <變數>"
+  category ='notselect' #重試類別select/notselect
+  result = retry(category,query)
+
+
+
+
   return result
+
+
 #-----------------抓取消費者訂單編號----------------
 def order_inf():
   query = f"SELECT 商品ID,訂單編號,訂單狀態未取已取 FROM order_details natural join Order_information"
@@ -281,6 +292,8 @@ def nopur_inf():
   category ='select' #重試類別select/notselect
   result = retry(category,query)
   return result
+
+
 #----------------將使用者輸入的新增進貨資訊存到資料庫-------------
 def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
   query = f"""INSERT INTO Purchase_Information (商品ID,進貨數量, 進貨單價, 商品單位, 進貨狀態, 進貨時間, 匯款金額,匯款時間) 
@@ -288,19 +301,19 @@ def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_
   category ='notselect' #重試類別select/notselect
   result = retry(category, query)
   return result
-#先做後面程序，上面的要問
-#----------------當使用者確定新增後更改商品資訊的現預購商品狀態---------------
-def entnewpur_upd(manufacturerY_id):
-  query = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{manufacturerY_id}'"
-  category ='notselect' #重試類別select/notselect
-  result = retry(category,query)
-  return result
-#----------------用商品ID查詢出所有有這個預購商品的所有訂單筆數，取得訂單編號的值---------------
-def select_oid(manufacturerI_id):
-  query = f"select 訂單編號 from order_details where 商品ID = '{manufacturerI_id}';"
-  category ='select' #重試類別select/notselect
-  result = retry(category,query)
-  return result
+
+##1008
+def np_statechange(suc_np_pid):
+    query_one = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{suc_np_pid}';"
+    category_one = 'notselect'
+    retry(category_one, query_one)
+    
+
+    query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購進貨' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{suc_np_pid}')"
+    category_two = 'notselect'
+    retry(category_two, query_two)
+
+    
 
 
 
@@ -309,6 +322,7 @@ def select_oid(manufacturerI_id):
 
 
 
+  
 
 #-------------------圖片取得並發送----------------------
 def imagesent():
