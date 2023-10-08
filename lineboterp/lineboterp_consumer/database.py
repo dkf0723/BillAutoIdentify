@@ -201,8 +201,55 @@ def manufacturer(name,principal,localcalls,phonenum,Payment,bankid,bankname,bank
   category ='notselect' #重試類別select/notselect
   result,result2 = retry(category,query)
   if result2 == 'ok':
-    info = f"manufacturer{addnum}"
-  return result2,info
+    check = 'ok'
+    result = Manufacturer_single(f"manufacturer{addnum}",0)
+    info = result
+  else:
+    check = 'no'
+    info = ''
+  return check,info
+
+#-------------------單獨查詢廠商----------------------
+def Manufacturer_single(manufacturer_id,choose):
+  id = lineboterp.user_id
+  message_storage = lineboterp.storage
+  query = f"""
+        SELECT 廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
+        FROM Manufacturer_Information
+        where 廠商編號 = '{manufacturer_id}';
+        """
+  category ='select' #重試類別select/notselect
+  result,result2 = retry(category,query)
+
+  #修改廠商資訊進入做的暫存
+  if choose == 1:
+    if result != []:
+      for storage in result:
+        message_storage[id+'manufacturer_list_check'] = 'ok'
+        message_storage[id+'manufacturer_list_name'] = storage[1]#廠商名
+        message_storage[id+'manufacturer_list_principal'] = storage[2]#負責或對接人
+        message_storage[id+'manufacturer_list_localcalls'] = storage[3]#市話
+        message_storage[id+'manufacturer_list_phone'] = storage[4]#電話
+        message_storage[id+'manufacturer_list_payment'] = storage[5]#付款方式
+        message_storage[id+'manufacturer_list_bankname'] = storage[6]#行庫名
+        message_storage[id+'manufacturer_list_bankid'] = storage[7]#行庫代號
+        message_storage[id+'manufacturer_list_bankaccount'] = storage[8]#匯款帳號
+    else:
+      message_storage[id+'manufacturer_list_check'] = 'no'
+  return result
+#-------------------廠商列表----------------------
+def Manufacturer():
+  query = f"""
+        SELECT 廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
+        FROM Manufacturer_Information;
+        """
+  category ='select' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  if result != []:
+    manufacturer_list = result
+  else:
+    manufacturer_list = 'no'
+  return manufacturer_list
 #-----------------------------------------
 
 #-------------------檢查連線超時----------------------

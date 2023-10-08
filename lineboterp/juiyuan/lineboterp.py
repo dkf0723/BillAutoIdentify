@@ -20,6 +20,7 @@ from product.cartlist import *
 from product.orderlist import *
 from selection_screen import *
 from FM import Manufacturer_fillin_and_check_screen #廠商建立用，未來拔掉
+from vendor_management import Manufacturer_list,Manufacturer_edit #廠商相關用，未來拔掉
 #======python的函式庫==========
 from mysql.connector import pooling
 import tempfile, os
@@ -123,6 +124,12 @@ def handle_message(event):
         list_page[user_id+'預購min'] = 0
     if (user_id+'預購max') not in list_page:
         list_page[user_id+'預購max'] = 9
+
+    ##下方兩個未來拔掉
+    if (user_id+'廠商列表min') not in list_page:
+        list_page[user_id+'廠商列表min'] = 0
+    if (user_id+'廠商列表max') not in list_page:
+        list_page[user_id+'廠商列表max'] = 9
     #-------------------確認使用者狀態進行處理----------------------
     #使用者狀態不屬於normal，不允許進行其他動作
     if user_state[user_id] != 'normal':
@@ -353,17 +360,67 @@ def handle_message(event):
                 )
             ))
         elif '【管理廠商】廠商列表' in msg:
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='show廠商列表'))
+            #上方加入 global list_page = {}
+            list_page[user_id+'廠商列表min'] = 0
+            list_page[user_id+'廠商列表max'] = 9
+            Manufacturerlistpage = Manufacturer_list()
+            if 'TextSendMessage' in Manufacturerlistpage:
+                line_bot_api.reply_message(event.reply_token,Manufacturerlistpage)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【管理廠商】廠商列表',
+                contents={
+                    "type": "carousel",
+                    "contents": Manufacturerlistpage      
+                    } 
+                ))
+        elif '【廠商列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【廠商列表下一頁】"的位置
+            start_index = original_string.find("【廠商列表下一頁】")
+            if start_index != -1:
+                # 從"【廠商列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【廠商列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'廠商列表min'] = min-1
+            list_page[user_id+'廠商列表max'] = max
+            Manufacturerlistpage = Manufacturer_list()
+            if 'TextSendMessage' in Manufacturerlistpage:
+                line_bot_api.reply_message(event.reply_token,Manufacturerlistpage)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【管理廠商】廠商列表',
+                contents={
+                    "type": "carousel",
+                    "contents": Manufacturerlistpage      
+                    } 
+                ))
         elif '【管理廠商】建立廠商' in msg:
             user_state[user_id] = 'manufacturer_name'
             storage[user_id+'Manufacturer_edit_step'] = 0
             show = Manufacturer_fillin_and_check_screen('')
             line_bot_api.reply_message(event.reply_token,show)
         elif '【廠商修改資料】' in msg:
-            check = msg[8:]#取得廠商編號
-            show = ""#修改畫面函式
+            original_string = msg
+            # 找到"【廠商修改資料】"的位置
+            start_index = original_string.find("【廠商修改資料】")
+            if start_index != -1:
+                # 從"【廠商修改資料】"後面開始切割字串
+                substr = original_string[start_index + len("【廠商修改資料】"):]
+                # 切割取得前後文字
+                id = substr.split("_")[0].strip() # 取出_前面的廠商id
+                substrpage = substr.split("_")[1].strip() # 取出_後面的頁號
+                min = int(substrpage.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substrpage.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            storage[user_id+'manufacturer_list_id'] = id
+            list_page[user_id+'廠商列表min'] = min
+            list_page[user_id+'廠商列表max'] = max
+            show = Manufacturer_edit()
             line_bot_api.reply_message(event.reply_token,show)
         elif '【廠商修改】廠商' in msg:
+            #user_state[user_id] = 'manufacturer_edit'
             check = msg[8:]
             if check == '名稱':
                 show = check_manufacturer_name()#廠商名稱
