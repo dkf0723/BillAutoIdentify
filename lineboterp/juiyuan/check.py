@@ -139,8 +139,9 @@ def new_manufacturer():
                                               message_storage[id+'manufacturer_Payment'],message_storage[id+'manufacturer_bankid'],
                                               message_storage[id+'manufacturer_bankname'],message_storage[id+'manufacturer_bankaccount'])
                     if check == 'ok':
-                        check_text = TextSendMessage(text=f"{info}廠商建立成功！")
-                        #check_text = Manufacturer_establishment_screen()
+                        #廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
+                        check_text = Manufacturer_establishment_screen(info[0][0],info[0][1],info[0][2],info[0][3],info[0][4],info[0][5],
+                                                                       info[0][6],info[0][7],info[0][8])
                     else:
                         check_text = TextSendMessage(text=f"{info}廠商建立流程失敗！")
                     #check_text = TextSendMessage(text=f"廠商建立成功！")
@@ -157,39 +158,11 @@ def new_manufacturer():
                 message_storage[id+'manufacturer_bankaccount'] = 'NAN'
                 message_storage[id+'manufacturer_all'] = 'NAN'
             else:
-                check_text = TemplateSendMessage(
-                                alt_text='廠商新增資料確認',
-                                template=ButtonsTemplate(
-                                    text= message_storage[id+'manufacturer_all'],
-                                    actions=[
-                                        MessageAction(
-                                            label='【新增廠商】',
-                                            text='1',
-                                        ),
-                                        MessageAction(
-                                            label='【取消】',
-                                            text='2',
-                                        )
-                                    ]
-                                )
-                            )
+                message_storage[id+'Manufacturer_edit_step'] = 8
+                check_text = Manufacturer_fillin_and_check_screen(f"「{message}」不是此流程的內容喔！")
         else:
-            check_text = TemplateSendMessage(
-                                alt_text='廠商新增資料確認',
-                                template=ButtonsTemplate(
-                                    text= message_storage[id+'manufacturer_all'],
-                                    actions=[
-                                        MessageAction(
-                                            label='【新增廠商】',
-                                            text='1',
-                                        ),
-                                        MessageAction(
-                                            label='【取消】',
-                                            text='2',
-                                        )
-                                    ]
-                                )
-                            )
+            message_storage[id+'Manufacturer_edit_step'] = 8
+            check_text = Manufacturer_fillin_and_check_screen(f"「{message}」不是此流程的內容喔！")
     return check_text
 ###-------------------廠商名稱檢查----------------------
 def check_manufacturer_name():

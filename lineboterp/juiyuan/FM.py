@@ -276,11 +276,377 @@ def Manufacturer_fillin_and_check_screen(errormsg):
     return screen
 
 #新增廠商建立成功畫面
-def Manufacturer_establishment_screen():
+def Manufacturer_establishment_screen(num,name,principal,localcalls,phone,payment,bankid,bankname,bankaccount):
+    #廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
     manufacturer_establishment_screen = []
-    establishment = {}
-    establishment.append()
-    manufacturer_establishment_screen.append()
+
+    payinfo = []
+    show0 = {
+            "type": "separator",
+            "margin": "md"
+        }
+    payinfo.append(show0)
+    if payment == '匯款':
+        show1 = {
+                "type": "text",
+                "text": "▼匯款資訊",
+                "wrap": True,
+                "color": "#3b5a5f",
+                "size": "md",
+                "flex": 5,
+                "margin": "sm",
+                "weight": "bold",
+                "offsetTop": "xs"
+            }
+        payinfo.append(show1)
+        show2 = {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "行庫代號：",
+                        "offsetStart": "xl",
+                        "color": "#3b5a5f"
+                    }
+                    ],
+                    "width": "100px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "wrap": True,
+                        "text": f"{bankid}",
+                        "color": "#3b5a5f"
+                    }
+                    ]
+                }
+                ]
+            }
+        payinfo.append(show2)
+        show3 = {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "行庫名稱：",
+                        "offsetStart": "xl",
+                        "color": "#3b5a5f"
+                    }
+                    ],
+                    "width": "100px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": f"{bankname}",
+                        "wrap": True,
+                        "color": "#3b5a5f"
+                    }
+                    ]
+                }
+                ]
+            }
+        payinfo.append(show3)
+        show4 = {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "匯款帳號：",
+                        "offsetStart": "xl",
+                        "color": "#3b5a5f"
+                    }
+                    ],
+                    "width": "100px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": f"{bankaccount}",
+                        "wrap": True,
+                        "color": "#3b5a5f"
+                    }
+                    ]
+                }
+                ]
+            }
+        payinfo.append(show4)
+    
+    if localcalls != '略過':
+        localcall = f"({localcalls[:-7]}){localcalls[-7:]}"
+    else:
+        localcall = localcalls
+    showall = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "高逸嚴選",
+                    "color": "#A44528",
+                    "size": "sm",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "廠商成功建立！",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center",
+                    "margin": "xl"
+                },
+                {
+                    "type": "text",
+                    "text": f"廠商編號：{num}",
+                    "weight": "bold",
+                    "size": "md",
+                    "align": "center",
+                    "margin": "sm",
+                    "color": "#564006"
+                },
+                {
+                    "type": "separator",
+                    "color": "#564006",
+                    "margin": "md"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "xs",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "◇廠商名稱：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ],
+                            "width": "100px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{name}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "◇負責/對接人：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ],
+                            "width": "120px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{principal}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "◇公司市話：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ],
+                            "width": "100px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{localcall}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "◇行動電話：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ],
+                            "width": "100px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{phone}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "◇付款方式：",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ],
+                            "width": "100px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{payment}",
+                                "wrap": True,
+                                "color": "#3b5a5f",
+                                "size": "md",
+                                "flex": 5,
+                                "margin": "sm",
+                                "weight": "bold"
+                            }
+                            ]
+                        }
+                        ]
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": payinfo
+                }
+                ]
+            }
+            }
+    manufacturer_establishment_screen.append(showall)
     screen =FlexSendMessage(
                             alt_text='現/預購商品選擇',
                             contents={
@@ -289,3 +655,18 @@ def Manufacturer_establishment_screen():
                                 } 
                             )
     return screen
+
+#廠商列表畫面
+'''def Manufacturer_list_screen():
+    manufacturer_list_screen = []
+    mlist = {}
+    mlist.append()
+    manufacturer_list_screen.append()
+    screen =FlexSendMessage(
+                            alt_text='現/預購商品選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": manufacturer_list_screen   
+                                } 
+                            )
+    return screen'''

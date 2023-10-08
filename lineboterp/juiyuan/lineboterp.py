@@ -359,6 +359,10 @@ def handle_message(event):
             storage[user_id+'Manufacturer_edit_step'] = 0
             show = Manufacturer_fillin_and_check_screen('')
             line_bot_api.reply_message(event.reply_token,show)
+        elif '【廠商修改資料】' in msg:
+            check = msg[8:]#取得廠商編號
+            show = ""#修改畫面函式
+            line_bot_api.reply_message(event.reply_token,show)
         elif '【廠商修改】廠商' in msg:
             check = msg[8:]
             if check == '名稱':
