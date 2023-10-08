@@ -276,7 +276,7 @@ def Manufacturer_fillin_and_check_screen(errormsg):
     return screen
 
 #新增廠商建立成功畫面
-def Manufacturer_establishment_screen(num,name,principal,localcalls,phone,payment,bankid,bankname,bankaccount):
+def Manufacturer_establishment_screen(num,name,principal,localcalls,phone,payment,bankname,bankid,bankaccount):
     #廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
     manufacturer_establishment_screen = []
 
