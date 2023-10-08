@@ -379,17 +379,20 @@ def handle_message(event):
             ))
         elif '【進貨狀態】' in msg:
             if msg[6:] == '進貨中':
+                ##1008 進貨中已到貨只能傳12個
                 result = puring_pro()
-                flex_message = puring_pro_flex_msg(result)
-                line_bot_api.reply_message(event.reply_token, flex_message)
+                flex_messages = puring_pro_flex_msg(result)
+                for flex_message in flex_messages:
+                    line_bot_api.reply_message(event.reply_token, flex_message)
             elif msg[6:] == '已到貨':
                 result = pured_pro()
-                flex_message = pured_pro_flex_msg(result)
-                line_bot_api.reply_message(event.reply_token, flex_message)
+                flex_messagess = pured_pro_flex_msg(result)
+                for flex_message in flex_messagess:
+                    line_bot_api.reply_message(event.reply_token, flex_message)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
         elif msg.startswith('商品已到貨'):
-            manufacturerV_id = msg[6:] 
+            manufacturerV_id = msg[5:] 
             result = puring_trastate(manufacturerV_id)
             line_bot_api.reply_message(event.reply_token, result)
             #-------------------預購狀態查詢----------------------
