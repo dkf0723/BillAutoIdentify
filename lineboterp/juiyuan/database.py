@@ -201,8 +201,19 @@ def manufacturer(name,principal,localcalls,phonenum,Payment,bankid,bankname,bank
   category ='notselect' #重試類別select/notselect
   result,result2 = retry(category,query)
   if result2 == 'ok':
-    info = f"manufacturer{addnum}"
-  return result2,info
+    check = 'ok'
+    query = f"""
+        SELECT 廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
+        FROM Manufacturer_Information
+        where 廠商編號 = 'manufacturer{addnum}';
+        """
+    category ='select' #重試類別select/notselect
+    result,result2 = retry(category,query)
+    info = result
+  else:
+    check = 'no'
+    info = ''
+  return check,info
 #-----------------------------------------
 
 #-------------------檢查連線超時----------------------
