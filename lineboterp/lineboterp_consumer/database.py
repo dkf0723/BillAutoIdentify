@@ -173,7 +173,10 @@ def retry(category,query):#select/notselect
       step = 1 #conn沒取到進入切換conn1
       if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
         block = 1
-        result = []
+        if category == 'select':
+          result = []
+        else:
+          result = 'no'
         result2 = 'no'
   return result,result2
 
@@ -250,6 +253,22 @@ def Manufacturer():
   else:
     manufacturer_list = 'no'
   return manufacturer_list
+
+#-------------------修改廠商資料----------------------
+def Manufacturer_infochange(editfield,changeinfo):
+  #editfield=廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
+  #changeinfo=修改的內容
+  id = lineboterp.user_id
+  message_storage = lineboterp.storage
+  manufacturer_id = message_storage[id+'manufacturer_list_id']
+  query = f"""
+            UPDATE Manufacturer_Information
+            SET {editfield} = '{changeinfo}'
+            WHERE 廠商編號 = '{manufacturer_id}';
+            """
+  category ='notselect' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  return result
 #-----------------------------------------
 
 #-------------------檢查連線超時----------------------

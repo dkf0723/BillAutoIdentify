@@ -441,7 +441,7 @@ def Manufacturer_list():
         manufacturer_show = TextSendMessage(text = '目前尚未有廠商資料！請前往「新增廠商」建立')
     return manufacturer_show
 
-#廠商資料修改畫面
+#廠商資料修改畫面(左右)
 def Manufacturer_edit():
     id = lineboterp.user_id
     message_storage = lineboterp.storage
@@ -499,8 +499,8 @@ def Manufacturer_edit():
                     "type": "button",
                     "action": {
                     "type": "message",
-                    "label": "4.修改_廠商電話",
-                    "text": "【廠商修改】廠商電話"
+                    "label": "4.修改_廠商行動電話",
+                    "text": "【廠商修改】廠商行動電話"
                     },
                     "style": "primary",
                     "color": "#999a9a",
