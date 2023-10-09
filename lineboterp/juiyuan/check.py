@@ -12,8 +12,11 @@ from product.cartlist import cart_list,addcart,cartrevise,checkcart
 from selection_screen import (Order_phonenum_screen,Single_order_confirmation_screen,Order_establishment_message,
                               Cart_join_success_message,Cancel_fail_message,Cart_order_screen,Cartordercheck_establishment_message,
                               Cartorder_establishment_message)
-from relevant_information import bank
-from FM import Manufacturer_fillin_and_check_screen,Manufacturer_establishment_screen #廠商建立用，未來拔掉
+###---
+from relevant_information import bank#廠商建立用，未來拔掉
+from FM import Manufacturer_fillin_and_check_screen,Manufacturer_establishment_screen,Manufacturer_edit_screen #廠商建立用，未來拔掉
+from vendor_management import Manufacturer_edit#廠商建立用，未來拔掉
+#----
 
 #-------------------使用者狀態檢查----------------------
 def product_check():
@@ -37,6 +40,8 @@ def product_check():
                        'manufacturer_localcalls','manufacturer_phonenum','manufacturer_Payment',
                        'manufacturer_bank','manufacturer_bankaccount','manufacturer_end']:#新增廠商
         check_text = new_manufacturer()#single_manufacturer_num單獨建立；other_manufacturer新商品新廠商過來的
+    elif 'manufacturer_edit_' in state[id]:
+        check_text = manufacturer_editinfo()
     #-----------------------------------------
     return check_text
 
@@ -61,7 +66,6 @@ def new_manufacturer():
         message_storage[id+'manufacturer_bankid'] = 'NAN'
         message_storage[id+'manufacturer_bankname'] = 'NAN'
         message_storage[id+'manufacturer_bankaccount'] = 'NAN'
-        message_storage[id+'manufacturer_all'] = 'NAN'
         if message == '取消':
             state[id] = 'normal'
             check_text = TextSendMessage(text="取消新增廠商流程囉！")
@@ -156,7 +160,6 @@ def new_manufacturer():
                 message_storage[id+'manufacturer_bankid'] = 'NAN'
                 message_storage[id+'manufacturer_bankname'] = 'NAN'
                 message_storage[id+'manufacturer_bankaccount'] = 'NAN'
-                message_storage[id+'manufacturer_all'] = 'NAN'
             else:
                 message_storage[id+'Manufacturer_edit_step'] = 8
                 check_text = Manufacturer_fillin_and_check_screen(f"「{message}」不是此流程的內容喔！")
@@ -164,6 +167,188 @@ def new_manufacturer():
             message_storage[id+'Manufacturer_edit_step'] = 8
             check_text = Manufacturer_fillin_and_check_screen(f"「{message}」不是此流程的內容喔！")
     return check_text
+
+#-------------------廠商管理-修改廠商資料----------------------
+def manufacturer_editinfo():
+    id = lineboterp.user_id
+    state = lineboterp.user_state
+    message = lineboterp.msg
+    message_storage = lineboterp.storage
+    #editfield=廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
+    show = [Manufacturer_edit()]#退回修改清單頁
+    if message == '取消':
+        state[id] = 'normal'
+        message_storage[id+'manufacturer_name'] = 'NAN'
+        message_storage[id+'manufacturer_principal'] = 'NAN'
+        message_storage[id+'manufacturer_localcalls'] = 'NAN'
+        message_storage[id+'manufacturer_phonenum'] = 'NAN'
+        message_storage[id+'manufacturer_Payment'] = 'NAN'
+        message_storage[id+'manufacturer_bankid'] = 'NAN'
+        message_storage[id+'manufacturer_bankname'] = 'NAN'
+        message_storage[id+'manufacturer_bankaccount'] = 'NAN'
+        message_storage[id+'manufacturer_all'] = 'NAN'
+        check_text = Manufacturer_edit()
+    elif state[id] == 'manufacturer_edit_name':
+        if message_storage[id+'manufacturer_list_name'] == message:#判斷有沒有修改
+            state[id] = 'normal'
+            check_text = Manufacturer_edit()
+        else:
+            textmsg,check_step = check_manufacturer_name()#廠商名稱檢查
+            if check_step == 'ok':
+                #發送修改資料庫
+                changedb =  Manufacturer_infochange('廠商名',message)#ok/no
+                if changedb == 'ok':
+                    check_text = Manufacturer_edit()
+                else:
+                    show.append(TextSendMessage(text='廠商名稱修改失敗！請稍後在試。'))
+                    check_text = Manufacturer_edit()#退回修改清單頁
+                state[id] = 'normal'
+            else:
+                check_text = Manufacturer_edit_screen(1,textmsg,message_storage[id+'manufacturer_list_name'])#edittype,errormsg,before..名稱
+    elif state[id] == 'manufacturer_edit_principal':
+        if message_storage[id+'manufacturer_list_principal'] == message:#判斷有沒有修改
+            state[id] = 'normal'
+            check_text = Manufacturer_edit()
+        else:
+            textmsg,check_step = check_manufacturer_principal()#廠商負責人或對接人檢查
+            if check_step == 'ok':
+                #發送修改資料庫
+                changedb =  Manufacturer_infochange('負責或對接人',message)#ok/no
+                if changedb == 'ok':
+                    check_text = Manufacturer_edit()
+                else:
+                    show.append(TextSendMessage(text='廠商負責或對接人修改失敗！請稍後在試。'))
+                    check_text = Manufacturer_edit()#退回修改清單頁
+                state[id] = 'normal'
+            else:
+                check_text = Manufacturer_edit_screen(2,textmsg,message_storage[id+'manufacturer_list_principal'])#edittype,errormsg,before..負責人
+    elif state[id] == 'manufacturer_edit_localcalls':
+        if message_storage[id+'manufacturer_list_localcalls'] == message:#判斷有沒有修改
+            state[id] = 'normal'
+            check_text = Manufacturer_edit()
+        else:
+            textmsg,check_step = check_manufacturer_localcalls()#廠商市話檢查
+            if check_step == 'ok':
+                #發送修改資料庫
+                changedb =  Manufacturer_infochange('市話',message)#ok/no
+                if changedb == 'ok':
+                    check_text = Manufacturer_edit()
+                else:
+                    show.append(TextSendMessage(text='廠商市話修改失敗！請稍後在試。'))
+                    check_text = Manufacturer_edit()#退回修改清單頁
+                state[id] = 'normal'
+            else:
+                check_text = Manufacturer_edit_screen(3,textmsg,message_storage[id+'manufacturer_list_localcalls'])#edittype,errormsg,before..市話
+    elif state[id] == 'manufacturer_edit_phonenum':
+        if message_storage[id+'manufacturer_list_phone'] == message:#判斷有沒有修改
+            state[id] = 'normal'
+            check_text = Manufacturer_edit()
+        else:
+            textmsg,check_step = check_manufacturer_phonenum()#廠商電話檢查
+            if check_step == 'ok':
+                #發送修改資料庫
+                changedb =  Manufacturer_infochange('電話',message)#ok/no
+                if changedb == 'ok':
+                    check_text = Manufacturer_edit()
+                else:
+                    show.append(TextSendMessage(text='廠商電話修改失敗！請稍後在試。'))
+                    check_text = Manufacturer_edit()#退回修改清單頁
+                state[id] = 'normal'
+            else:
+                check_text = Manufacturer_edit_screen(4,textmsg,message_storage[id+'manufacturer_list_phone'])#edittype,errormsg,before..電話
+    elif state[id] == 'manufacturer_edit_payment':
+        if message_storage[id+'manufacturer_list_payment'] == message:#判斷有沒有修改
+            state[id] = 'normal'
+            check_text = Manufacturer_edit()
+        else:
+            textmsg,check_step = check_manufacturer_Payment()#廠商付款方式檢查
+            if check_step in ['ok','okend'] :
+                #發送修改資料庫
+                changedb =  Manufacturer_infochange('付款方式',message)#ok/no
+                if message == '現金':
+                    changedb1 =  Manufacturer_infochange('行庫代號','略過')#ok/no
+                    changedb2 =  Manufacturer_infochange('行庫名','略過')#ok/no
+                    changedb3 =  Manufacturer_infochange('匯款帳號','略過')#ok/no
+                else:
+                    changedb1 =  'ok'
+                    changedb2 =  'ok'
+                    changedb3 =  'ok'
+
+                if (changedb == 'ok') and (changedb1 == 'ok') and (changedb2 == 'ok') and (changedb3 == 'ok'):
+                    if (message == '匯款') and (message_storage[id+'manufacturer_list_bankid'] == '略過'):#判斷有沒有匯款資料
+                        state[id] = 'manufacturer_edit_bank'#接續完成行庫代號/名稱及帳號
+                        before = [str(message_storage[id+'manufacturer_list_bankid']),message_storage[id+'manufacturer_list_bankname']]
+                        check_text = Manufacturer_edit_screen(6,textmsg,before)#edittype,errormsg,before..行庫/代號
+                    else:
+                        state[id] = 'normal'
+                        check_text = Manufacturer_edit()
+                else:
+                    show.append(TextSendMessage(text='付款方式修改失敗！請稍後在試。'))
+                    check_text = Manufacturer_edit()#退回修改清單頁
+                    state[id] = 'normal'
+            else:
+                check_text = Manufacturer_edit_screen(5,textmsg,message_storage[id+'manufacturer_list_payment'])#edittype,errormsg,before..付款方式
+    elif state[id] == 'manufacturer_edit_bank':
+        textmsg,check_step = check_manufacturer_bank()#行庫/行庫代號檢查
+        if check_step == 'ok':
+            #發送修改資料庫
+            bankid = message_storage[id+'manufacturer_bankid']
+            bankname = message_storage[id+'manufacturer_bankname']
+            changedb1 =  Manufacturer_infochange('行庫代號',bankid)#ok/no
+            changedb2 =  Manufacturer_infochange('行庫名',bankname)#ok/no
+            if changedb1 == 'ok' and changedb2 == 'ok':
+                if message_storage[id+'manufacturer_list_bankaccount'] == '略過':
+                    state[id] = 'manufacturer_edit_bankaccount'#接續完成帳號
+                    check_text = Manufacturer_edit_screen(7,textmsg,message_storage[id+'manufacturer_list_bankaccount'])#edittype,errormsg,before..行庫/代號
+                else:
+                    state[id] = 'normal'
+                    check_text = Manufacturer_edit()
+            else:
+                failinfo = ''
+                if changedb1 == 'no':
+                    failinfo += '行庫代號'
+                elif changedb2 == 'no':
+                    failinfo += '行庫名稱'
+                if len(failinfo) > 4:
+                    failinfo = '行庫代號及行庫名稱'
+                show.append(TextSendMessage(text=f"{failinfo}修改失敗！請稍後在試。"))
+                check_text = Manufacturer_edit()#退回修改清單頁
+                state[id] = 'normal'
+        else:
+            before = [str(message_storage[id+'manufacturer_list_bankid']),message_storage[id+'manufacturer_list_bankname']]
+            check_text = Manufacturer_edit_screen(6,textmsg,before)#edittype,errormsg,before..行庫/代號
+    elif state[id] == 'manufacturer_edit_bankaccount':
+        if message_storage[id+'manufacturer_list_bankaccount'] == message:#判斷有沒有修改
+            state[id] = 'normal'
+            check_text = Manufacturer_edit()
+        else:
+            textmsg,check_step = check_manufacturer_bankaccount()#廠商付款帳號確認
+            bankaccount = message_storage[id+'manufacturer_bankaccount']
+            if check_step == 'ok':
+                #發送修改資料庫
+                changedb =  Manufacturer_infochange('匯款帳號',bankaccount)#ok/no
+                if changedb == 'ok':
+                    check_text = Manufacturer_edit()
+                else:
+                    show.append(TextSendMessage(text='匯款帳號修改失敗！請稍後在試。'))
+                    check_text = Manufacturer_edit()#退回修改清單頁
+                state[id] = 'normal'
+            else:
+                check_text = Manufacturer_edit_screen(7,textmsg,message_storage[id+'manufacturer_list_bankaccount'])#edittype,errormsg,before..行庫帳號
+    else:
+        state[id] = 'normal'
+        check_text = [TextSendMessage(text=f"「{message}」不是廠商修改資料的項目。"),Manufacturer_edit()]
+    message_storage[id+'manufacturer_name'] = 'NAN'
+    message_storage[id+'manufacturer_principal'] = 'NAN'
+    message_storage[id+'manufacturer_localcalls'] = 'NAN'
+    message_storage[id+'manufacturer_phonenum'] = 'NAN'
+    message_storage[id+'manufacturer_Payment'] = 'NAN'
+    message_storage[id+'manufacturer_bankid'] = 'NAN'
+    message_storage[id+'manufacturer_bankname'] = 'NAN'
+    message_storage[id+'manufacturer_bankaccount'] = 'NAN'
+    message_storage[id+'manufacturer_all'] = 'NAN'
+    return check_text
+
 ###-------------------廠商名稱檢查----------------------
 def check_manufacturer_name():
     id = lineboterp.user_id
@@ -171,9 +356,8 @@ def check_manufacturer_name():
     message_storage = lineboterp.storage
     if len(message) <= 20:
         message_storage[id+'manufacturer_name'] = message #廠商名暫存
-        message_storage[id+'manufacturer_all'] = f"===建立廠商===\n1.廠商名稱：{message_storage[id+'manufacturer_name']}"
         check_step = 'ok'
-        check_text = f"{message_storage[id+'manufacturer_all']}\n=>2.請打字輸入負責人或對接人名稱：\n(10字內)"
+        check_text = ''
     else:
         check_step = ''
         check_text = f"輸入的「{message}」名稱大於20字喔！"
@@ -185,9 +369,8 @@ def check_manufacturer_principal():
     message_storage = lineboterp.storage
     if len(message) <= 10:
         message_storage[id+'manufacturer_principal'] = message #負責人暫存
-        message_storage[id+'manufacturer_all'] += f"\n2.負責人或對接人名稱：{message_storage[id+'manufacturer_principal']}"
         check_step = 'ok'
-        check_text = f"{message_storage[id+'manufacturer_all']}\n=>3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過"
+        check_text = ''
     else:
         check_step = ''
         check_text = f"輸入的「{message}」名稱大於10字喔！"
@@ -216,9 +399,8 @@ def check_manufacturer_localcalls():
             
             if check_areacode == 'ok':
                 message_storage[id+'manufacturer_localcalls'] = message #市話暫存
-                message_storage[id+'manufacturer_all'] += f"\n3.公司市話：{message_storage[id+'manufacturer_localcalls']}"
                 check_step = 'ok'
-                check_text = f"{message_storage[id+'manufacturer_all']}\n=>4.請打字輸入行動電話：\nex.0952025413、略過"
+                check_text = ''
             else:
                 check_step = ''
                 check_text = f"輸入的「{message}」區碼錯誤喔！"
@@ -229,8 +411,7 @@ def check_manufacturer_localcalls():
         if message == '略過':
             check_step = 'ok'
             message_storage[id+'manufacturer_localcalls'] = message #市話暫存
-            message_storage[id+'manufacturer_all'] += f"\n3.公司市話：{message_storage[id+'manufacturer_localcalls']}"
-            check_text = f"{message_storage[id+'manufacturer_all']}\n=>4.請打字輸入行動電話：\nex.0952025413、略過"
+            check_text = ''
         else:
             check_step = ''
             check_text = f"輸入的「{message}」不是市話的規則喔！"
@@ -253,14 +434,12 @@ def check_manufacturer_phonenum():
         else:
             message_storage[id+'manufacturer_phonenum'] = message #行動電話暫存
             check_step = 'ok'
-            message_storage[id+'manufacturer_all'] += f"\n4.行動電話：{message_storage[id+'manufacturer_phonenum']}"
-            check_text = f"{message_storage[id+'manufacturer_all']}\n=>5.請打字輸入付款方式：\nex.現金、匯款"
+            check_text = ''
     else:
         if message == '略過':
             check_step = 'ok'
             message_storage[id+'manufacturer_phonenum'] = message #行動電話暫存
-            message_storage[id+'manufacturer_all'] += f"\n4.行動電話：{message_storage[id+'manufacturer_phonenum']}"
-            check_text = f"{message_storage[id+'manufacturer_all']}\n=>5.請打字輸入付款方式：\nex.現金、匯款"
+            check_text = ''
         else:
             check_step = ''
             check_text = f"輸入的「{message}」不是行動電話的規則喔！"
@@ -272,10 +451,9 @@ def check_manufacturer_Payment():
     message_storage = lineboterp.storage
     if message in ['現金','匯款']:
         message_storage[id+'manufacturer_Payment'] = message #付款方式暫存
-        message_storage[id+'manufacturer_all'] += f"\n5.付款方式：{message_storage[id+'manufacturer_Payment']}"
         if message == '匯款':
             check_step = 'ok'
-            check_text = f"{message_storage[id+'manufacturer_all']}\n=>6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，則一即可："
+            check_text = ''
         else:
             check_step = 'okend'
             message_storage[id+'manufacturer_bankid'] = "略過"
@@ -298,14 +476,12 @@ def check_manufacturer_bank():
             for bankcheck in bankdata:
                 if message == bankcheck['code']:
                     message_storage[id+'manufacturer_bankid'] = message #行庫代號暫存
-                    message_storage[id+'manufacturer_all'] += f"\n6.行庫代號：{message_storage[id+'manufacturer_bankid']}"
                     message_storage[id+'manufacturer_bankname'] = bankcheck['name'] #行庫名稱暫存
-                    message_storage[id+'manufacturer_all'] += f"\n7.行庫名稱：{message_storage[id+'manufacturer_bankname']}"
                     checkbank = 'yes'
                     break
             if checkbank == 'yes':
                 check_step = 'ok'
-                check_text = f"{message_storage[id+'manufacturer_all']}\n=>8.請打字輸入行庫帳號：\n(數字14碼內)"
+                check_text = ''
             else:
                 check_step = ''
                 check_text = f"輸入的代號「{message}」查無銀行！"  
@@ -317,14 +493,12 @@ def check_manufacturer_bank():
             for bankcheck in bankdata:
                 if message in bankcheck['name']:
                     message_storage[id+'manufacturer_bankid'] = bankcheck['code'] #行庫代號暫存
-                    message_storage[id+'manufacturer_all'] += f"\n6.行庫代號：{message_storage[id+'manufacturer_bankid']}"
                     message_storage[id+'manufacturer_bankname'] = bankcheck['name'] #行庫名稱暫存
-                    message_storage[id+'manufacturer_all'] += f"\n7.行庫名稱：{message_storage[id+'manufacturer_bankname']}"
                     checkbank = 'yes'
                     break
             if checkbank == 'yes':
                 check_step = 'ok'
-                check_text = f"{message_storage[id+'manufacturer_all']}\n=>8.請打字輸入行庫帳號：\n(數字14碼內)"
+                check_text = ''
             else:
                 check_step = ''
                 check_text = f"輸入的行庫名「{message}」查無銀行！"    
@@ -344,7 +518,6 @@ def check_manufacturer_bankaccount():
                     message = '0'+ message
             message_storage[id+'manufacturer_bankaccount'] = message #行庫帳號暫存
             check_step = 'ok'
-            message_storage[id+'manufacturer_all'] += f"\n8.行庫帳號：{message_storage[id+'manufacturer_bankaccount']}"
             check_text = ''
         else:
             check_step = ''

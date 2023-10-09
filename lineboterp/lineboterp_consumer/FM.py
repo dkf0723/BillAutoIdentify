@@ -4,6 +4,133 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import lineboterp
 
+#廠商管理列表與新增選擇畫面
+def Manufacturer_list_and_new_chosen_screen():
+    manufacturer_list_and_new_chosen_screen = []
+    info1 = {
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "url": "https://i.imgur.com/VpkoVwC.jpg",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "查詢廠商",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "text",
+                    "text": "※廠商資料列表",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "※廠商資料修改",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "sm",
+                    "weight": "bold"
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                {
+                    "type": "button",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": "廠商列表",
+                    "text": "【管理廠商】廠商列表"
+                    },
+                    "color": "#5f5f5f",
+                    "style": "primary"
+                }
+                ],
+                "flex": 0
+            }
+            }
+    manufacturer_list_and_new_chosen_screen.append(info1)
+    info2 = {
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "url": "https://i.imgur.com/CePlNvY.jpg",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "新增廠商",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "text",
+                    "text": "※建立新廠商資料",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                {
+                    "type": "button",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": "新增廠商",
+                    "text": "【管理廠商】建立廠商"
+                    },
+                    "color": "#C9B0A8",
+                    "style": "primary"
+                }
+                ],
+                "flex": 0
+            }
+            }
+    manufacturer_list_and_new_chosen_screen.append(info2)
+    screen =FlexSendMessage(
+                            alt_text='廠商列表或新增選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": manufacturer_list_and_new_chosen_screen  
+                                } 
+                            )
+    return screen
 #新增廠商填寫及確認畫面
 def Manufacturer_fillin_and_check_screen(errormsg):
     id = lineboterp.user_id
@@ -24,7 +151,7 @@ def Manufacturer_fillin_and_check_screen(errormsg):
             '3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過',
             '4.請打字輸入行動電話：\nex.0952025413、略過',
             '5.請打字輸入付款方式：\nex.現金、匯款',
-            '6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，則一即可',
+            '6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，擇一即可',
             '8.請打字輸入行庫帳號：\n(數字14碼內)']#編寫提示訊息
     Completed = ['廠商名稱','負責/對接人','公司市話','行動電話','付款方式','行庫代號','行庫名稱','匯款帳號']#填寫後的欄位顯示
     field_value = ['manufacturer_name','manufacturer_principal','manufacturer_localcalls','manufacturer_phonenum',
@@ -51,7 +178,7 @@ def Manufacturer_fillin_and_check_screen(errormsg):
             #負責人長度不同判斷
             if step == 4:
                 hintshow = hint[4]
-            elif step <= 5:
+            elif step < 4:
                 hintshow = hint[step]
             else:
                 hintshow = hint[5]
@@ -267,7 +394,7 @@ def Manufacturer_fillin_and_check_screen(errormsg):
 
     manufacturer_fillin_and_check_screen.append(fillin_screen)
     screen =FlexSendMessage(
-                            alt_text='現/預購商品選擇',
+                            alt_text='新增廠商填寫或確認',
                             contents={
                                 "type": "carousel",
                                 "contents": manufacturer_fillin_and_check_screen   
@@ -648,7 +775,7 @@ def Manufacturer_establishment_screen(num,name,principal,localcalls,phone,paymen
             }
     manufacturer_establishment_screen.append(showall)
     screen =FlexSendMessage(
-                            alt_text='現/預購商品選擇',
+                            alt_text='廠商建立成功！',
                             contents={
                                 "type": "carousel",
                                 "contents": manufacturer_establishment_screen   
@@ -656,17 +783,210 @@ def Manufacturer_establishment_screen(num,name,principal,localcalls,phone,paymen
                             )
     return screen
 
-#廠商列表畫面
-'''def Manufacturer_list_screen():
-    manufacturer_list_screen = []
-    mlist = {}
-    mlist.append()
-    manufacturer_list_screen.append()
+#廠商資訊修改畫面
+def Manufacturer_edit_screen(edittype,errormsg,before):
+    manufacturer_edit_screen = []
+    id = lineboterp.user_id
+    message_storage = lineboterp.storage
+    #editfield=廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
+    heading = ['廠商名稱','廠商負責或對接人','廠商市話','廠商電話','付款方式','匯款行庫資料','匯款帳號資料']
+    contentshow = ['廠商名稱','負責/對接人','廠商市話','廠商電話','付款方式','行庫資料','匯款帳號']
+    title = f"修改{heading[edittype-1]}"
+
+    hint = ['1.請打字輸入廠商名稱：\n(20字內)',
+            '2.請打字輸入負責人或對接人名稱：\n(10字內)',
+            '3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過',
+            '4.請打字輸入行動電話：\nex.0952025413、略過',
+            '5.請打字輸入付款方式：\nex.現金、匯款',
+            '6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，擇一即可',
+            '7.請打字輸入行庫帳號：\n(數字14碼內)']#編寫提示訊息
+    fillin = []#填寫訊息合併暫存
+    if edittype == 6:
+        if before[0] == '略過':
+                beforeinfo = '(尚無填寫行庫相關內容)'
+        else:
+            beforeinfo = f"{before[0]}\n{before[1]}"
+    else:
+        if edittype == 7:
+            if before == '略過':
+                beforeinfo = '(尚無填寫帳號內容)'
+            else:
+                beforeinfo = before
+        else:
+            beforeinfo = before
+    fill = {
+            "type": "text",
+            "text": f"〈修改前內容〉",
+            "wrap": True,
+            "color": "#3b5a5f",
+            "weight": "bold",
+            "size": "md"
+        }
+    fillin.append(fill)
+    fill_0 = {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": f"{contentshow[edittype-1]}：",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "sm"
+                }
+                ],
+                "width": "100px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": f"{beforeinfo}",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "sm"
+                }
+                ]
+            }
+            ]
+        }
+    fillin.append(fill_0)
+    fill_1 = {
+                "type": "separator",
+                "color": "#564006",
+                "margin": "lg"
+            }
+    fillin.append(fill_1)
+    fill_2 = {
+            "type": "text",
+            "text": f"=>{hint[edittype-1]}",
+            "wrap": True,
+            "color": "#3b5a5f",
+            "weight": "bold"
+        }
+    fillin.append(fill_2)
+    if errormsg != '':
+        fill_4 = {
+                    "type": "text",
+                    "text": f"★錯誤：{errormsg}",
+                    "wrap": True,
+                    "color": "#c42149",
+                    "margin": "md"
+                }
+        fillin.append(fill_4)
+
+    #按鈕
+    buttonshow = []
+    if edittype in [3,4]:
+        button = {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "略過",
+                    "text": "略過"
+                    },
+                    "height": "sm",
+                    "style": "primary",
+                    "color": "#696969"
+                }
+        buttonshow.append(button)
+
+    if edittype == 5:
+        button = {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "現金",
+                    "text": "現金"
+                    },
+                    "height": "sm",
+                    "style": "primary",
+                    "color": "#696969"
+                }
+        buttonshow.append(button)
+        button1 = {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "匯款",
+                    "text": "匯款"
+                    },
+                    "height": "sm",
+                    "style": "primary",
+                    "margin": "md",
+                    "color": "#bcb5bf"
+                }
+        buttonshow.append(button1)
+    
+    button2 = {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "取消",
+                "text": "取消"
+                },
+                "margin": "md"
+            }
+    buttonshow.append(button2)
+                        
+    fillin_screen = {
+                    "type": "bubble",
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "高逸嚴選",
+                            "color": "#A44528",
+                            "size": "sm",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"{title}",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center",
+                            "margin": "xl"
+                        },
+                        {
+                            "type": "separator",
+                            "color": "#564006",
+                            "margin": "md"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "xs",
+                            "contents": fillin,
+                            "backgroundColor": "#F5F5F5"
+                        }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": buttonshow
+                    }
+                    }
+    manufacturer_edit_screen.append(fillin_screen)
     screen =FlexSendMessage(
-                            alt_text='現/預購商品選擇',
+                            alt_text='廠商資訊修改',
                             contents={
                                 "type": "carousel",
-                                "contents": manufacturer_list_screen   
+                                "contents": manufacturer_edit_screen   
                                 } 
                             )
-    return screen'''
+    return screen
