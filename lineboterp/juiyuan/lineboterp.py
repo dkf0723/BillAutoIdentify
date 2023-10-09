@@ -19,7 +19,7 @@ from relevant_information import linebotinfo,dbinfo
 from product.cartlist import *
 from product.orderlist import *
 from selection_screen import *
-from FM import Manufacturer_fillin_and_check_screen #廠商建立用，未來拔掉
+from FM import Manufacturer_fillin_and_check_screen,Manufacturer_edit_screen,Manufacturer_list_and_new_chosen_screen #廠商建立用，未來拔掉
 from vendor_management import Manufacturer_list,Manufacturer_edit #廠商相關用，未來拔掉
 #======python的函式庫==========
 from mysql.connector import pooling
@@ -130,6 +130,8 @@ def handle_message(event):
         list_page[user_id+'廠商列表min'] = 0
     if (user_id+'廠商列表max') not in list_page:
         list_page[user_id+'廠商列表max'] = 9
+    if (user_id+'manufacturer_list_id') not in storage:
+        storage[user_id+'manufacturer_list_id'] = None
     #-------------------確認使用者狀態進行處理----------------------
     #使用者狀態不屬於normal，不允許進行其他動作
     if user_state[user_id] != 'normal':
@@ -343,22 +345,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, imgsend)
         #-------------------廠商管理-新增廠商----------------------
         elif '廠商管理' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-                alt_text='廠商管理功能選擇',
-                template=ButtonsTemplate(
-                    text='請選擇廠商管理功能：\n【廠商列表】或是【建立廠商】',
-                    actions=[
-                        MessageAction(
-                            label='【廠商列表】',
-                            text='【管理廠商】廠商列表',
-                        ),
-                        MessageAction(
-                            label='【建立廠商】',
-                            text='【管理廠商】建立廠商',
-                        )
-                    ]
-                )
-            ))
+            line_bot_api.reply_message(event.reply_token, Manufacturer_list_and_new_chosen_screen())
         elif '【管理廠商】廠商列表' in msg:
             #上方加入 global list_page = {}
             list_page[user_id+'廠商列表min'] = 0
@@ -421,23 +408,41 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token,show)
         elif '【廠商修改】廠商' in msg:
             #user_state[user_id] = 'manufacturer_edit'
-            check = msg[8:]
-            if check == '名稱':
-                show = check_manufacturer_name()#廠商名稱
-            elif check == '負責人或對接人':
-                show = check_manufacturer_principal()#廠商負責人或對接人
-            elif check == '市話':
-                show = check_manufacturer_localcalls()#廠商市話
-            elif check == '電話':
-                show = check_manufacturer_phonenum()#廠商電話
-            elif check == '付款方式':
-                show = check_manufacturer_Payment()#廠商付款方式
-            elif check == '行庫/行庫代號':
-                show = check_manufacturer_bank()#廠商行庫/行庫代號
-            elif check == '付款帳號':
-                show = check_manufacturer_bankaccount()#廠商付款帳號
+            if storage[user_id+'manufacturer_list_id'] != None:
+                check = msg[8:]
+                if check == '名稱':
+                    user_state[user_id] = 'manufacturer_edit_name'
+                    show = Manufacturer_edit_screen(1,'',storage[user_id+'manufacturer_list_name'])#edittype,errormsg,before
+                    #show = check_manufacturer_name()#廠商名稱
+                elif check == '負責人或對接人':
+                    user_state[user_id] = 'manufacturer_edit_principal'
+                    show = Manufacturer_edit_screen(2,'',storage[user_id+'manufacturer_list_principal'])#edittype,errormsg,before
+                    #show = check_manufacturer_principal()#廠商負責人或對接人
+                elif check == '市話':
+                    user_state[user_id] = 'manufacturer_edit_localcalls'
+                    show = Manufacturer_edit_screen(3,'',storage[user_id+'manufacturer_list_localcalls'])#edittype,errormsg,before
+                    #show = check_manufacturer_localcalls()#廠商市話
+                elif check == '行動電話':
+                    user_state[user_id] = 'manufacturer_edit_phonenum'
+                    show = Manufacturer_edit_screen(4,'',storage[user_id+'manufacturer_list_phone'])#edittype,errormsg,before
+                    #show = check_manufacturer_phonenum()#廠商電話
+                elif check == '付款方式':
+                    user_state[user_id] = 'manufacturer_edit_payment'
+                    show = Manufacturer_edit_screen(5,'',storage[user_id+'manufacturer_list_payment'])#edittype,errormsg,before
+                    #show = check_manufacturer_Payment()#廠商付款方式
+                elif check == '行庫/行庫代號':
+                    user_state[user_id] = 'manufacturer_edit_bank'
+                    before = [str(storage[user_id+'manufacturer_list_bankid']),storage[user_id+'manufacturer_list_bankname']]
+                    show = Manufacturer_edit_screen(6,'',before)#edittype,errormsg,before
+                    #show = check_manufacturer_bank()#廠商行庫/行庫代號
+                elif check == '付款帳號':
+                    user_state[user_id] = 'manufacturer_edit_bankaccount'
+                    show = Manufacturer_edit_screen(7,'',storage[user_id+'manufacturer_list_bankaccount'])#edittype,errormsg,before
+                    #show = check_manufacturer_bankaccount()#廠商付款帳號
+                else:
+                    show = TextSendMessage(text='不在修改項目內。')
             else:
-                show = TextSendMessage(text='===廠商資料修改===\n=>1.請打字輸入廠商名稱：\n(20字內)')
+                show = TextSendMessage(text='非正常流程進入修改喔！')
             line_bot_api.reply_message(event.reply_token,show)
     
             
