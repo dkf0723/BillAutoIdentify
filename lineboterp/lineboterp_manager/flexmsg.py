@@ -16,12 +16,12 @@ import manager
 def alls_manufacturers_name_flex_msg(result): 
     if result is not None and len(result) > 0:
         flex_messages = []
-        batch_size = 12  # 设置每批消息的最大数量
+        batch_size = 12  
 
         for i in range(0, len(result), batch_size):
-            batch_result = result[i:i+batch_size]  # 获取当前批次的结果
+            batch_result = result[i:i+batch_size] 
 
-            # 创建一个列表以存储消息内容
+            
             message_contents = []
 
             for row in batch_result:
@@ -41,7 +41,7 @@ def alls_manufacturers_name_flex_msg(result):
                     }
                 }
 
-                # 添加商品已到货按钮
+               
                 message_content['footer'] = {
                     "type": "box",
                     "layout": "vertical",
@@ -67,12 +67,12 @@ def alls_manufacturers_name_flex_msg(result):
 def allr_manufacturers_name_flex_msg(result): 
     if result is not None and len(result) > 0:
         flex_messages = []
-        batch_size = 12  # 设置每批消息的最大数量
+        batch_size = 12 
 
         for i in range(0, len(result), batch_size):
-            batch_result = result[i:i+batch_size]  # 获取当前批次的结果
+            batch_result = result[i:i+batch_size] 
 
-            # 创建一个列表以存储消息内容
+          
             message_contents = []
 
             for row in batch_result:
@@ -92,7 +92,7 @@ def allr_manufacturers_name_flex_msg(result):
                     }
                 }
 
-                # 添加商品已到货按钮
+              
                 message_content['footer'] = {
                     "type": "box",
                     "layout": "vertical",
@@ -185,7 +185,7 @@ def stock_categoryate_flex_msg(result):
             }
         )
     return flex_message
-
+#1010與下面進貨時間無法換行
 def rev_pur_info_flex_msg(result):
     if result is not None:
         bubbles = []
@@ -202,8 +202,7 @@ def rev_pur_info_flex_msg(result):
                     "contents": [
                         {"type": "text", "text": f"商品ID：{pid}"},
                         {"type": "text", "text": f"商品名稱：{pname}"},
-                        {"type": "text", "text": f"上次進貨時間：{purtime}"},
-                        
+                        {"type": "text", "text": f"上次進貨時間：\n{purtime}"}
                     ]
                 },
                     "footer": {
@@ -247,7 +246,7 @@ def rev_pur_info_flex_msg(result):
             }
         )
     return flex_message
-##1008
+
 def revc_pur_info_flex_msg(result):
     if result is not None:
         bubbles = []
@@ -264,7 +263,7 @@ def revc_pur_info_flex_msg(result):
                     "contents": [
                         {"type": "text", "text": f"商品ID：{pid}"},
                         {"type": "text", "text": f"商品名稱：{pname}"},
-                        {"type": "text", "text": f"上次進貨時間：{purtime}"},
+                        {"type": "text", "text": f"上次進貨時間：\n{purtime}"},
                         
                     ]
                 },
@@ -310,16 +309,16 @@ def revc_pur_info_flex_msg(result):
         )
     return flex_message
 
-##1008
+
 def puring_pro_flex_msg(result): 
     if result is not None and len(result) > 0:
         flex_messages = []
-        batch_size = 12  # 设置每批消息的最大数量
+        batch_size = 12  
 
         for i in range(0, len(result), batch_size):
-            batch_result = result[i:i+batch_size]  # 获取当前批次的结果
+            batch_result = result[i:i+batch_size]  
 
-            # 创建一个列表以存储消息内容
+            
             message_contents = []
 
             for row in batch_result:
@@ -345,7 +344,7 @@ def puring_pro_flex_msg(result):
                     }
                 }
 
-                # 添加商品已到货按钮
+               
                 message_content['footer'] = {
                     "type": "box",
                     "layout": "vertical",
@@ -371,12 +370,12 @@ def puring_pro_flex_msg(result):
 def pured_pro_flex_msg(result):
     if result is not None and len(result) > 0:
         flex_messages = []
-        batch_size = 12  # 设置每批消息的最大数量
+        batch_size = 12  
 
         for i in range(0, len(result), batch_size):
-            batch_result = result[i:i+batch_size]  # 获取当前批次的结果
+            batch_result = result[i:i+batch_size]  
 
-            # 创建一个列表以存储消息内容
+           
             message_contents = []
 
             for row in batch_result:
@@ -402,7 +401,7 @@ def pured_pro_flex_msg(result):
                     }
                 }
 
-                # 添加商品已到货按钮
+              
                 message_content['footer'] = {
                     "type": "box",
                     "layout": "vertical",
