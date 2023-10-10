@@ -270,21 +270,22 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, reply_messages)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
-        ##1008出不來
+        ##1010進貨時間要換行換不了
         elif msg.startswith('快速進貨-選擇廠商'):
-            manufacturerR_id = msg[10:] 
+            manufacturerR_id = msg[9:] 
             result = revm_pur_info(manufacturerR_id)
             flex_message = rev_pur_info_flex_msg(result)
             line_bot_api.reply_message(event.reply_token, flex_message)
-        ##1008需要寫狀態
+        ##1011狀態已成功可以做快速進貨且資料庫可修改
         elif msg.startswith('快速進貨-商品'):
-            # ppid = msg[5:]
-            # user_state[user_id] = 'repurchase_ck'
-            # message_storage[user_id + 'purchase_pid'] = pid
-            # check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
-            # user_state1[user_id] = 'num'
-            # line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='快速進貨-商品'))
+            ppid = msg[7:]
+            user_state[user_id] = 'repurchase_ck'
+            message_storage[user_id + 'purchase_pid'] = ppid
+            message_storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
+            check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
+            user_state1[user_id] = 'num'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
+            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='快速進貨-商品'))
         elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
             selectedr_category = msg.rstrip("1")
             result = revc_pur_info(selectedr_category)
