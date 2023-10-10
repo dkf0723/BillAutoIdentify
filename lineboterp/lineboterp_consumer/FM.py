@@ -148,8 +148,8 @@ def Manufacturer_fillin_and_check_screen(errormsg):
         title = "廠商資料確認"
     manufacturer_fillin_and_check_screen = []
     hint = ['2.請打字輸入負責人或對接人名稱：\n(10字內)',
-            '3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過',
-            '4.請打字輸入行動電話：\nex.0952025413、略過',
+            '3.請打字輸入公司市話(區碼)+市話5~8碼：\n區碼名單：02,03,037,04,049,05,06,07,08,089,082,0826,0836。\nex.0224820346、039981564、037748231',
+            '4.請打字輸入行動電話：\nex.0952025413',
             '5.請打字輸入付款方式：\nex.現金、匯款',
             '6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，擇一即可',
             '8.請打字輸入行庫帳號：\n(數字14碼內)']#編寫提示訊息
@@ -523,10 +523,6 @@ def Manufacturer_establishment_screen(num,name,principal,localcalls,phone,paymen
             }
         payinfo.append(show4)
     
-    if localcalls != '略過':
-        localcall = f"({localcalls[:-7]}){localcalls[-7:]}"
-    else:
-        localcall = localcalls
     showall = {
             "type": "bubble",
             "body": {
@@ -673,7 +669,7 @@ def Manufacturer_establishment_screen(num,name,principal,localcalls,phone,paymen
                             "contents": [
                             {
                                 "type": "text",
-                                "text": f"{localcall}",
+                                "text": f"{localcalls}",
                                 "wrap": True,
                                 "color": "#3b5a5f",
                                 "size": "md",
@@ -795,8 +791,8 @@ def Manufacturer_edit_screen(edittype,errormsg,before):
 
     hint = ['1.請打字輸入廠商名稱：\n(20字內)',
             '2.請打字輸入負責人或對接人名稱：\n(10字內)',
-            '3.請打字輸入公司市話(0+2~3碼)+7碼：\nex.039981234、0379981234、08269981234、略過',
-            '4.請打字輸入行動電話：\nex.0952025413、略過',
+            '3.請打字輸入公司市話(區碼)+市話5~8碼：\n區碼名單：02,03,037,04,049,05,06,07,08,089,082,0826,0836。\nex.0224820346、039981564、037748231',
+            '4.請打字輸入行動電話：\nex.0952025413',
             '5.請打字輸入付款方式：\nex.現金、匯款',
             '6.請打字輸入行庫代號(數字3碼)或行庫名稱(30字內)，擇一即可',
             '7.請打字輸入行庫帳號：\n(數字14碼內)']#編寫提示訊息
