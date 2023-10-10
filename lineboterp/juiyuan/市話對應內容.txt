@@ -29,6 +29,13 @@ def Citytalk():
             "total_code_length":[9]
         },
         {
+            "area":"南投縣",
+            "code":"049",
+            "starting_number":['2','3','4','5','6','7','8','9'],
+            "back_code_length":[7],
+            "total_code_length":[10]
+        },
+        {
             "area":"苗栗縣",
             "code":"037",
             "starting_number":['2','3','4','5','6','7','8','9'],
