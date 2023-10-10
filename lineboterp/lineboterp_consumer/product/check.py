@@ -13,7 +13,7 @@ from selection_screen import (Order_phonenum_screen,Single_order_confirmation_sc
                               Cart_join_success_message,Cancel_fail_message,Cart_order_screen,Cartordercheck_establishment_message,
                               Cartorder_establishment_message)
 ###---
-from relevant_information import bank#廠商建立用，未來拔掉
+from relevant_information import bank,Citytalk#廠商建立用，未來拔掉
 from FM import Manufacturer_fillin_and_check_screen,Manufacturer_establishment_screen,Manufacturer_edit_screen #廠商建立用，未來拔掉
 from vendor_management import Manufacturer_edit#廠商建立用，未來拔掉
 #----
@@ -66,6 +66,8 @@ def new_manufacturer():
         message_storage[id+'manufacturer_bankid'] = 'NAN'
         message_storage[id+'manufacturer_bankname'] = 'NAN'
         message_storage[id+'manufacturer_bankaccount'] = 'NAN'
+        message_storage[id+'manufacturer_localcalls_code'] = 'NAN'
+        message_storage[id+'manufacturer_localcalls_num'] = 'NAN'
         if message == '取消':
             state[id] = 'normal'
             check_text = TextSendMessage(text="取消新增廠商流程囉！")
@@ -138,8 +140,9 @@ def new_manufacturer():
         if message.isdigit():
             if message in ['1','2']:
                 if message == '1':
+                    citycall = f"({message_storage[id+'manufacturer_localcalls_code']}){message_storage[id+'manufacturer_localcalls_num']}"
                     check,info = manufacturer(message_storage[id+'manufacturer_name'],message_storage[id+'manufacturer_principal'],
-                                              message_storage[id+'manufacturer_localcalls'],message_storage[id+'manufacturer_phonenum'],
+                                              citycall,message_storage[id+'manufacturer_phonenum'],
                                               message_storage[id+'manufacturer_Payment'],message_storage[id+'manufacturer_bankid'],
                                               message_storage[id+'manufacturer_bankname'],message_storage[id+'manufacturer_bankaccount'])
                     if check == 'ok':
@@ -160,6 +163,8 @@ def new_manufacturer():
                 message_storage[id+'manufacturer_bankid'] = 'NAN'
                 message_storage[id+'manufacturer_bankname'] = 'NAN'
                 message_storage[id+'manufacturer_bankaccount'] = 'NAN'
+                message_storage[id+'manufacturer_localcalls_code'] = 'NAN'
+                message_storage[id+'manufacturer_localcalls_num'] = 'NAN'
             else:
                 message_storage[id+'Manufacturer_edit_step'] = 8
                 check_text = Manufacturer_fillin_and_check_screen(f"「{message}」不是此流程的內容喔！")
@@ -186,7 +191,8 @@ def manufacturer_editinfo():
         message_storage[id+'manufacturer_bankid'] = 'NAN'
         message_storage[id+'manufacturer_bankname'] = 'NAN'
         message_storage[id+'manufacturer_bankaccount'] = 'NAN'
-        message_storage[id+'manufacturer_all'] = 'NAN'
+        message_storage[id+'manufacturer_localcalls_code'] = 'NAN'
+        message_storage[id+'manufacturer_localcalls_num'] = 'NAN'
         check_text = Manufacturer_edit()
     elif state[id] == 'manufacturer_edit_name':
         if message_storage[id+'manufacturer_list_name'] == message:#判斷有沒有修改
@@ -230,7 +236,8 @@ def manufacturer_editinfo():
             textmsg,check_step = check_manufacturer_localcalls()#廠商市話檢查
             if check_step == 'ok':
                 #發送修改資料庫
-                changedb =  Manufacturer_infochange('市話',message)#ok/no
+                citycall = f"({message_storage[id+'manufacturer_localcalls_code']}){message_storage[id+'manufacturer_localcalls_num']}"
+                changedb =  Manufacturer_infochange('市話',citycall)#ok/no
                 if changedb == 'ok':
                     check_text = Manufacturer_edit()
                 else:
@@ -346,7 +353,8 @@ def manufacturer_editinfo():
     message_storage[id+'manufacturer_bankid'] = 'NAN'
     message_storage[id+'manufacturer_bankname'] = 'NAN'
     message_storage[id+'manufacturer_bankaccount'] = 'NAN'
-    message_storage[id+'manufacturer_all'] = 'NAN'
+    message_storage[id+'manufacturer_localcalls_code'] = 'NAN'
+    message_storage[id+'manufacturer_localcalls_num'] = 'NAN'
     return check_text
 
 ###-------------------廠商名稱檢查----------------------
@@ -380,33 +388,39 @@ def check_manufacturer_localcalls():
     id = lineboterp.user_id
     message = lineboterp.msg
     message_storage = lineboterp.storage
-    areacode = ['02','03','037','04','049','05','06','07','08','089','082','0826','0836']#所有區碼
+    citytalkinfo = Citytalk()#市話所有資訊
     if message.isdigit():
         check_areacode = 'no'
-        if len(message) in [9,10,11]:
-            if len(message) == 9:
-                cut_areacode = message[:2]
-                if cut_areacode in areacode:
-                    check_areacode = 'ok'
-            elif len(message) == 10:
-                cut_areacode = message[:3]
-                if cut_areacode in areacode:
-                    check_areacode = 'ok'
-            elif len(message) == 11:
-                cut_areacode = message[:4]
-                if cut_areacode in areacode:
-                    check_areacode = 'ok'
-            
-            if check_areacode == 'ok':
-                message_storage[id+'manufacturer_localcalls'] = message #市話暫存
-                check_step = 'ok'
-                check_text = ''
-            else:
+        if len(message) in [9,10]:
+            for info in citytalkinfo:
+                for i in range(4, 0, -1):#從前4,3,2,1倒數切割
+                    if message[:(i)] == info['code']:#從區碼清單中比對是否存在
+                        check_areacode = 'ok'
+                        if message[i:][0] in info['starting_number']:
+                            if len(message[i:]) in info['back_code_length']:
+                                message_storage[id+'manufacturer_localcalls'] = message #市話暫存
+                                message_storage[id+'manufacturer_localcalls_code'] = info['code'] #區碼
+                                message_storage[id+'manufacturer_localcalls_num'] = message[i:] #市話
+                                check_step = 'ok'
+                                check_text = ''
+                            else:
+                                lengthmsg = ''
+                                for length in info['back_code_length']:
+                                    lengthmsg += str(length)+'或'
+                                check_step = ''
+                                check_text = f"區碼「{info['code']}」與市話開頭「{message[i:][0]}」正確，扣除區碼之市話長度不是「{lengthmsg[:-1]}」！"
+                        else:
+                            check_step = ''
+                            check_text = f"「{info['code']}」區碼正確，電話號碼開頭錯誤！"
+                        break
+                if check_areacode == 'ok':
+                    break#提早尋找到
+            if check_areacode == 'no':
                 check_step = ''
-                check_text = f"輸入的「{message}」區碼錯誤喔！"
+                check_text = f"輸入的「{message}」其中的區碼不在臺灣所規定的'固定通信網路服務'中，請再重新查核！"
         else:
             check_step = ''
-            check_text = f"輸入的「{message}」不是市話的規則喔！"
+            check_text = f"輸入的「{message}」不是區碼加市話的9或10碼，請再重新查核！"
     else:
         if message == '略過':
             check_step = 'ok'

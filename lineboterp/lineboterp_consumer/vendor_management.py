@@ -165,12 +165,6 @@ def Manufacturer_list():
                     }
                 payinfo.append(show4)
             
-            if manufacturer_localcalls[i] is None:
-                localcall = manufacturer_localcalls[i]
-            elif manufacturer_localcalls[i] != '略過':
-                localcall = f"({manufacturer_localcalls[i][:-7]}){manufacturer_localcalls[i][-7:]}"
-            else:
-                localcall = manufacturer_localcalls[i]
             showall = {
                         "type": "bubble",
                         "body": {
@@ -278,7 +272,7 @@ def Manufacturer_list():
                                         "contents": [
                                         {
                                             "type": "text",
-                                            "text": f"{localcall}",
+                                            "text": f"{manufacturer_localcalls[i]}",
                                             "wrap": True,
                                             "color": "#3b5a5f",
                                             "size": "md",
@@ -668,13 +662,6 @@ def Manufacturer_edit():
                 "margin": "lg"
             }
         editpay.append(show7)
-
-        if localcalls is None:
-            localcall = localcalls
-        elif localcalls != '略過':
-            localcall = f"({localcalls[:-7]}){localcalls[-7:]}"
-        else:
-            localcall = localcalls
         
         #左側資訊
         show00 = {
@@ -823,7 +810,7 @@ def Manufacturer_edit():
                                 "contents": [
                                 {
                                     "type": "text",
-                                    "text": f"{localcall}",
+                                    "text": f"{localcalls}",
                                     "wrap": True,
                                     "color": "#3b5a5f",
                                     "size": "md",
