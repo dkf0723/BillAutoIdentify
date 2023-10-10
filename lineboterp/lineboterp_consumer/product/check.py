@@ -411,7 +411,7 @@ def check_manufacturer_localcalls():
                                 check_text = f"區碼「{info['code']}」與市話開頭「{message[i:][0]}」正確，扣除區碼之市話長度不是「{lengthmsg[:-1]}」！"
                         else:
                             check_step = ''
-                            check_text = f"「{info['code']}」區碼正確，電話號碼開頭錯誤！"
+                            check_text = f"「{info['code']}」區碼正確，市話號碼開頭錯誤！"
                         break
                 if check_areacode == 'ok':
                     break#提早尋找到
