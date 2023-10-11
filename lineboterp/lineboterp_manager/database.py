@@ -249,7 +249,7 @@ def np_statechange(suc_np_pid):
     category_one = 'notselect'
     retry(category_one, query_one)
   
-    query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購進貨' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{suc_np_pid}')"
+    query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購截止' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{suc_np_pid}')"
     category_two = 'notselect'
     retry(category_two, query_two)
 #-----------------抓取進貨中商品-----------------
@@ -281,7 +281,6 @@ def pured_pro():
   category ='select'
   result = retry(category,query)
   return result
-
 #-------------------圖片取得並發送----------------------
 def imagesent():
     implement = databasetest()  # 定義 databasetest() 函式並返回相關物件 #要
