@@ -180,13 +180,13 @@ def retry(category,query):#select/notselect
         result2 = 'no'
   return result
 #-------------所有廠商名稱列出---------------
-def test_manufacturers():
+def db_manufacturers():
   query = "SELECT * FROM Manufacturer_Information;"
   category = 'select' #重試類別 select/notselect
   result = retry(category,query)
   return result
 #--------------此廠商所有商品----------------
-def products_manufacturers(manufacturer_id):
+def db_products_manufacturers(manufacturer_id):
   query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價 FROM Product_information NATURAL JOIN Purchase_Information WHERE 廠商編號 = '{manufacturer_id}'"
   category = 'select'  # 重試類別 select/notselect
   result = retry(category, query)
@@ -228,13 +228,13 @@ def Product_status():
     product_status = '查無'
   return product_status    
 #--------------現購FM函數------------------------
-def Now_Product(pname):
-  user_id = manager.user_id
-  pid = manager.product[user_id + 'Product_Modification_Product_id']
-  query = f"SELECT 商品名稱,商品ID FROM Product_information natural join Purchase_Information WHERE 商品名稱 = '{pname}'AND 商品ID = '{pid}' "
-  category = 'select'  # 重試類別 select/notselect
-  result = retry(category, query)
-  return result  
+# def Now_Product(pname):
+#   user_id = manager.user_id
+#   pid = manager.product[user_id + 'Product_Modification_Product_id']
+#   query = f"SELECT 商品名稱,商品簡介,售出單價,售出單價2 FROM Product_information natural join Purchase_Information WHERE 商品名稱 = '{pname}', 商品簡介 = '{pid}',售出單價  = '{sell_price}',售出單價2  = '{sell_price2}"
+#   category = 'select'  # 重試類別 select/notselect
+#   result = retry(category, query)
+#   return result  
 # def Now_Product(pname,introduction,sell_price,sell_price2,pphoto):
 #   query = f"SELECT 商品名稱,商品簡介,售出單價,售出單價2,商品圖片 FROM Product_information natural join Purchase_Information WHERE 商品名稱 = '{pname}' AND 商品簡介 = '{introduction}' AND 售出單價 = '{sell_price}' AND 售出單價2 = '{sell_price2}' AND 商品圖片 = '{pphoto}'"
 #   category = 'select'  # 重試類別 select/notselect
