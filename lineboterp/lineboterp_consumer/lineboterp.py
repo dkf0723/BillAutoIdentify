@@ -371,7 +371,11 @@ def handle_message(event):
                 # 切割取得前後文字
                 min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
                 max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
-            list_page[user_id+'廠商列表min'] = min-1
+            if (min - 1) < 0:
+                min = 0
+            else:
+                min = min - 1
+            list_page[user_id+'廠商列表min'] = min
             list_page[user_id+'廠商列表max'] = max
             Manufacturerlistpage = Manufacturer_list()
             if 'TextSendMessage' in Manufacturerlistpage:
@@ -404,47 +408,9 @@ def handle_message(event):
             storage[user_id+'manufacturer_list_id'] = id
             list_page[user_id+'廠商列表min'] = min
             list_page[user_id+'廠商列表max'] = max
+            user_state[user_id] = 'manufacturereditall'
             show = Manufacturer_edit()
             line_bot_api.reply_message(event.reply_token,show)
-        elif '【廠商修改】廠商' in msg:
-            #user_state[user_id] = 'manufacturer_edit'
-            if storage[user_id+'manufacturer_list_id'] != None:
-                check = msg[8:]
-                if check == '名稱':
-                    user_state[user_id] = 'manufacturer_edit_name'
-                    show = Manufacturer_edit_screen(1,'',storage[user_id+'manufacturer_list_name'])#edittype,errormsg,before
-                    #show = check_manufacturer_name()#廠商名稱
-                elif check == '負責人或對接人':
-                    user_state[user_id] = 'manufacturer_edit_principal'
-                    show = Manufacturer_edit_screen(2,'',storage[user_id+'manufacturer_list_principal'])#edittype,errormsg,before
-                    #show = check_manufacturer_principal()#廠商負責人或對接人
-                elif check == '市話':
-                    user_state[user_id] = 'manufacturer_edit_localcalls'
-                    show = Manufacturer_edit_screen(3,'',storage[user_id+'manufacturer_list_localcalls'])#edittype,errormsg,before
-                    #show = check_manufacturer_localcalls()#廠商市話
-                elif check == '行動電話':
-                    user_state[user_id] = 'manufacturer_edit_phonenum'
-                    show = Manufacturer_edit_screen(4,'',storage[user_id+'manufacturer_list_phone'])#edittype,errormsg,before
-                    #show = check_manufacturer_phonenum()#廠商電話
-                elif check == '付款方式':
-                    user_state[user_id] = 'manufacturer_edit_payment'
-                    show = Manufacturer_edit_screen(5,'',storage[user_id+'manufacturer_list_payment'])#edittype,errormsg,before
-                    #show = check_manufacturer_Payment()#廠商付款方式
-                elif check == '行庫/行庫代號':
-                    user_state[user_id] = 'manufacturer_edit_bank'
-                    before = [str(storage[user_id+'manufacturer_list_bankid']),storage[user_id+'manufacturer_list_bankname']]
-                    show = Manufacturer_edit_screen(6,'',before)#edittype,errormsg,before
-                    #show = check_manufacturer_bank()#廠商行庫/行庫代號
-                elif check == '付款帳號':
-                    user_state[user_id] = 'manufacturer_edit_bankaccount'
-                    show = Manufacturer_edit_screen(7,'',storage[user_id+'manufacturer_list_bankaccount'])#edittype,errormsg,before
-                    #show = check_manufacturer_bankaccount()#廠商付款帳號
-                else:
-                    show = TextSendMessage(text='不在修改項目內。')
-            else:
-                show = TextSendMessage(text='非正常流程進入修改喔！')
-            line_bot_api.reply_message(event.reply_token,show)
-    
             
         #-------------------非上方功能的所有回覆----------------------
         else:
