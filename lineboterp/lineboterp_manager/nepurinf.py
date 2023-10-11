@@ -139,10 +139,15 @@ def renepurchase_info():
             message_storage[id + 'money_time']
         )
         if result == 'ok':
-            check_text = f'您已成功快速進貨商品{message_storage[id + "purchase_pid"]}' 
+            purchase_pid = message_storage[id + "purchase_pid"].strip('{}')
+            check_text = checkquick_ok(purchase_pid) 
         else:
             check_text = '快速進貨失敗！稍後再試'
-        check_text = TextSendMessage(text=check_text)
+            check_text = TextSendMessage(text=check_text)
+        #check_text = TextSendMessage(text=check_text)
         state[id] = 'normal'
         state1[id] = 'NAN'
     return check_text
+
+
+
