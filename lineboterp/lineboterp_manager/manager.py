@@ -12,6 +12,8 @@ from flexmsg import *
 from database import *
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import *
+from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_edit_screen,Manufacturer_list_and_new_chosen_screen
+from vendor_management import Manufacturer_list,Manufacturer_edit 
 #======python的函式庫==========
 from mysql.connector import pooling
 import tempfile, os
@@ -59,6 +61,10 @@ global duplicate_save
 duplicate_save = {}
 global db
 db = {}
+global list_page
+list_page = {}
+global storage
+storage = {}
 
 #資料庫pool設定數量4個
 dbdata = dbinfo()
@@ -178,8 +184,6 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
         elif '報表管理' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
-        elif '廠商管理' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='廠商管理'))
 ######################################庫存管理及功能選擇按鈕########################################################
         elif '庫存管理' in msg: 
             message = TextSendMessage(text='請點選以下操作功能',
@@ -403,6 +407,74 @@ def handle_message(event):
             manufacturerV_id = msg[5:] 
             result = puring_trastate(manufacturerV_id)
             line_bot_api.reply_message(event.reply_token, result)
+        #-------------------廠商管理-新增廠商----------------------
+        elif '廠商管理' in msg:
+            line_bot_api.reply_message(event.reply_token, Manufacturer_list_and_new_chosen_screen())
+        elif '【管理廠商】廠商列表' in msg:
+            #上方加入 global list_page = {}
+            list_page[user_id+'廠商列表min'] = 0
+            list_page[user_id+'廠商列表max'] = 9
+            Manufacturerlistpage = Manufacturer_list()
+            if 'TextSendMessage' in Manufacturerlistpage:
+                line_bot_api.reply_message(event.reply_token,Manufacturerlistpage)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【管理廠商】廠商列表',
+                contents={
+                    "type": "carousel",
+                    "contents": Manufacturerlistpage      
+                    } 
+                ))
+        elif '【廠商列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【廠商列表下一頁】"的位置
+            start_index = original_string.find("【廠商列表下一頁】")
+            if start_index != -1:
+                # 從"【廠商列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【廠商列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            if (min - 1) < 0:
+                min = 0
+            else:
+                min = min - 1
+            list_page[user_id+'廠商列表min'] = min
+            list_page[user_id+'廠商列表max'] = max
+            Manufacturerlistpage = Manufacturer_list()
+            if 'TextSendMessage' in Manufacturerlistpage:
+                line_bot_api.reply_message(event.reply_token,Manufacturerlistpage)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【管理廠商】廠商列表',
+                contents={
+                    "type": "carousel",
+                    "contents": Manufacturerlistpage      
+                    } 
+                ))
+        elif '【管理廠商】建立廠商' in msg:
+            user_state[user_id] = 'manufacturer_name'
+            storage[user_id+'Manufacturer_edit_step'] = 0
+            show = Manufacturer_fillin_and_check_screen('')
+            line_bot_api.reply_message(event.reply_token,show)
+        elif '【廠商修改資料】' in msg:
+            original_string = msg
+            # 找到"【廠商修改資料】"的位置
+            start_index = original_string.find("【廠商修改資料】")
+            if start_index != -1:
+                # 從"【廠商修改資料】"後面開始切割字串
+                substr = original_string[start_index + len("【廠商修改資料】"):]
+                # 切割取得前後文字
+                id = substr.split("_")[0].strip() # 取出_前面的廠商id
+                substrpage = substr.split("_")[1].strip() # 取出_後面的頁號
+                min = int(substrpage.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substrpage.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            storage[user_id+'manufacturer_list_id'] = id
+            list_page[user_id+'廠商列表min'] = min
+            list_page[user_id+'廠商列表max'] = max
+            user_state[user_id] = 'manufacturereditall'
+            show = Manufacturer_edit()
+            line_bot_api.reply_message(event.reply_token,show)
             #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
             databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n更新時間：\n{db['databaseup']}\n下次更新時間：\n{db['databasenext']}\n\n"

@@ -551,3 +551,4 @@ def checkquick_ok(purchase_pid):
             }
             }
     return FlexSendMessage(alt_text="新增確認選項", contents = bubble)
+
