@@ -4,7 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 import manager
 from database import *
-from FM import products_manufacturers_FM,Now_Product_Modification_FM,Pre_Product_Modification_FM
+from FM import Now_Product_Modification_FM,Pre_Product_Modification_FM
 
 #-------------------使用者狀態檢查----------------------
 message_storage = {}
@@ -116,71 +116,6 @@ def add_goods():
 #     return flex_message 
 
 #--------蓉-我正在測試中----------------
-# def product_modification():
-#     id = manager.user_id
-#     state = manager.user_state
-#     message = manager.msg
-#     product = manager.product
-#     manufacturer_id = product[id + 'Product_Modification_manufacturer_id'] 
-#     product_status = product[id + 'Product_Modification_Product_status']  # 現預購狀態
-#     product_id = product[id + 'Product_Modification_Product_id']
-    
-#     if state[id] == 'Product_Modification_Product':
-#         info = message[8:]
-#         if '商品名稱' == info:
-#             state[id] = 'Product_Modification_Product_Pname'#修改商品名稱
-#             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的商品名稱:')
-#         elif'商品簡介' == info:
-#             state[id] = 'Product_Modification_Pintroduction'#修改商品簡介
-#             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的修改商品簡介:')
-#         elif'商品售出單價' == info:
-#             flex_message = TextSendMessage(text='修改商品售出單價')
-#         elif message == '取消':
-#             state[id] = 'normal'
-#             flex_message = TextSendMessage(text='已經取消囉！')
-#         else:
-#             flex_message = TextSendMessage(text=f'「{message}」錯誤內容指令')
-
-#     elif state[id] =='Product_Modification_Product_Pname':#修改商品名稱
-#         if message != '取消':
-#             product_id = product[id + 'Product_Modification_Product_id']
-#             result = MP_information_Pname(message, product_id)
-#             if result == 'ok':
-#                 if product_status == '現購':
-#                     flex_message = Now_Product_Modification_FM(product_id)
-#                 elif product_status == '預購':
-#                     flex_message = Pre_Product_Modification_FM(product_id)
-#                 elif product_status == '查無':
-#                     flex_message = TextSendMessage(text='商品有誤！')
-#             else:
-#                 flex_message = TextSendMessage(text='修改失敗請稍後再試')
-#             state[id] = 'normal'  # 恢復使用者狀態
-#         else:
-#             state[id] = 'normal'  # 恢復使用者狀態
-
-#     elif state[id] =='Product_Modification_Pintroduction':#修改商品簡介
-#         if message != '取消':
-#             product_id = product[id + 'Product_Modification_Product_id']
-#             result = MP_information_Pintroduction(message, product_id)
-#             if result == 'ok':
-#                 if product_status == '現購':
-#                     flex_message = Now_Product_Modification_FM(product_id)
-#                 elif product_status == '預購':
-#                     flex_message = Pre_Product_Modification_FM(product_id)
-#                 elif product_status == '查無':
-#                     flex_message = TextSendMessage(text='商品有誤！')
-#             else:
-#                 flex_message = TextSendMessage(text='修改失敗請稍後再試')
-#             state[id] = 'normal'  # 恢復使用者狀態
-#         else:
-#             state[id] = 'normal'  # 恢復使用者狀態
-
-#     elif state[id] == 'Product_Modification_Pintroduction':
-#         flex_message = ''
-#     else:  # 取消修改動作
-#         state[id] = 'normal'  # 恢復使用者狀態
-#     return flex_message
-#--------測試2-----------------
 def product_modification():
     id = manager.user_id
     state = manager.user_state
@@ -206,6 +141,7 @@ def product_modification():
             state[id] = 'Product_Modification_Punit price sold2'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的商品售出單價2:')
         elif '更換商品圖片' == info:
+            
             state[id] = 'Product_Modification_Photo'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想更換的商品圖片:')        
         elif message == '取消':
@@ -243,8 +179,16 @@ def get_product_modification_flex_message(product_status, product_id):
         return Now_Product_Modification_FM(product_id)
     elif product_status == '預購':
         return Pre_Product_Modification_FM(product_id)
+    elif product_status == '預購進貨':
+        return Pre_Product_Modification_FM(product_id)
+    elif product_status == '預購未取':
+        return Pre_Product_Modification_FM(product_id)
+    elif product_status == '預購截止':
+        return Pre_Product_Modification_FM(product_id)
     elif product_status == '查無':
         return TextSendMessage(text='商品有誤！')
+
+
 
 
 '''def search_inf():
