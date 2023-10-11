@@ -10,10 +10,8 @@ from linebot.models import TextSendMessage
 #======這裡是呼叫的檔案內容=====
 from flexmsg import *
 from database import *
-#from repurinf import *
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import *
-#from pdf_utils import create_pdf
 #======python的函式庫==========
 from mysql.connector import pooling
 import tempfile, os
@@ -285,7 +283,9 @@ def handle_message(event):
             check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
             user_state1[user_id] = 'num'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='快速進貨-商品'))
+        elif msg.startswith('您已成功快速進貨商品'):
+            suc_np_pid = msg[11:]
+            np_statechange(suc_np_pid)
         elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
             selectedr_category = msg.rstrip("1")
             result = revc_pur_info(selectedr_category)
@@ -326,7 +326,6 @@ def handle_message(event):
                     ]
                 )
             )) 
-
         elif '【庫存查詢】' in msg:
             if msg[6:] == '廠商':
                 result = alls_manufacturers_name()

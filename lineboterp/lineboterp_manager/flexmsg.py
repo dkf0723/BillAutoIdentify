@@ -498,3 +498,56 @@ def check_ok(purchase_pid):
             }
             }
     return FlexSendMessage(alt_text="新增確認選項", contents = bubble)
+
+
+def checkquick_ok(purchase_pid):
+    bubble = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "weight": "bold",
+                    "size": "xl",
+                    "margin": "none",
+                    "text": "您已成功快速進貨商品",
+                    "gravity": "center",
+                    "align": "center"
+                },
+                {
+                    "type": "separator",
+                    "margin": "sm"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "message",
+                        "label": "完成",
+                        "text": f"您已成功快速進貨商品 {purchase_pid}"
+                        },
+                        "margin": "xs",
+                        "position": "relative",
+                        "style": "primary",
+                        "gravity": "center"
+                    }
+                    ],
+                    "spacing": "xs"
+                }
+                ],
+                "margin": "none",
+                "spacing": "none"
+            },
+            "styles": {
+                "footer": {
+                "separator": True
+                }
+            }
+            }
+    return FlexSendMessage(alt_text="新增確認選項", contents = bubble)
