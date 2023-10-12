@@ -146,13 +146,13 @@ def imagetolink():
     #delete_images()#刪除images檔案圖片
   return {'imagetitle':imagetitle,'imagelink':imagelink}
 
-#-------------------取出預購/未取名單---------------------------------
-def order_list(queryObject):
+#-------------------取出預購名單---------------------------------
+def preorder_list():
   cursor = manager.db['cursor']
   query = f"""
           SELECT 訂單編號, 會員_LINE_ID, 電話, 訂單成立時間, 總額
           FROM Order_information
-			    WHERE 訂單狀態未取已取='{queryObject}';"""
+			    WHERE 訂單狀態未取已取='預購';"""
   cursor.execute(query)
   result = cursor.fetchall()
   if result != []:
@@ -161,21 +161,20 @@ def order_list(queryObject):
     orderlist = "找不到符合條件的資料。"
   return orderlist
 #-------------------取出未取名單---------------------------------
-# def notpickedup_list():
-#   cursor = manager.db['cursor'] 
-#   query = """
-#           SELECT 訂單編號, 會員_LINE_ID, 電話, 訂單成立時間, 總額
-#           FROM Order_information
-# 			    WHERE 訂單狀態未取已取='未取';"""
-#   cursor.execute(query)
-#   notpickedup_result = cursor.fetchall()
-
-#   if notpickedup_result != []:
-#     notpickeduplist = notpickedup_result
-#   else:
-#     notpickeduplist = "找不到符合條件的資料。" 
-
-#   return notpickeduplist
+def order_list():
+  cursor = manager.db['cursor']
+  query = f"""
+          SELECT 訂單編號, 會員_LINE_ID, 電話, 訂單成立時間, 總額
+          FROM Order_information
+			    WHERE 訂單狀態未取已取='預購未取' or 訂單狀態未取已取='現購未取'
+          limit 100 offset 0;"""
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if result != []:
+    orderlist = result
+  else:
+    orderlist = "找不到符合條件的資料。"
+  return orderlist
 #-------------------訂單詳細資料------------------------
 def orderdt():
   userid = manager.user_id
