@@ -5,8 +5,8 @@ from linebot.models import *
 from database  import order_list, orderdt
 import manager
 #---------------預購/未取------------
-def manager_order_list(queryObject):
-    db_nottaken = order_list(queryObject)
+def manager_order_list():
+    db_nottaken = order_list()
     if db_nottaken=="找不到符合條件的資料。":
       ordernottaken_show = TextSendMessage(text=db_nottaken)
     else:
