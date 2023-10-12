@@ -12,8 +12,9 @@ from database import *
 from test_check import *
 from relevant_information import *
 from DidnotPickedUp import *
-from selection_screen import *
+from Preorder import *
 from Inventoryinquiry import *
+from selection_screen import *
 from test import *
 #======python的函數庫==========
 import tempfile, os
@@ -185,15 +186,11 @@ def handle_message(event):
         elif '預購/未取名單' in msg:
             line_bot_api.reply_message(event.reply_token, Order_preorder_selectionscreen())
         elif '【預購名單】列表' in msg:
-                queryObject = '預購'
-                # querylist = '預購名單'
-                show = manager_order_list(queryObject)
-                line_bot_api.reply_message(event.reply_token, show)
+            show = manager_preorder_list()
+            line_bot_api.reply_message(event.reply_token, show)
         elif '【未取名單】列表' in msg:
-                queryObject = '未取'
-                # querylist = '未取名單'
-                show = manager_order_list(queryObject)
-                line_bot_api.reply_message(event.reply_token, show)
+            show = manager_order_list()
+            line_bot_api.reply_message(event.reply_token, show)
         elif '【訂單詳細】' in msg:
             msg = str(msg)
             orderall[user_id+'dt'] = msg[-18:]
