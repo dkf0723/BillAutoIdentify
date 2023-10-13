@@ -431,7 +431,7 @@ def nopur_inf_flex_msg(result):
             body=BoxComponent(
                 layout='vertical',
                 contents=[
-                    TextComponent(text='新增進貨資訊商品ID列表', weight='bold', size='lg'),
+                    TextComponent(text='新增進貨資訊商品列表', weight='bold', size='lg'),
                 ],
             ),
         )
@@ -440,12 +440,36 @@ def nopur_inf_flex_msg(result):
             button = ButtonComponent(
                 style='link',
                 height='sm',
-                action=MessageAction(label=row[1], text=f"商品ID:{str(row[0])+str(row[2])}")
+                action=MessageAction(label=row[1], text=f"預購商品ID:{str(row[0])+str(row[2])}")
             )
             bubble.body.contents.append(button)
 
         flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
         return flex_message
+
+def product_ing_flex_msg(result):
+    if result:
+        bubble = BubbleContainer(
+            direction='ltr',
+            body=BoxComponent(
+                layout='vertical',
+                contents=[
+                    TextComponent(text='新增現購進貨資訊商品列表', weight='bold', size='lg'),
+                ],
+            ),
+        )
+
+        for row in result:
+            button = ButtonComponent(
+                style='link',
+                height='sm',
+                action=MessageAction(label=row[1], text=f"現購商品ID:{str(row[0])+str(row[2])}")
+            )
+            bubble.body.contents.append(button)
+
+        flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
+        return flex_message
+
 
 def check_ok(purchase_pid):
     bubble = {
@@ -459,7 +483,7 @@ def check_ok(purchase_pid):
                     "weight": "bold",
                     "size": "xl",
                     "margin": "none",
-                    "text": "您已成功新增進貨商品",
+                    "text": "您已成功新增預購進貨商品",
                     "gravity": "center",
                     "align": "center"
                 },
@@ -477,7 +501,59 @@ def check_ok(purchase_pid):
                         "action": {
                         "type": "message",
                         "label": "完成",
-                        "text": f"您已成功新增進貨商品 {purchase_pid}"
+                        "text": f"您已成功新增預購進貨商品 {purchase_pid}"
+                        },
+                        "margin": "xs",
+                        "position": "relative",
+                        "style": "primary",
+                        "gravity": "center"
+                    }
+                    ],
+                    "spacing": "xs"
+                }
+                ],
+                "margin": "none",
+                "spacing": "none"
+            },
+            "styles": {
+                "footer": {
+                "separator": True
+                }
+            }
+            }
+    return FlexSendMessage(alt_text="新增確認選項", contents = bubble)
+
+def check_okok(purchase_pid):
+    bubble = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "weight": "bold",
+                    "size": "xl",
+                    "margin": "none",
+                    "text": "您已成功新增預購進貨商品",
+                    "gravity": "center",
+                    "align": "center"
+                },
+                {
+                    "type": "separator",
+                    "margin": "sm"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "action": {
+                        "type": "message",
+                        "label": "完成",
+                        "text": f"您已成功新增現購進貨商品 {purchase_pid}"
                         },
                         "margin": "xs",
                         "position": "relative",
@@ -552,3 +628,159 @@ def checkquick_ok(purchase_pid):
             }
     return FlexSendMessage(alt_text="新增確認選項", contents = bubble)
 
+def Order_preorder_selectionscreen(): #管理者-預購/未取
+    Order_preorder_screen = []
+    Order = {
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "url": "https://i.imgur.com/vLCC99Q.jpg",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "預購名單",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "text",
+                    "text": "※最近100筆預購訂單",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "預購訂單成立由近到遠排序",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "sm",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "可顯示預購訂單詳細內容",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "sm",
+                    "weight": "bold"
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                {
+                    "type": "button",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": "預購名單列表",
+                    "text": "【預購名單】列表"
+                    },
+                    "color": "#1a9879",
+                    "style": "primary"
+                }
+                ],
+                "flex": 0
+            }
+            }
+    Order_preorder_screen.append(Order)
+    preorder = {
+                "type": "bubble",
+                "hero": {
+                    "type": "image",
+                    "url": "https://i.imgur.com/5ksWY7Y.jpg",
+                    "size": "full",
+                    "aspectRatio": "20:13",
+                    "aspectMode": "cover"
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "未取名單",
+                        "weight": "bold",
+                        "size": "xl",
+                        "align": "center"
+                    },
+                    {
+                        "type": "text",
+                        "text": "※最近100筆未取訂單",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "md",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "※未取訂單成立由近到遠排序",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "sm",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "※可顯示未取訂單詳細內容",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "sm",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "未取名單列表",
+                        "text": "【未取名單】列表"
+                        },
+                        "color": "#c42149",
+                        "style": "primary"
+                    }
+                    ],
+                    "flex": 0
+                }
+                }
+    Order_preorder_screen.append(preorder)
+    screen =FlexSendMessage(
+                            alt_text='預購/未取名單列表',
+                            contents={
+                                "type": "carousel",
+                                "contents": Order_preorder_screen   
+                                } 
+                            )
+    return screen
