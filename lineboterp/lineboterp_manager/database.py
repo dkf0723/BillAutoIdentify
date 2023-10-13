@@ -232,18 +232,25 @@ def purchase_categoryate(selectedA_category):
 ##1009完成新增進貨商品資料庫內容
 #-----------------抓取未有進貨資訊的商品ID---------------
 def nopur_inf():
-  query = f"SELECT P.商品ID,P.商品名稱,P.商品單位 FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID WHERE PI.商品ID IS NULL;"
+  query = f"SELECT P.商品ID,P.商品名稱,P.商品單位 FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID WHERE PI.商品ID IS NULL AND P.現預購商品 = '預購';"
   category ='select'
   result = retry(category,query)
   return result
-#----------------將使用者輸入的新增進貨資訊存到資料庫-------------
+#----------------將使用者輸入的新增預購進貨資訊存到資料庫-------------
 def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
   query = f"""INSERT INTO Purchase_Information (商品ID,進貨數量, 進貨單價, 商品單位, 進貨狀態, 進貨時間, 匯款金額,匯款時間) 
             VALUES ('{purchase_pid}','{purchase_num}','{purchase_cost}','{purchase_unit}','進貨中','{purchase_time}','{give_money}','{money_time}');"""
   category ='notselect'
   result = retry(category, query)
   return result
-#------------------新增進貨資訊後的狀態改變-預購進貨---------------------
+#----------------將使用者輸入的新增現購進貨資訊存到資料庫-------------
+def newingtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
+  query = f"""INSERT INTO Purchase_Information (商品ID,進貨數量, 進貨單價, 商品單位, 進貨狀態, 進貨時間, 匯款金額,匯款時間) 
+            VALUES ('{purchase_pid}','{purchase_num}','{purchase_cost}','{purchase_unit}','已到貨','{purchase_time}','{give_money}','{money_time}');"""
+  category ='notselect'
+  result = retry(category, query)
+  return result
+#------------------新增預購進貨資訊後的狀態改變-預購進貨---------------------
 def np_statechange(suc_np_pid):
     query_one = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{suc_np_pid}';"
     category_one = 'notselect'
@@ -252,6 +259,11 @@ def np_statechange(suc_np_pid):
     query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購截止' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{suc_np_pid}')"
     category_two = 'notselect'
     retry(category_two, query_two)
+#------------------新增現購進貨資訊後的狀態改變---------------------
+# def nping_statechange(succc_np_pid):
+#     query_one = f"UPDATE Purchase_information SET 進貨狀態 = '已到貨' WHERE 商品ID = '{succc_np_pid}';"
+#     category_one = 'notselect'
+#     retry(category_one, query_one)
 #-----------------抓取進貨中商品-----------------
 def puring_pro():
   query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='進貨中'"
@@ -281,6 +293,15 @@ def pured_pro():
   category ='select'
   result = retry(category,query)
   return result
+#------------------抓取現購商品------------------
+def product_ing():
+  query = f"""SELECT P.商品ID,P.商品名稱,P.商品單位 
+            FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID 
+            WHERE PI.商品ID IS NULL AND P.現預購商品 = '現購';"""
+  category ='select'
+  result = retry(category,query)
+  return result
+
 #-------------------圖片取得並發送----------------------
 def imagesent():
     implement = databasetest()  # 定義 databasetest() 函式並返回相關物件 #要
@@ -444,3 +465,62 @@ def Manufacturer_infochange(editfield,changeinfo):
   result = retry(category,query)
   return result
 #---------------------廠商管理結束--------------------
+#-------------------取出預購名單---------------------------------海碧
+def preorder_list():
+  query = f"""
+          SELECT 訂單編號, 會員_LINE_ID, 電話, 訂單成立時間, 總額
+          FROM Order_information
+			    WHERE 訂單狀態未取已取='預購';"""
+  category ='select'
+  result = retry(category,query)
+  return result
+ 
+#-------------------取出未取名單---------------------------------
+def order_list():
+  query = f"""
+          SELECT 訂單編號, 會員_LINE_ID, 電話, 訂單成立時間, 總額
+          FROM Order_information
+			    WHERE 訂單狀態未取已取='預購未取' or 訂單狀態未取已取='現購未取'
+          limit 100 offset 0;"""
+  category ='select'
+  result = retry(category,query)
+  return result
+#-------------------訂單詳細資料------------------------
+def orderdt():
+  userid = manager.user_id
+  ordersearch = manager.orderall[userid+'dt'] #本是使用者的ID
+  query = f"""
+          SELECT
+            Order_information.訂單編號,
+            Order_information.電話,
+            Order_information.訂單狀態未取已取,
+            Product_information.商品ID,
+            Product_information.商品名稱,
+            Product_information.商品單位,
+            order_details.訂購數量,
+            order_details.商品小計,
+            Order_information.總額,
+            Order_information.訂單成立時間,
+            Order_information.取貨完成時間
+          FROM
+            Order_information
+          JOIN
+            order_details ON Order_information.訂單編號 = order_details.訂單編號
+          JOIN
+            Product_information ON order_details.商品ID = Product_information.商品ID
+          WHERE Order_information.訂單編號 = '{ordersearch}' ;
+          """
+  category ='select'
+  result = retry(category,query)
+  return result
+#-------------------取出庫存---------------------------------
+def inquiry_list():
+  query = """
+    SELECT 商品名稱, 商品ID, 庫存數量
+    FROM Product_information
+    WHERE 現預購商品='現購' AND 庫存數量 IS NOT NULL AND 庫存數量<=20
+    order by 庫存數量 asc;"""
+  category ='select'
+  result = retry(category,query)
+  return result
+#-----------------------------------------------------海碧

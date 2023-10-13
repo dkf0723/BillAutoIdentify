@@ -14,6 +14,9 @@ from relevant_information import linebotinfo,dbinfo
 from nepurinf import *
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_edit_screen,Manufacturer_list_and_new_chosen_screen
 from vendor_management import Manufacturer_list,Manufacturer_edit 
+from DidnotPickedup import *
+from Preorder import *
+from Inventoryinquiry import *
 #======python的函式庫==========
 from mysql.connector import pooling
 import tempfile, os
@@ -65,6 +68,8 @@ global list_page
 list_page = {}
 global storage
 storage = {}
+global orderall
+orderall = {}
 
 #資料庫pool設定數量4個
 dbdata = dbinfo()
@@ -180,8 +185,6 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
         elif '【新廠商】'in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))   
-        elif '未取名單' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
         elif '報表管理' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
 ######################################庫存管理及功能選擇按鈕########################################################
@@ -201,8 +204,12 @@ def handle_message(event):
                     text='請選擇新增或快速進貨商品：',
                     actions=[
                         MessageAction(
-                            label='【新增】',
-                            text='【進貨商品】新增',
+                            label='【新增預購】',
+                            text='【進貨商品】新增預購商品',
+                        ),
+                        MessageAction(
+                            label='【新增現購】',
+                            text='【進貨商品】新增現購商品',
                         ),
                         MessageAction(
                             label='【快速進貨】',
@@ -212,7 +219,7 @@ def handle_message(event):
                 )
             ))
         elif '【進貨商品】' in msg:
-            if msg[6:] == '新增':
+            if msg[6:] == '新增預購商品':
                 result = nopur_inf()
                 flex_message = nopur_inf_flex_msg(result)
                 line_bot_api.reply_message(event.reply_token, flex_message)
@@ -233,19 +240,36 @@ def handle_message(event):
                                     ]
                                 )
                             ))
-        elif msg.startswith('商品ID:'):
-            pid = msg[5:-1]
+            elif msg[6:] == '新增現購商品':
+                result = product_ing()
+                flex_message = product_ing_flex_msg(result)
+                line_bot_api.reply_message(event.reply_token, flex_message)
+        elif msg.startswith('預購商品ID:'):
+            pid = msg[7:-1]
             unit = msg[-1:]
-            user_state[user_id] = 'purchase_ck'
+            user_state[user_id] = 'pre_purchase_ck'
             message_storage[user_id + 'purchase_pid'] = pid
             message_storage[user_id + 'purchase_unit'] = unit
             message_storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
             check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
             user_state1[user_id] = 'num'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-        elif msg.startswith('您已成功新增進貨商品'):
+        elif msg.startswith('您已成功新增預購進貨商品'):
             suc_np_pid = msg[11:]
             np_statechange(suc_np_pid)
+        elif msg.startswith('現購商品ID:'):
+            pid = msg[7:-1]
+            unit = msg[-1:]
+            user_state[user_id] = 'purchasing_ck'
+            message_storage[user_id + 'purchase_pid'] = pid
+            message_storage[user_id + 'purchase_unit'] = unit
+            message_storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
+            check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
+            user_state1[user_id] = 'num'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
+        # elif msg.startswith('您已成功新增現購進貨商品'): ##庫存數量觸發
+        #     succc_np_pid = msg[11:]
+        #     nping_statechange(succc_np_pid)
         elif '【快速進貨】' in msg:
             if msg[6:] == '類別':
                 message = TextSendMessage(text='請點選查詢類別',
@@ -356,8 +380,6 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, message)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
-        elif '【查詢】庫存警示' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='庫存警示'))
         elif msg.startswith('庫存-選擇廠商'):
             manufacturer_id = msg[8:] 
             result = stock_manufacturers(manufacturer_id)
@@ -404,7 +426,8 @@ def handle_message(event):
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
         elif msg.startswith('商品已到貨'):
-            manufacturerV_id = msg[5:] 
+            manufacturerV_id = msg[5:]
+            #需加一個flexmessage選擇預購未取或現貨
             result = puring_trastate(manufacturerV_id)
             line_bot_api.reply_message(event.reply_token, result)
         #-------------------廠商管理-新增廠商----------------------
@@ -475,6 +498,54 @@ def handle_message(event):
             user_state[user_id] = 'manufacturereditall'
             show = Manufacturer_edit()
             line_bot_api.reply_message(event.reply_token,show)
+        elif '未取/預購名單' in msg:
+            line_bot_api.reply_message(event.reply_token, Order_preorder_selectionscreen())
+        elif '【預購名單】列表' in msg:
+            show = manager_preorder_list()
+            line_bot_api.reply_message(event.reply_token, show)
+        elif '【未取名單】列表' in msg:
+            show = manager_order_list()
+            line_bot_api.reply_message(event.reply_token, show)
+        elif '【訂單詳細】' in msg:
+            msg = str(msg)
+            orderall[user_id+'dt'] = msg[-18:]
+            searchresult = orderdtsearch()
+            line_bot_api.reply_message(event.reply_token, searchresult)
+            #-------------------庫存查詢----------------------
+        elif '【查詢】庫存警示' in msg:
+            list_page[user_id+'庫存min'] = 0
+            list_page[user_id+'庫存max'] = 9
+            show = manager_inquiry_list()
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【查詢】庫存警示',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
+        elif '【庫存警示列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【庫存警示列表下一頁】"的位置
+            start_index = original_string.find("【庫存警示列表下一頁】")
+            if start_index != -1:
+                # 從"【庫存警示列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【庫存警示列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'庫存min'] = min-1
+            list_page[user_id+'庫存max'] = max
+            show = manager_inquiry_list()
+            if 'TextSendMessage' in show:
+                line_bot_api.reply_message(event.reply_token,show)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【庫存警示】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
             #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
             databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n更新時間：\n{db['databaseup']}\n下次更新時間：\n{db['databasenext']}\n\n"
