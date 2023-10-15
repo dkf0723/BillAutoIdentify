@@ -59,6 +59,8 @@ global duplicate_save
 duplicate_save = {}
 global db
 db = {}
+global global_Storage
+global_Storage ={}
 
 #資料庫pool設定數量4個
 dbdata = dbinfo()
@@ -91,27 +93,9 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, check_text)
     else:
         if '顧客取貨' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-                alt_text='取貨選擇',
-                template=ConfirmTemplate(
-                    text='請選擇取貨方式：\n【手機後三碼】或是【訂單編號】',
-                    actions=[
-                        MessageAction(
-                            label='【後三碼】',
-                            text='【取貨】手機後三碼',
-                        ),
-                        MessageAction(
-                            label='【訂單編號】',
-                            text='【取貨】訂單編號'
-                        )
-                    ]
-                )
-            ))
-        elif '【取貨】' in msg:
-            if msg[4:] == '手機後三碼':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
-            elif msg[4:] == '訂單編號':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
+            user_state[user_id] = 'searchingOrderByPhoneNumber'
+            user_state1[user_id] = 'first'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入手機後三碼'))
      #--------商品管理----------------#           
         elif '商品管理' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -274,7 +258,13 @@ def handle_message(event):
             #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
         elif '【新廠商】'in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
-
+        elif '新增現購商品'in msg:
+            user_state[user_id] = 'createNowProduct'
+            user_state1[user_id] = 'first'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
+        elif '新增預購商品'in msg:
+            # line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
+            print('0')
         elif '未取名單' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
         elif '報表管理' in msg:
@@ -393,3 +383,25 @@ import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+  
+# #使用者圖片處理
+# @handler.add(MessageEvent, message=ImageMessage)
+# def handle_image_message(event):
+#     global msgtype
+#     msgtype = event.message.type
+#     if user_state[user_id] == 'wishesimg':#願望圖片上傳狀態執行
+#         image_name = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(4))#為圖片隨機命名
+#         image_content = line_bot_api.get_message_content(event.message.id)#取得訊息的ID
+#         image_name = image_name.upper()+'.jpg'#轉換大寫並加入副檔名
+#         path='images/'+image_name #儲存資料夾路徑
+#         with open(path, 'wb') as fd: #執行檔案寫入
+#             for chunk in image_content.iter_content():
+#                 fd.write(chunk)
+#         storage[user_id+'img'] = path #暫存圖片路徑
+#         line_bot_api.reply_message(event.reply_token, wishes())
+#     else:
+#         if user_state[user_id] in ['wishes','wishesreason','wishessource','wishescheck']:#以下狀態皆不需要接收到圖片
+#             wishesin = wishes()
+#             line_bot_api.reply_message(event.reply_token, [TextSendMessage(text='目前動作狀態無需發送照片呦～'),wishesin[1]])
+#         else:
+#             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='目前動作狀態無需發送照片呦～'))

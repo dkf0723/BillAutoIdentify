@@ -378,3 +378,69 @@ def test_Product_Modification(pid):
 #     result = retry(category,query)
 #     return result
 
+# def single_imagetolink():
+#   id = lineboterp.user_id
+#   storageimg = lineboterp.storage
+#   imgurdata = imgurinfo()
+#   # 取得圖片路徑
+#   image_files = f"{storageimg[id+'img']}" #例：images/FXR0.jpg
+#   #執行轉換連結
+#   CLIENT_ID = imgurdata['CLIENT_ID_data']
+#   PATH = image_files
+#   title = image_files[:-4]
+#   im = pyimgur.Imgur(CLIENT_ID)
+#   uploaded_image = im.upload_image(PATH, title=title)
+#   imagelink = uploaded_image.link
+#   storageimg[id+'imagelink'] = imagelink #儲存圖片連結
+#   #執行資料夾中此圖片刪除
+#   if os.path.isfile(image_files):
+#       os.remove(image_files)
+def getPhoneNumberByPhoneNumberLastThreeYard(phoneNumber):
+    query = f"SELECT 電話 FROM Order_information WHERE 電話 LIKE '%{phoneNumber}';"
+    result = retry('select',query)
+    send = []
+    if result is not None:
+        for row in result:
+            send.append(row[0])       
+    # 關閉游標與連線
+    return send
+def getOrderByPhoneNumber(phoneNumber):
+    query = f"SELECT 訂單編號 FROM Order_information WHERE 電話 = '{phoneNumber}';"
+    # cursor.execute(query)
+    result = retry('select',query)
+    # result = cursor.fetchall() 
+    send = []
+    if result is not None:
+        for row in result:
+            send.append(row[0])       
+    # 關閉游標與連線
+    return send
+
+def getOrderDetailByPhoneNumber(phoneNumber):
+    query = f"SELECT o.訂單編號,p.商品名稱 ,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 in( select 訂單編號 from Order_information where 電話 = '{phoneNumber}');"
+    result = retry('select', query)
+    test =''
+    send = []
+    a=[]
+    for i in result:
+        if i[0] == test:
+          a.append(i)
+        else :
+          test = i[0]  
+          send.append(a)
+          a =[]
+          a.append(i)
+    send.append(a)
+    send.pop(0)
+    return send
+def getOrderDetailByOrder(order):
+    query = f"SELECT o.訂單編號,p.商品名稱,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 = '{order}';"
+    result = retry('select', query)
+    send=[]    
+    send.append(result)
+    # 關閉游標與連線
+    return send
+def getTotalByOrder(order):
+    query = f"SELECT 總額 FROM Order_information WHERE 訂單編號 = '{order}';"
+    result = retry('select', query)
+    return result[0][0]

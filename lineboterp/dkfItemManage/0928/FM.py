@@ -10,6 +10,7 @@ from relevant_information import dbinfo,imgurinfo
 import os, io, pyimgur, glob
 import manager
 from database import product_info
+import database
 #-------------所有廠商名稱列出(FM)---------------
 def test_manufacturers_FM(result):
   if result is not None:
@@ -87,6 +88,8 @@ def test_manufacturers_FM(result):
     flex_message = FlexSendMessage(alt_text="廠商列表", contents={"type": "text", "text": "找不到符合條件的廠商。"})     
   return flex_message
 #---------------此廠商所有商品(已變數/FM)-------------------------
+
+
 def products_manufacturers_FM(result):
   if result is not None:
     bubbles = []
@@ -843,3 +846,251 @@ def Pre_Product_Modification_CFM():
             }
           }
   return FlexSendMessage(alt_text="產品修改選項", contents=bubble)
+
+def create_now_purchase_product(id):
+  storage = manager.global_Storage
+  pname = storage[id+'pname']
+  category= storage[id+'category']
+  unit= storage[id+'unit']
+  introduction= storage[id+'introduction']
+  unitPrice= storage[id+'unitPrice']
+  unitPrice2= storage[id+'unitPrice2']
+  picture= storage[id+'picture']
+  returnProduct= storage[id+'returnProduct']
+  bubble = {
+              "type": "bubble",
+              "hero": {
+                "type": "image",
+                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_2_restaurant.png",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                }
+              },
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                },
+                "contents": [
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{pname}",
+                      "text": f"{pname[:2]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{category}",
+                      "text": f"{category[:4]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unit}",
+                      "text": f"{unit[:4]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{introduction}",
+                      "text": f"{introduction[:4]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice}",
+                      "text": f"{unitPrice[:6]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice2}",
+                      "text": f"{unitPrice2[:7]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{picture}",
+                      "text": f"{picture[:4]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{returnProduct}",
+                      "text": f"{returnProduct[:5]}"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "button",
+                    "style": "secondary",
+                    "color": "#EAD880",
+                    "margin": "xs",
+                    "action": {
+                      "type": "message",
+                      "label": "建立商品",
+                      "text": "建立商品"
+                    },
+                    "height": "md"
+                  }
+                ],
+                "spacing": "md",
+                "margin": "md"
+              }
+            }
+  screen =FlexSendMessage(
+                            alt_text='未取/預購/歷史訂單選擇',
+                            contents = bubble
+                            )
+  return screen
+
+
+def showOrder(orderDetails):
+    Notpickedup_preordered_history_screen = []
+    for i in orderDetails :        
+        orderDetail = {
+                        "type": "bubble",
+                        "body": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "高逸嚴選",
+                                "weight": "bold",
+                                "color": "#1DB446",
+                                "size": "sm"
+                            },
+                            {
+                                "type": "text",
+                                "text": "購物車訂單確認",
+                                "weight": "bold",
+                                "size": "xl",
+                                "margin": "md",
+                                "align": "center"
+                            },
+                            {
+                                "type": "separator",
+                                "margin": "xxl"
+                            },
+                            {
+                                "type": "text",
+                                "text": "訂單內容",
+                                "size": "sm",
+                                "margin": "lg",
+                                "wrap": True
+                            },
+                           
+                            {
+                                "type": "separator",
+                                "margin": "xxl"
+                            },
+                            {
+                                "type": "text",
+                                "text": f"總額：NT${database.getTotalByOrder(i[0][0])}",
+                                "size": "md",
+                                "margin": "lg",
+                                "align": "center",
+                                "weight": "bold"
+                            }
+                            ]
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                "type": "message",
+                                "label": "【1.確認】",
+                                "text": "【確認】"
+                                }
+                            },
+                            {
+                                "type": "button",
+                                "action": {
+                                "type": "message",
+                                "label": "【2.取消】",
+                                "text": "【取消】"
+                                }
+                            }
+                            ],
+                            "spacing": "none",
+                            "paddingAll": "sm"
+                        },
+                        "styles": {
+                            "footer": {
+                            "separator": True
+                            }
+                        }
+                        }
+        count = 5
+        for j in i :
+                sum=int(j[2])*int(j[3])
+                a={
+                      "type": "text",
+                      "text":f'{j[1]}',
+                      "margin": "10px"
+                  }
+                b={
+                    "type": "text",
+                    "text": f"{ j[2]}*{j[3]}={sum}$",
+                    "align": "end"
+                }
+                orderDetail['body']['contents'].insert(count,a)
+                orderDetail['body']['contents'].insert(count+1,b)
+                count += 2
+        Notpickedup_preordered_history_screen.append(orderDetail)
+    screen =FlexSendMessage(
+                            alt_text='未取/預購/歷史訂單選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": Notpickedup_preordered_history_screen   
+                                } 
+                            )
+    return screen
