@@ -19,8 +19,6 @@ from relevant_information import linebotinfo,dbinfo
 from product.cartlist import *
 from product.orderlist import *
 from selection_screen import *
-from FM import Manufacturer_fillin_and_check_screen,Manufacturer_edit_screen,Manufacturer_list_and_new_chosen_screen #廠商建立用，未來拔掉
-from vendor_management import Manufacturer_list,Manufacturer_edit #廠商相關用，未來拔掉
 #======python的函式庫==========
 from mysql.connector import pooling
 import tempfile, os
@@ -343,80 +341,59 @@ def handle_message(event):
         elif '圖片' in msg:
             imgsend = imagesent()
             line_bot_api.reply_message(event.reply_token, imgsend)
-        #-------------------廠商管理-新增廠商----------------------
-        elif '廠商管理' in msg:
-            line_bot_api.reply_message(event.reply_token, Manufacturer_list_and_new_chosen_screen())
-        elif '【管理廠商】廠商列表' in msg:
-            #上方加入 global list_page = {}
-            list_page[user_id+'廠商列表min'] = 0
-            list_page[user_id+'廠商列表max'] = 9
-            Manufacturerlistpage = Manufacturer_list()
-            if 'TextSendMessage' in Manufacturerlistpage:
-                line_bot_api.reply_message(event.reply_token,Manufacturerlistpage)
-            else:
-                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【管理廠商】廠商列表',
-                contents={
-                    "type": "carousel",
-                    "contents": Manufacturerlistpage      
-                    } 
-                ))
-        elif '【廠商列表下一頁】' in msg:
-            original_string = msg
-            # 找到"【廠商列表下一頁】"的位置
-            start_index = original_string.find("【廠商列表下一頁】")
-            if start_index != -1:
-                # 從"【廠商列表下一頁】"後面開始切割字串
-                substr = original_string[start_index + len("【廠商列表下一頁】"):]
-                # 切割取得前後文字
-                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
-                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
-            if (min - 1) < 0:
-                min = 0
-            else:
-                min = min - 1
-            list_page[user_id+'廠商列表min'] = min
-            list_page[user_id+'廠商列表max'] = max
-            Manufacturerlistpage = Manufacturer_list()
-            if 'TextSendMessage' in Manufacturerlistpage:
-                line_bot_api.reply_message(event.reply_token,Manufacturerlistpage)
-            else:
-                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【管理廠商】廠商列表',
-                contents={
-                    "type": "carousel",
-                    "contents": Manufacturerlistpage      
-                    } 
-                ))
-        elif '【管理廠商】建立廠商' in msg:
-            user_state[user_id] = 'manufacturer_name'
-            storage[user_id+'Manufacturer_edit_step'] = 0
-            show = Manufacturer_fillin_and_check_screen('')
-            line_bot_api.reply_message(event.reply_token,show)
-        elif '【廠商修改資料】' in msg:
-            original_string = msg
-            # 找到"【廠商修改資料】"的位置
-            start_index = original_string.find("【廠商修改資料】")
-            if start_index != -1:
-                # 從"【廠商修改資料】"後面開始切割字串
-                substr = original_string[start_index + len("【廠商修改資料】"):]
-                # 切割取得前後文字
-                id = substr.split("_")[0].strip() # 取出_前面的廠商id
-                substrpage = substr.split("_")[1].strip() # 取出_後面的頁號
-                min = int(substrpage.split("～")[0].strip()) # 取出～前面的字並去除空白字元
-                max = int(substrpage.split("～")[1].strip()) # 取出～後面的字並去除空白字元
-            storage[user_id+'manufacturer_list_id'] = id
-            list_page[user_id+'廠商列表min'] = min
-            list_page[user_id+'廠商列表max'] = max
-            user_state[user_id] = 'manufacturereditall'
-            show = Manufacturer_edit()
-            line_bot_api.reply_message(event.reply_token,show)
             
         #-------------------非上方功能的所有回覆----------------------
         else:
             if '【商品簡介】' not in msg:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
-
+        #-------------------日期時間測試----------------------
+        '''elif '日期' in msg:
+            datetimechoose = {
+                        "type": "bubble",
+                        "body": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "日期與時間選擇",
+                                "weight": "bold",
+                                "size": "xl"
+                            },
+                            {
+                                "type": "text",
+                                "text": "=>請輸入進貨日期及時間",
+                                "margin": "md"
+                            }
+                            ]
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "spacing": "sm",
+                            "contents": [
+                            {
+                                "type": "button",
+                                "style": "link",
+                                "height": "sm",
+                                "action": {
+                                "type": "datetimepicker",
+                                "label": "日期與時間選擇",
+                                "data": "進貨時間輸入",
+                                "mode": "datetime"
+                                }
+                            }
+                            ],
+                            "flex": 0
+                        }
+                        }
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='日期時間選擇器',
+                contents={
+                    "type": "carousel",
+                    "contents": [datetimechoose]     
+                    } 
+                ))'''
             
 #使用者圖片處理
 @handler.add(MessageEvent, message=ImageMessage)
@@ -439,10 +416,26 @@ def handle_image_message(event):
             line_bot_api.reply_message(event.reply_token, [TextSendMessage(text='目前動作狀態無需發送照片呦～'),wishesin[1]])
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='目前動作狀態無需發送照片呦～'))
+#//--------------------------------------------
+#日期時間選擇器
+'''@handler.add(PostbackEvent)
+def handle_postback(event):
+    #postback_data = event.postback.data
+    if 'datetime' in event.postback.params:
+        # 獲取使用者選擇的日期和時間
+        selected_datetime = event.postback.params['datetime']
+        tdelete_datetime = selected_datetime.replace('T', ' ')
+        #轉換格式2023-10-18T21:00 -> 2023-10-18 21:00:00
+        date_time_obj = datetime.strptime(tdelete_datetime , '%Y-%m-%d %H:%M')
+        restock_datetime = date_time_obj.strftime('%Y-%m-%d %H:%M')
+        response = f"您選擇的日期和時間是 {restock_datetime}"
+    else:
+        response = "未能獲取日期和時間資訊."
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response))'''
 
-@handler.add(PostbackEvent)
+'''@handler.add(PostbackEvent)
 def handle_message(event):
-    print(event.postback.data)
+    print(event.postback.data)'''
 
 @handler.add(MemberJoinedEvent)
 def welcome(event):
