@@ -1,0 +1,78 @@
+#排名或許只能一個月一個月看
+#依賣出商品總數排名廠商
+	依賣出商品排名
+#每個月第一天減一個月
+#每個月
+If month == 1:
+	WHERE 訂單成立時間=yyyy/1/1 ~ yyyy/1/31
+elif month == 2:
+	WHERE 訂單成立時間=yyyy/2/1 ~ yyyy/2/28
+elif month == 3:
+	WHERE 訂單成立時間=yyyy/3/1 ~ yyyy/3/31
+elif month == 4:
+	WHERE 訂單成立時間=yyyy/4/1 ~ yyyy/4/30
+elif month == 5:
+	WHERE 訂單成立時間=yyyy/5/1 ~ yyyy/5/31
+elif month == 6:
+	WHERE 訂單成立時間=yyyy/6/1 ~ yyyy/6/30
+elif month == 7:
+	WHERE 訂單成立時間=yyyy/7/1 ~ yyyy/7/31
+elif month == 8:
+	WHERE 訂單成立時間=yyyy/8/1 ~ yyyy/8/31
+elif month == 9:
+	WHERE 訂單成立時間=yyyy/9/1 ~ yyyy/9/30
+elif month == 10:
+	WHERE 訂單成立時間=yyyy/10/1 ~ yyyy/10/31
+elif month == 11:
+	WHERE 訂單成立時間=yyyy/11/1 ~ yyyy/11/30
+else:
+	WHERE 訂單成立時間=yyyy/12/1 ~ yyyy/12/31
+
+#--------------------------預先建立表格
+
+# 現有哪些廠商
+SELECT 廠商編號, 廠商名
+FROM Manufacturer_Information
+
+# 廠商有哪些商品
+SELECT 商品名稱, 商品ID(?)
+FROM Product_informaiton
+result={廠商A:{商品名:[],
+		 售出數量:[]},
+	  廠商B:{商品名:[],
+		 售出數量:[]}
+	} 
+#------------------------------填入表格
+
+# 每月完成訂單
+SELECT 訂單編號
+FROM Order_information
+WHERE 時間範圍
+
+# 訂單的內容
+SELECT 商品ID, 訂購數量
+FROM order_details
+WHERE 符合上個條件的訂單
+
+# 商品屬於誰
+If 商品ID相同
+累加訂單數量到該list位置
+
+
+
+
+result = {廠商A:{商品名(由售出數量高到低):[],
+		 售出數量:[]},
+	  廠商B:{商品名(由售出數量高到低):[],
+		 售出數量:[]}
+	} 
+
+#長條圖  -全部廠商有的商品
+x1=[廠商A]
+x2=[廠商B]
+x3=[廠商C]
+
+y1=[廠商A賣出的商品各個量數量]
+y2=[廠商B賣出的商品各個量數量]
+y3=[廠商C賣出的商品各個量數量]
+-----------------------------------------------------------------------------------
