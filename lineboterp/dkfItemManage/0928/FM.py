@@ -884,7 +884,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{pname}",
-                      "text": f"{pname[:2]}"
+                      "text": '修改品名'
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -894,7 +894,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{category}",
-                      "text": f"{category[:4]}"
+                      "text": f"修改商品類別"
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -904,7 +904,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{unit}",
-                      "text": f"{unit[:4]}"
+                      "text": f"修改商品單位"
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -914,7 +914,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{introduction}",
-                      "text": f"{introduction[:4]}"
+                      "text": f"修改商品簡介"
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -924,7 +924,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{unitPrice}",
-                      "text": f"{unitPrice[:6]}"
+                      "text": f"修改商品售出單價"
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -934,7 +934,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{unitPrice2}",
-                      "text": f"{unitPrice2[:7]}"
+                      "text": f"修改商品售出單價2"
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -944,7 +944,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{picture}",
-                      "text": f"{picture[:4]}"
+                      "text": f"修改商品圖片"
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -954,7 +954,7 @@ def create_now_purchase_product(id):
                     "action": {
                       "type": "message",
                       "label": f"{returnProduct}",
-                      "text": f"{returnProduct[:5]}"
+                      "text": f"修改可否退換貨"
                     },
                     "style": "secondary",
                     "color": "#B1D3C5"
@@ -988,6 +988,159 @@ def create_now_purchase_product(id):
                             )
   return screen
 
+
+def create_preorder(id):
+  storage = manager.global_Storage
+  pname = storage[id+'pname']
+  category= storage[id+'category']
+  unit= storage[id+'unit']
+  introduction= storage[id+'introduction']
+  unitPrice= storage[id+'unitPrice']
+  unitPrice2= storage[id+'unitPrice2']
+  picture= storage[id+'picture']
+  multiple= storage[id+'multiple']
+  deadline= storage[id+'deadline']
+  bubble = {
+              "type": "bubble",
+              "hero": {
+                "type": "image",
+                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_2_restaurant.png",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                }
+              },
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                },
+                "contents": [
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{pname}",
+                      "text": '修改品名'
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{category}",
+                      "text": f"修改商品類別"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unit}",
+                      "text": f"修改商品單位"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{introduction}",
+                      "text": f"修改商品簡介"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice}",
+                      "text": f"修改商品售出單價"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice2}",
+                      "text": f"修改商品售出單價2"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{picture}",
+                      "text": f"修改商品圖片"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{multiple}",
+                      "text": f"修改商品預購倍數"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{deadline}",
+                      "text": f"修改商品預購截止時間"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "button",
+                    "style": "secondary",
+                    "color": "#EAD880",
+                    "margin": "xs",
+                    "action": {
+                      "type": "message",
+                      "label": "建立商品",
+                      "text": "建立商品"
+                    },
+                    "height": "md"
+                  }
+                ],
+                "spacing": "md",
+                "margin": "md"
+              }
+            }
+
+  screen =FlexSendMessage(
+                            alt_text='未取/預購/歷史訂單選擇',
+                            contents = bubble
+                            )
+  return screen
 
 def showOrder(orderDetails):
     Notpickedup_preordered_history_screen = []
