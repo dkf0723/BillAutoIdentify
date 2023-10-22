@@ -1,0 +1,79 @@
+#每月完成的訂單
+If month == 1:
+	WHERE 訂單成立時間=yyyy/1/1 ~ yyyy/1/31
+elif month == 2:
+	WHERE 訂單成立時間=yyyy/2/1 ~ yyyy/2/28
+elif month == 3:
+	WHERE 訂單成立時間=yyyy/3/1 ~ yyyy/1/31
+elif month == 4:
+	WHERE 訂單成立時間=yyyy/4/1 ~ yyyy/1/30
+elif month == 5:
+	WHERE 訂單成立時間=yyyy/5/1 ~ yyyy/5/31
+elif month == 6:
+	WHERE 訂單成立時間=yyyy/6/1 ~ yyyy/6/30
+elif month == 7:
+	WHERE 訂單成立時間=yyyy/7/1 ~ yyyy/7/31
+elif month == 8:
+	WHERE 訂單成立時間=yyyy/8/1 ~ yyyy/8/31
+elif month == 9:
+	WHERE 訂單成立時間=yyyy/9/1 ~ yyyy/1/30
+elif month == 10:
+	WHERE 訂單成立時間=yyyy/10/1 ~ yyyy/1/31
+elif month == 11:
+	WHERE 訂單成立時間=yyyy/11/1 ~ yyyy/1/30
+else:
+	WHERE 訂單成立時間=yyyy/12/1 ~ yyyy/12/31
+
+		SELECT 訂單編號 
+		FROM Order_information
+		WHERE 訂單狀態='現購已取' AND *(沒看到)訂單狀態='預購已取' AND 訂單成立時間 = yyyy/mm/1 ~ yyyy/mm/dd
+訂單裡有哪些商品
+		SELECT 商品ID,訂購數量
+		FROM order_details
+		WHERE 符合上個條件的訂單編號
+商品的成本
+		SELECT 進貨單價
+		FROM Purchase_Information
+		WHERE 商品ID
+商品的名稱
+		SELECT 商品名稱, 售出單價
+		FROM Product_information
+		WHERE 商品ID
+
+result = 商品名稱, 進貨單價, 訂購數量, 售出單價
+
+-------------------------------------------------------------------------------------------------
+#每30天取完成的訂單 
+		SELECT 訂單編號 
+		FROM Order_information
+		WHERE 訂單狀態='現購已取' AND *(沒看到)訂單狀態='預購已取' AND 訂單成立時間-30天
+訂單裡有哪些商品
+		SELECT 商品ID,訂購數量
+		FROM order_details
+		WHERE 符合上個條件的訂單編號
+商品的成本
+		SELECT 進貨單價
+		FROM Purchase_Information
+		WHERE 商品ID
+商品的名稱
+		SELECT 商品名稱, 售出單價
+		FROM Product_information
+		WHERE 商品ID
+
+result = 商品名稱, 進貨單價, 訂購數量, 售出單價
+
+--------------------------------------------------------------------------------------------------
+#繪圖
+利潤 = 售出單價-進貨單價)*訂購數量
+#圓餅圖 ★
+x=[ 商品名稱 ]
+y=[ (售出單價-進貨單價)*訂購數量 ]
+
+#折線圖
+x=[日期]
+y=[ (售出單價-進貨單價)*訂購數量 ]
+
+#--------------傳回資料庫---------------
+	INSERT 訂單成立時間, 商品名稱, 數量, 利潤
+	TO XXX 資料表
+#---------------------------------------
