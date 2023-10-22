@@ -67,23 +67,24 @@ def databasetest(db_pool, serial_number):
     if db['conn'] is not None:
       try:
         db['conn'].close()
-      except mysql.connector.Error as err:
-        conn = err
+      except mysql.connector.Error as mysql_err:
+        databasetest_msg = mysql_err
     db['databasetest_msg'] = databasetest_msg
     db['databaseup'] = formatted_datetime
     db['databasenext'] = new_formatted_datetime
     db['conn'] = conn
   elif serial_number == 4:
     new_formatted_datetime = next_conn_time(formatted_datetime, 4)#取得下次執行時間
-    if db['conn'] is not None:
+    if db['conn1'] is not None:
       try:
         db['conn1'].close()
-      except mysql.connector.Error as err:
-        conn = err
+      except mysql.connector.Error as mysql_err:
+        databasetest_msg = mysql_err
     db['databasetest_msg1'] = databasetest_msg
     db['databaseup1'] = formatted_datetime
     db['databasenext1'] = new_formatted_datetime
     db['conn1'] = conn
+    
 
 #下次更新時間計算
 def next_conn_time(formatted_datetime, serial_number):
@@ -179,97 +180,6 @@ def retry(category,query):#select/notselect
           result = 'no'
         result2 = 'no'
   return result,result2
-
-#-------------------廠商管理建立----------------------
-def manufacturer(name,principal,localcalls,phonenum,Payment,bankid,bankname,bankaccount):
-  timeget = gettime()
-  formatted_datetimeget = timeget['formatted_datetime']
-
-  query = """SELECT 廠商編號 FROM Manufacturer_Information order by 建立時間 desc limit 1;"""
-  category ='select' #重試類別select/notselect
-  manufacturernum_result,result2 = retry(category,query)
-
-  if manufacturernum_result == []:
-    addnum = '000001'
-  else:
-    add = int(str(manufacturernum_result[0][0])[12:])+1
-    addnum = '00000' + str(add)
-  if len(addnum) != 6:
-    addnum = addnum[-6:]
-
-  query = f"""
-        INSERT INTO Manufacturer_Information (廠商編號,廠商名,負責或對接人,市話,電話,付款方式,行庫代號,行庫名,匯款帳號,建立時間)
-        VALUES ('manufacturer{addnum}','{name}','{principal}','{localcalls}','{phonenum}','{Payment}','{bankid}','{bankname}','{bankaccount}','{formatted_datetimeget}');
-        """
-  category ='notselect' #重試類別select/notselect
-  result,result2 = retry(category,query)
-  if result2 == 'ok':
-    check = 'ok'
-    result = Manufacturer_single(f"manufacturer{addnum}",0)
-    info = result
-  else:
-    check = 'no'
-    info = ''
-  return check,info
-
-#-------------------單獨查詢廠商----------------------
-def Manufacturer_single(manufacturer_id,choose):
-  id = lineboterp.user_id
-  message_storage = lineboterp.storage
-  query = f"""
-        SELECT 廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
-        FROM Manufacturer_Information
-        where 廠商編號 = '{manufacturer_id}';
-        """
-  category ='select' #重試類別select/notselect
-  result,result2 = retry(category,query)
-
-  #修改廠商資訊進入做的暫存
-  if choose == 1:
-    if result != []:
-      for storage in result:
-        message_storage[id+'manufacturer_list_check'] = 'ok'
-        message_storage[id+'manufacturer_list_name'] = storage[1]#廠商名
-        message_storage[id+'manufacturer_list_principal'] = storage[2]#負責或對接人
-        message_storage[id+'manufacturer_list_localcalls'] = storage[3]#市話
-        message_storage[id+'manufacturer_list_phone'] = storage[4]#電話
-        message_storage[id+'manufacturer_list_payment'] = storage[5]#付款方式
-        message_storage[id+'manufacturer_list_bankname'] = storage[6]#行庫名
-        message_storage[id+'manufacturer_list_bankid'] = storage[7]#行庫代號
-        message_storage[id+'manufacturer_list_bankaccount'] = storage[8]#匯款帳號
-    else:
-      message_storage[id+'manufacturer_list_check'] = 'no'
-  return result
-#-------------------廠商列表----------------------
-def Manufacturer():
-  query = f"""
-        SELECT 廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
-        FROM Manufacturer_Information;
-        """
-  category ='select' #重試類別select/notselect
-  result,result2 = retry(category,query)
-  if result != []:
-    manufacturer_list = result
-  else:
-    manufacturer_list = 'no'
-  return manufacturer_list
-
-#-------------------修改廠商資料----------------------
-def Manufacturer_infochange(editfield,changeinfo):
-  #editfield=廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
-  #changeinfo=修改的內容
-  id = lineboterp.user_id
-  message_storage = lineboterp.storage
-  manufacturer_id = message_storage[id+'manufacturer_list_id']
-  query = f"""
-            UPDATE Manufacturer_Information
-            SET {editfield} = '{changeinfo}'
-            WHERE 廠商編號 = '{manufacturer_id}';
-            """
-  category ='notselect' #重試類別select/notselect
-  result,result2 = retry(category,query)
-  return result
-#-----------------------------------------
 
 #-------------------檢查連線超時----------------------
 def Connection_timeout():
@@ -620,7 +530,10 @@ def multiplesearch(product_id):
     multiple = 1 #預設倍數
   else:
     for i in multiple_result:
-      multiple = int(i[0]) #查詢倍數
+      if i[0] is not None:
+        multiple = int(i[0]) #查詢倍數
+      else:
+        multiple = 1 #預設倍數
   return multiple
 
 #商品單位查詢

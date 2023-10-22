@@ -69,7 +69,7 @@ def Order_preorder_selectionscreen():
                     "height": "sm",
                     "action": {
                     "type": "message",
-                    "label": "現購商列表",
+                    "label": "現購商品列表",
                     "text": "【現購商品】列表"
                     },
                     "color": "#1a9879",
@@ -152,7 +152,7 @@ def Order_preorder_selectionscreen():
                         "height": "sm",
                         "action": {
                         "type": "message",
-                        "label": "預購商列表",
+                        "label": "預購商品列表",
                         "text": "【預購商品】列表"
                         },
                         "color": "#c42149",
