@@ -1,7 +1,4 @@
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
-# 載入對應的函式庫
-from linebot.models import *
+from linebot.models import TextSendMessage,FlexSendMessage,QuickReplyButton,MessageAction,QuickReply
 import lineboterp
 from database import buynow_list,unitsearch,stockonly
 from selection_screen import Order_buynow_preorder_screen
@@ -16,7 +13,7 @@ def product_buynow_list():
         pagemin = lineboterp.list_page[lineboterp.user_id+'現購min']
         pagemax = lineboterp.list_page[lineboterp.user_id+'現購max']#9
         db_buynow = db_buynow_list[pagemin:pagemax] #最多九個+1more
-        product_show =[]#輸出全部
+        show =[]#輸出全部
         product_id = []#商品ID
         product_name = []#商品名稱
         product_img = []#商品圖片
@@ -34,7 +31,7 @@ def product_buynow_list():
                 name = db_preorder_list[1]#商品名稱
                 #現預購商品
                 product_name.append(name)
-                if db_preorder_list[3] is None:
+                if (db_preorder_list[3] is None) or (db_preorder_list[3][:4] != 'http'):
                     img = 'https://i.imgur.com/rGlTAt3.jpg'
                 else:
                     img = db_preorder_list[3]#商品圖片
@@ -56,7 +53,7 @@ def product_buynow_list():
                 price2 = '暫無其他優惠'
             else:
                 price2 = f"2{product_unit[i]}起每{product_unit[i]}{str(product_price2[i])}元"
-            product_show.append({
+            show.append({
                 "type": "bubble",
                 "size": "mega",
                 "direction": "ltr",
@@ -209,7 +206,7 @@ def product_buynow_list():
                 }
         })
         if len(product_show) >= 9:
-            product_show.append({
+            show.append({
                 "type": "bubble",
                 "body": {
                     "type": "box",
@@ -230,7 +227,7 @@ def product_buynow_list():
                 }
             })
         else:
-            product_show.append({
+            show.append({
                 "type": "bubble",
                 "body": {
                     "type": "box",
@@ -250,6 +247,13 @@ def product_buynow_list():
                     ]
                 }
             })
+        product_show = FlexSendMessage(
+                    alt_text='【現購商品】列表',
+                    contents={
+                        "type": "carousel",
+                        "contents": show      
+                        } 
+                    )
     return product_show
 #-------------------現購訂單----------------------
 def Order_buynow(errormsg):

@@ -1,16 +1,11 @@
 import mysql.connector
-import requests
 from datetime import datetime, timedelta
 from mysql.connector import errorcode
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
-# 載入對應的函式庫
-from linebot.models import *
-from relevant_information import dbinfo,imgurinfo
-import os, io, pyimgur, glob
+from linebot.models import TextSendMessage,ImageSendMessage
+from relevant_information import imgurinfo #dbinfo
+import os, pyimgur, glob
 import lineboterp
 import time
-import random #隨機產生
 #安裝 Python 的 MySQL 連接器及其相依性>pip install mysql-connector-python
 #安裝Python 的 pyimgur套件> pip install pyimgur
 # Obtain connection string information from the portal
@@ -189,7 +184,7 @@ def Connection_timeout():
   resulttimeout,result2 = retry(category,query)
   if resulttimeout != []:
     for i in resulttimeout:
-      if (i[1] > 1200) and (i[2].split('.')[0] == '216'):
+      if (i[1] > 1200) and (i[2].split('.')[0] in ['147','216']):
         query =f"""KILL '{i[0]}';"""
         category ='notselect' #重試類別select/notselect
         result,result2 = retry(category,query)

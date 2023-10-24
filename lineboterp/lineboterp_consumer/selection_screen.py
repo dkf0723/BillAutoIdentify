@@ -1,7 +1,4 @@
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
-# 載入對應的函式庫
-from linebot.models import *
+from linebot.models import FlexSendMessage
 import lineboterp
 from database import unitsearch, onlyprice
 

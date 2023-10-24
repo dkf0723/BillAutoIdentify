@@ -1,9 +1,5 @@
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
-# 載入對應的函式庫
-from linebot.models import *
-import lineboterp
-from database  import *
+from linebot.models import TextSendMessage,FlexSendMessage
+from database  import ordertoplist,orderpreorderlist,ordertopalllist,orderdt,onlyprice
 
 #-------------------未取列表----------------------
 def ordernottaken_list():
@@ -84,6 +80,7 @@ def ordernottaken_list():
                 "contents": ordernottaken_show      
                 } 
             )
+    #del db_nottaken,ordernottaken_show,ordernottaken_handlelist,buttons
     return ordernottaken_show
 
 #-------------------預購列表----------------------
@@ -165,6 +162,7 @@ def orderpreorder_list():
                 "contents": orderpreorder_show      
                 } 
             )
+    #del db_nottaken,orderpreorder_show,orderpreorder_handlelist,buttons
     return orderpreorder_show
 #-------------------歷史列表----------------------
 def orderhastaken_list():
@@ -245,6 +243,7 @@ def orderhastaken_list():
                 "contents": orderhastaken_show      
                 } 
             )
+    #del db_hastaken,orderhastaken_show,orderhastaken_handlelist,buttons
     return orderhastaken_show
 
 #-------------------訂單詳細資料----------------------
@@ -710,4 +709,5 @@ def orderdtsearch():
                 "contents": showdt     
                 } 
             )
+    #del db_orderdt,showdt,show0,show1,button,show2
     return show

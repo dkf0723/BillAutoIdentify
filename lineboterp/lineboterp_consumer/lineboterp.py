@@ -6,28 +6,27 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
-from linebot.models import *
+from linebot.models import MessageEvent,TextSendMessage,ImageMessage
 
 #======這裡是呼叫的檔案內容=====
-from product.product_preorder import *
-from product.buy_now import *
-from product.check import *
-from database import *
+from product.product_preorder import product_preorder_list,Order_preorder
+from product.buy_now import Order_buynow,product_buynow_list
+from product.check import product_check,business_information,recent_phone_call,Cart_order_screen
+from database import gettime, databasetest,member_profile,test_datasearch,imagesent,Connection_timeout
 from ask_wishes.ask import *
-from ask_wishes.wishes import *
+from ask_wishes.wishes import initial_fill_screen,wishes
 from relevant_information import linebotinfo,dbinfo
-from product.cartlist import *
-from product.orderlist import *
-from selection_screen import *
+from product.cartlist import addcart,cart_list,cartrevise,editcart,removecart
+from product.orderlist import ordernottaken_list,orderpreorder_list,orderhastaken_list,orderdtsearch
+from selection_screen import Order_preorder_selectionscreen, Order_cart_selectionscreen, Notpickedup_preordered_history_selectionscreen
 #======python的函式庫==========
 from mysql.connector import pooling
-import tempfile, os
-from datetime import datetime, timedelta
+import os
+from datetime import datetime
 import schedule #排程
 import threading #排程執行緒
 from apscheduler.schedulers.background import BackgroundScheduler#另一種排程
 import time
-import requests
 import string #字符串處理相關的工具
 import random #隨機產生
 #安裝schedule套件=> pip install schedule
@@ -56,7 +55,6 @@ def callback():
     except InvalidSignatureError:
         abort(400)
     return 'OK'
-
 
 #-------------------儲存各種狀態----------------------
 global user_state
@@ -147,24 +145,13 @@ def handle_message(event):
             list_page[user_id+'預購min'] = 0
             list_page[user_id+'預購max'] = 9
             product_show = product_preorder_list()
-            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【預購商品】列表',
-                contents={
-                    "type": "carousel",
-                    "contents": product_show      
-                    } 
-                ))
+            line_bot_api.reply_message(event.reply_token,product_show)
+
         elif '【現購商品】列表' in msg:
             list_page[user_id+'現購min'] = 0
             list_page[user_id+'現購max'] = 9
-            product_show = product_buynow_list()
-            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【現購商品】列表',
-                contents={
-                    "type": "carousel",
-                    "contents": product_show      
-                    } 
-                ))
+            buynow_show = product_buynow_list()
+            line_bot_api.reply_message(event.reply_token,buynow_show)
         #-------------------查詢、訂單、購物車----------------------
         elif '訂單/購物車查詢' in msg:
             line_bot_api.reply_message(event.reply_token, Order_cart_selectionscreen())
@@ -295,16 +282,8 @@ def handle_message(event):
             list_page[user_id+'現購min'] = min-1
             list_page[user_id+'現購max'] = max
             buynowpage = product_buynow_list()
-            if 'TextSendMessage' in buynowpage:
-                line_bot_api.reply_message(event.reply_token,buynowpage)
-            else:
-                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【現購商品】列表',
-                contents={
-                    "type": "carousel",
-                    "contents": buynowpage      
-                    } 
-                ))
+            line_bot_api.reply_message(event.reply_token,buynowpage)
+            
         elif '【預購列表下一頁】' in msg:
             original_string = msg
             # 找到"【預購列表下一頁】"的位置
@@ -318,16 +297,8 @@ def handle_message(event):
             list_page[user_id+'預購min'] = min-1
             list_page[user_id+'預購max'] = max
             preorderpage = product_preorder_list()
-            if 'TextSendMessage' in preorderpage:
-                line_bot_api.reply_message(event.reply_token,buynowpage)
-            else:
-                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【現購商品】列表',
-                contents={
-                    "type": "carousel",
-                    "contents": preorderpage      
-                    } 
-                ))
+            line_bot_api.reply_message(event.reply_token,preorderpage)
+            
         #-------------------資料庫連線測試----------------------
         elif '資料庫' in msg:
             #databasetest_msg = databasetest()['databasetest_msg']
@@ -346,55 +317,7 @@ def handle_message(event):
         else:
             if '【商品簡介】' not in msg:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的問題：\n「'+msg+'」\n無法立即回覆！\n已將問題發送至客服人員，請稍後！'))
-        #-------------------日期時間測試----------------------
-        '''elif '日期' in msg:
-            datetimechoose = {
-                        "type": "bubble",
-                        "body": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": "日期與時間選擇",
-                                "weight": "bold",
-                                "size": "xl"
-                            },
-                            {
-                                "type": "text",
-                                "text": "=>請輸入進貨日期及時間",
-                                "margin": "md"
-                            }
-                            ]
-                        },
-                        "footer": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "button",
-                                "style": "link",
-                                "height": "sm",
-                                "action": {
-                                "type": "datetimepicker",
-                                "label": "日期與時間選擇",
-                                "data": "進貨時間輸入",
-                                "mode": "datetime"
-                                }
-                            }
-                            ],
-                            "flex": 0
-                        }
-                        }
-            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='日期時間選擇器',
-                contents={
-                    "type": "carousel",
-                    "contents": [datetimechoose]     
-                    } 
-                ))'''
-            
+    
 #使用者圖片處理
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
@@ -417,25 +340,6 @@ def handle_image_message(event):
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='目前動作狀態無需發送照片呦～'))
 #//--------------------------------------------
-#日期時間選擇器
-'''@handler.add(PostbackEvent)
-def handle_postback(event):
-    #postback_data = event.postback.data
-    if 'datetime' in event.postback.params:
-        # 獲取使用者選擇的日期和時間
-        selected_datetime = event.postback.params['datetime']
-        tdelete_datetime = selected_datetime.replace('T', ' ')
-        #轉換格式2023-10-18T21:00 -> 2023-10-18 21:00:00
-        date_time_obj = datetime.strptime(tdelete_datetime , '%Y-%m-%d %H:%M')
-        restock_datetime = date_time_obj.strftime('%Y-%m-%d %H:%M')
-        response = f"您選擇的日期和時間是 {restock_datetime}"
-    else:
-        response = "未能獲取日期和時間資訊."
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response))'''
-
-'''@handler.add(PostbackEvent)
-def handle_message(event):
-    print(event.postback.data)'''
 
 @handler.add(MemberJoinedEvent)
 def welcome(event):
