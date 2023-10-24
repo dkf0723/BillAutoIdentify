@@ -1,7 +1,4 @@
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
-# 載入對應的函式庫
-from linebot.models import *
+from linebot.models import TextSendMessage,FlexSendMessage,QuickReplyButton,MessageAction,QuickReply
 import lineboterp
 from database import cartsearch,unitsearch,stock,removecart,revise,cartsubtotal,stockonly
 from selection_screen import Cart_add_screen
