@@ -396,7 +396,7 @@ def test_Product_Modification(pid):
 #   if os.path.isfile(image_files):
 #       os.remove(image_files)
 def getPhoneNumberByPhoneNumberLastThreeYard(phoneNumber):
-    query = f"SELECT 電話 FROM Order_information WHERE 電話 LIKE '%{phoneNumber}';"
+    query = f"SELECT distinct 電話 FROM Order_information WHERE 電話 LIKE '%{phoneNumber}' and 訂單狀態未取已取 like '%未取';"
     result = retry('select',query)
     send = []
     if result is not None:
@@ -405,7 +405,7 @@ def getPhoneNumberByPhoneNumberLastThreeYard(phoneNumber):
     # 關閉游標與連線
     return send
 def getOrderByPhoneNumber(phoneNumber):
-    query = f"SELECT 訂單編號 FROM Order_information WHERE 電話 = '{phoneNumber}';"
+    query = f"SELECT 訂單編號 FROM Order_information WHERE 電話 = '{phoneNumber}' and 訂單狀態未取已取 like '%未取';"
     # cursor.execute(query)
     result = retry('select',query)
     # result = cursor.fetchall() 
@@ -417,7 +417,7 @@ def getOrderByPhoneNumber(phoneNumber):
     return send
 
 def getOrderDetailByPhoneNumber(phoneNumber):
-    query = f"SELECT o.訂單編號,p.商品名稱 ,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 in( select 訂單編號 from Order_information where 電話 = '{phoneNumber}');"
+    query = f"SELECT o.訂單編號,p.商品名稱 ,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 in( select 訂單編號 from Order_information where 電話 = '{phoneNumber}' );"
     result = retry('select', query)
     test =''
     send = []
@@ -444,3 +444,25 @@ def getTotalByOrder(order):
     query = f"SELECT 總額 FROM Order_information WHERE 訂單編號 = '{order}';"
     result = retry('select', query)
     return result[0][0]
+def createProduct(id):
+  storage = manager.global_Storage
+  pname = storage[id+'pname']
+  category= storage[id+'category']
+  unit= storage[id+'unit']
+  introduction= storage[id+'introduction']
+  unitPrice= storage[id+'unitPrice']
+  unitPrice2= storage[id+'unitPrice2']
+  picture= storage[id+'picture']
+  returnProduct= storage[id+'returnProduct']
+  # query = f"SELECT 總額 FROM Order_information WHERE 訂單編號 = '{order}';"
+  # result = retry('notselect', query)
+  # return result
+def updateOrder(id):
+  storage = manager.global_Storage
+  if storage[id+'order'][:1] == '0':
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = '現購已取' WHERE (電話 = '{storage[id+'order']}');"
+    result = retry('notselect', query)
+  else : 
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = '現購已取' WHERE (訂單編號 = '{storage[id+'order']}');"
+    result = retry('notselect', query)
+  return result

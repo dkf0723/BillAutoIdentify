@@ -128,9 +128,6 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示已到貨商品選單'))
             elif msg[4:] == '未到貨':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示未到貨商品選單'))
-            #-------------------報表管理----------------------
-        elif '報表管理' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
             #-------------------顧客QA及2種回覆狀態列表----------------------
         elif '顧客QA' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -232,19 +229,17 @@ def handle_message(event):
                     } 
                 ))
             #-------------------報表查詢----------------------
-        elif '報表查詢' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-            alt_text='報表選擇',
-            template=ConfirmTemplate(
-                    text='請選擇報表',
-                    actions=[
-                            MessageAction(
-                                label='【累積銷售】',
-                                text='【累積銷售】報表'
-                            )
-                    ]
-                )
-            ))
+        elif '報表管理' in msg:
+            line_bot_api.reply_message(event.reply_token, report_list_selectionscreen())
+        elif '【成本統計】列表' in msg:
+            queryObject = '成本'
+            line_bot_api.reply_message(event.reply_token, Report_statistics_selectionscreen(queryObject))    
+        elif '【利潤統計】列表' in msg:
+            queryObject = '利潤'
+            line_bot_api.reply_message(event.reply_token, Report_statistics_selectionscreen(queryObject)) 
+        elif '【熱門商品統計】列表' in msg:
+            queryObject = '熱門商品'
+            line_bot_api.reply_message(event.reply_token, Report_statistics_selectionscreen(queryObject))
         elif '累積銷售' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
             alt_text='範圍選擇',

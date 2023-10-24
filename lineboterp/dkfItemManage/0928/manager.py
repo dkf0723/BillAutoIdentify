@@ -263,8 +263,9 @@ def handle_message(event):
             user_state1[user_id] = 'first'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
         elif '新增預購商品'in msg:
-            # line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
-            print('0')
+            user_state[user_id] = 'createPreOrder'
+            user_state1[user_id] = 'first'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
         elif '未取名單' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
         elif '報表管理' in msg:
