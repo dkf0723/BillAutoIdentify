@@ -244,32 +244,36 @@ def handle_message(event):
                 result = product_ing()
                 flex_message = product_ing_flex_msg(result)
                 line_bot_api.reply_message(event.reply_token, flex_message)
-        elif msg.startswith('預購商品ID:'):
-            pid = msg[7:-1]
-            unit = msg[-1:]
+        elif msg.startswith('預購商品ID:'):##########我不會切割1025
+            #預購商品ID:test00010~顆!測試廠商/現金
+            parts = msg.split("~")
+            pid = parts[0].split(":")[1]
+            unit = parts[1].split("!")[0]
+            manuname = parts[1].split("!")[1].split("/")[0]
+            payment = parts[1].split("!")[1].split("/")[1]
             user_state[user_id] = 'pre_purchase_ck'
-            message_storage[user_id + 'purchase_pid'] = pid
-            message_storage[user_id + 'purchase_unit'] = unit
-            message_storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
-            check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
+            storage[user_id + 'purchase_pid'] = pid
+            storage[user_id + 'purchase_unit'] = unit
+            storage[user_id + 'manu_manuname'] = manuname
+            storage[user_id + 'manu_payment'] = payment
+            storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}\n廠商名：{manuname}\n付款方式：{payment}"
+            check_text = f"{storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
             user_state1[user_id] = 'num'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-        elif msg.startswith('您已成功新增預購進貨商品'):
-            suc_np_pid = msg[11:]
-            np_statechange(suc_np_pid)
         elif msg.startswith('現購商品ID:'):
             pid = msg[7:-1]
             unit = msg[-1:]
             user_state[user_id] = 'purchasing_ck'
-            message_storage[user_id + 'purchase_pid'] = pid
-            message_storage[user_id + 'purchase_unit'] = unit
-            message_storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
-            check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
+            storage[user_id + 'purchase_pid'] = pid
+            storage[user_id + 'purchase_unit'] = unit
+            storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
+            check_text = f"{storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
             user_state1[user_id] = 'num'
+            getmanuinf()#取得現預購類別及廠商付款方式
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-        # elif msg.startswith('您已成功新增現購進貨商品'): ##庫存數量觸發
-        #     succc_np_pid = msg[11:]
-        #     nping_statechange(succc_np_pid)
+        elif msg.startswith('您已成功新增現購進貨商品'): ##1014庫存數量(訂單剩餘還沒處理)
+            succc_np_pid = msg[13:]
+            nping_statechange(succc_np_pid)
         elif '【快速進貨】' in msg:
             if msg[6:] == '類別':
                 message = TextSendMessage(text='請點選查詢類別',
@@ -296,19 +300,17 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, reply_messages)
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
-        ##1010進貨時間要換行換不了
         elif msg.startswith('快速進貨-選擇廠商'):
             manufacturerR_id = msg[9:] 
             result = revm_pur_info(manufacturerR_id)
             flex_message = rev_pur_info_flex_msg(result)
             line_bot_api.reply_message(event.reply_token, flex_message)
-        ##1011狀態已成功可以做快速進貨且資料庫可修改
         elif msg.startswith('快速進貨-商品'):
             ppid = msg[7:]
             user_state[user_id] = 'repurchase_ck'
-            message_storage[user_id + 'purchase_pid'] = ppid
-            message_storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
-            check_text = f"{message_storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
+            storage[user_id + 'purchase_pid'] = ppid
+            storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
+            check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
             user_state1[user_id] = 'num'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
         elif msg.startswith('您已成功快速進貨商品'):
@@ -427,9 +429,9 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
         elif msg.startswith('商品已到貨'):
             manufacturerV_id = msg[5:]
-            #需加一個flexmessage選擇預購未取或現貨
-            result = puring_trastate(manufacturerV_id)
-            line_bot_api.reply_message(event.reply_token, result)
+            puring_trastate(manufacturerV_id)
+
+            #line_bot_api.reply_message(event.reply_token, result)
         #-------------------廠商管理-新增廠商----------------------
         elif '廠商管理' in msg:
             line_bot_api.reply_message(event.reply_token, Manufacturer_list_and_new_chosen_screen())
@@ -572,6 +574,26 @@ def send_category_selection(event, line_bot_api):
             ]))
     line_bot_api.reply_message(event.reply_token, message)
 
+#日期時間選擇器
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    storage = manager.storage
+    #postback_data = event.postback.data
+    if 'datetime' in event.postback.params:
+        # 獲取使用者選擇的日期和時間
+        selected_datetime = event.postback.params['datetime']
+        tdelete_datetime = selected_datetime.replace('T', ' ')
+        #轉換格式2023-10-18T21:00 -> 2023-10-18 21:00:00
+        date_time_obj = datetime.strptime(tdelete_datetime , '%Y-%m-%d %H:%M')
+        restock_datetime = date_time_obj.strftime('%Y-%m-%d %H:%M')
+        storage[user_id + 'money_time'] = str(restock_datetime)
+        storage[user_id+'purchase_all'] += f'\n您輸入的匯款時間： {str(restock_datetime)}'
+        response = purchase_check()
+        line_bot_api.reply_message(event.reply_token, response)
+        #response = f"您選擇的日期和時間是 {restock_datetime}"
+        '''else:
+            response = "未能獲取日期和時間資訊."
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response))'''
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
 #資料庫連線1
@@ -613,3 +635,6 @@ import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
+
+    
