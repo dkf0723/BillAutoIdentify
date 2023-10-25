@@ -12,6 +12,7 @@ import os, io, pyimgur, glob
 import manager
 import time
 import random #隨機產生
+import pytz
 
 #-------------------取得現在時間----------------------
 def gettime():
@@ -230,19 +231,57 @@ def purchase_categoryate(selectedA_category):
   result = retry(category,query)
   return result
 ##1009完成新增進貨商品資料庫內容
+
+#-----------------點擊要進貨時的商品及廠商資訊-----------------
+def getmanuinf():
+  id = manager.user_id
+  pid = manager.storage[id + 'purchase_pid']
+  message_storage = manager.storage
+  query = f"""select 商品ID, 現預購商品, 付款方式, 行庫名, 行庫代號, 匯款帳號
+              from Product_information natural join Manufacturer_Information
+              where 商品ID = '{pid}'
+              """
+  category ='select'
+  message_storage[id + 'dbmanuinf'] = retry(category,query)
+
 #-----------------抓取未有進貨資訊的商品ID---------------
 def nopur_inf():
-  query = f"SELECT P.商品ID,P.商品名稱,P.商品單位 FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID WHERE PI.商品ID IS NULL AND P.現預購商品 = '預購';"
+  # query = f"SELECT P.商品ID,P.商品名稱,P.商品單位 FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID WHERE PI.商品ID IS NULL AND P.現預購商品 = '預購';"
+  query =f"""SELECT P.商品ID,P.商品名稱,P.商品單位,廠商名,付款方式 
+            FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID natural join Manufacturer_Information
+            WHERE PI.商品ID IS NULL AND P.現預購商品 = '預購';"""
   category ='select'
   result = retry(category,query)
   return result
-#----------------將使用者輸入的新增預購進貨資訊存到資料庫-------------
+#----------------1025將使用者輸入的新增預購進貨資訊存到資料庫-------------
 def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
+  if money_time != 'NULL':
+    change_money_time = f"'{money_time}'"
+  else:
+    change_money_time = money_time
   query = f"""INSERT INTO Purchase_Information (商品ID,進貨數量, 進貨單價, 商品單位, 進貨狀態, 進貨時間, 匯款金額,匯款時間) 
-            VALUES ('{purchase_pid}','{purchase_num}','{purchase_cost}','{purchase_unit}','進貨中','{purchase_time}','{give_money}','{money_time}');"""
+            VALUES ('{purchase_pid}','{purchase_num}','{purchase_cost}','{purchase_unit}','進貨中','{purchase_time}','{give_money}',{change_money_time});"""
   category ='notselect'
-  result = retry(category, query)
-  return result
+  result1 = retry(category, query)
+
+  query_one = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{purchase_pid}';"
+  category_one = 'notselect'
+  result1 = retry(category_one, query_one)
+
+  order_numbers = []
+  query_two = f"SELECT 訂單編號 FROM order_details WHERE 商品ID = '{purchase_pid}'"
+  category_two = 'select'
+  result = retry(category_two, query_two)
+
+  for row in result:
+    order_numbers.append(row[0])
+
+  for order_num in order_numbers:
+      query_three = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購進貨' WHERE 訂單編號 = '{order_num}'"
+      category_three = 'notselect'
+      result1 = retry(category_three, query_three)
+
+  return result1
 #----------------將使用者輸入的新增現購進貨資訊存到資料庫-------------
 def newingtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
   query = f"""INSERT INTO Purchase_Information (商品ID,進貨數量, 進貨單價, 商品單位, 進貨狀態, 進貨時間, 匯款金額,匯款時間) 
@@ -250,20 +289,25 @@ def newingtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purcha
   category ='notselect'
   result = retry(category, query)
   return result
-#------------------新增預購進貨資訊後的狀態改變-預購進貨---------------------
+#------------------新增預購進貨資訊後的狀態改變-快速進貨(是否不用更改狀態1025)---------------------
 def np_statechange(suc_np_pid):
     query_one = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{suc_np_pid}';"
     category_one = 'notselect'
     retry(category_one, query_one)
-  
-    query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購截止' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{suc_np_pid}')"
+
+  ##1016先獨立select出訂單編號寫進陣列存下，再去UPDATE for迴圈
+    query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購進貨' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{suc_np_pid}')"
     category_two = 'notselect'
     retry(category_two, query_two)
 #------------------新增現購進貨資訊後的狀態改變---------------------
-# def nping_statechange(succc_np_pid):
-#     query_one = f"UPDATE Purchase_information SET 進貨狀態 = '已到貨' WHERE 商品ID = '{succc_np_pid}';"
-#     category_one = 'notselect'
-#     retry(category_one, query_one)
+def nping_statechange(succc_np_pid): 
+    query_one = f"UPDATE Product_information SET 庫存數量 = Product_information.庫存數量 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{succc_np_pid}') WHERE 商品ID = '{succc_np_pid}';"
+    category_one = 'notselect' ##管理者
+    retry(category_one, query_one)
+
+    query_two = f"UPDATE Product_information SET 訂單剩餘 = Product_information.訂單剩餘 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{succc_np_pid}') WHERE 商品ID = '{succc_np_pid}';"
+    category_two = 'notselect' ##消費者
+    retry(category_two, query_two)
 #-----------------抓取進貨中商品-----------------
 def puring_pro():
   query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='進貨中'"
@@ -274,19 +318,38 @@ def puring_pro():
 def puring_trastate(manufacturerV_id):
   queryone = f"UPDATE Purchase_Information SET 進貨狀態 = '已到貨' WHERE 商品ID = '{manufacturerV_id}'"
   categoryone ='notselect' 
-  retry(categoryone,queryone)
+  result2 = retry(categoryone,queryone)
 
   querytwo = f"UPDATE Product_information SET 現預購商品 = '預購未取' WHERE 商品ID = '{manufacturerV_id}'"
   categorytwo ='notselect'
-  retry(categorytwo,querytwo)
+  result2 = retry(categorytwo,querytwo)
 
   querythree = f"UPDATE Product_information SET 庫存數量 = Product_information.庫存數量 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{manufacturerV_id}') WHERE 商品ID = '{manufacturerV_id}';"
   categorythree ='notselect'
-  retry(categorythree,querythree)
+  result2 = retry(categorythree,querythree)
 
-  queryfour = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購未取' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{manufacturerV_id}')"
-  categoryfour ='notselect'
-  retry(categoryfour,queryfour)
+  order_numbers = []
+  query_four = f"SELECT 訂單編號 FROM order_details WHERE 商品ID = '{manufacturerV_id}'"
+  category_four = 'select'
+  result = retry(category_four, query_four)
+
+  for row in result:
+    order_numbers.append(row[0])
+
+  for order_num in order_numbers:
+      query_five = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購未取' WHERE 訂單編號 = '{order_num}'"
+      category_five = 'notselect'
+      result2 = retry(category_five, query_five)
+  return result2
+
+  ##這裡是現金付款的
+
+# def bankpay():
+#   timeget = gettime()['formatted_datetime']
+#   queryfive = f"UPDATE Purchase_information SET 匯款時間 = '{timeget}' WHERE 商品ID = '{manufacturerV_id}'"
+#   categoryfive ='notselect'
+#   retry(categoryfive,queryfive)
+  
 #-----------------抓取已到貨商品-----------------
 def pured_pro():
   query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='已到貨'"

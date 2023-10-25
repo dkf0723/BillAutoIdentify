@@ -6,6 +6,7 @@ from linebot.models import TemplateSendMessage, ButtonsTemplate, MessageAction,D
 from linebot.models import *
 from datetime import datetime, timedelta
 import manager
+import pytz
 from database import *
 from flexmsg import *
 ###廠商管理---
@@ -39,44 +40,90 @@ def purchase_check():
     #-----------------------------------------
     return check_texts
 
+#新增預購進貨
 def nepurchase_info():
     id = manager.user_id
     state = manager.user_state
     state1 = manager.user_state1
     message = manager.msg
-
-    #if message.isdigit():
+    message_storage = manager.storage
+    
     if message == '取消':
         state[id] = 'normal'
         state1[id] = 'NAN'
     elif state1[id] == 'num':
         message_storage[id + 'purchase_num'] = int(message)
-        message_storage[id+'purchase_all'] += f'\n您輸入的進貨數量： {message}'
-        check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨單價」"
+        message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
+        check_text = f"{message_storage[id + 'purchase_all']}\n=>請接著輸入「進貨單價」"
         check_text = TextSendMessage(text=check_text)
         state1[id] = 'cost'
     elif state1[id] == 'cost':
         message_storage[id + 'purchase_cost'] = int(message)
-        message_storage[id+'purchase_all'] += f'\n您輸入的進貨單價： {message}'
-        check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨時間」"
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'ptime'
-    elif state1[id] == 'ptime':
-        message_storage[id + 'purchase_time'] = message
-        message_storage[id+'purchase_all'] += f'\n您輸入的進貨時間： {message}'
-        check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款金額」"
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'mmoney'
-    elif state1[id] == 'mmoney':
-        message_storage[id + 'give_money'] = int(message)
-        message_storage[id+'purchase_all'] += f'\n您輸入的匯款金額： {message}'
-        check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款時間」"
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'mtime'
+        purchase_num = message_storage[id + 'purchase_num']
+        purchase_cost = message_storage[id + 'purchase_cost']
+        payment_amount = purchase_num * purchase_cost
+        message_storage[id + 'give_money'] = payment_amount
+        message_storage[id + 'purchase_all'] += f'\n您輸入的進貨單價： {message}'
+        message_storage[id + 'purchase_all'] += f'\n您輸入的匯款金額： {payment_amount}'  
+        taiwan_timezone = pytz.timezone('Asia/Taipei')
+        current_time_taiwan = datetime.now(taiwan_timezone)
+        current_time_str = current_time_taiwan.strftime("%Y-%m-%d %H:%M:%S")
+        message_storage[id + 'purchase_time'] = current_time_str  
+        message_storage[id + 'purchase_all'] += f'\n您輸入的進貨時間： {current_time_str}'
+        if message_storage[id + 'manu_payment'] != '現金':
+            template_message = FlexSendMessage(
+                                alt_text='匯款時間選擇',
+                                contents={
+                                    "type": "carousel",
+                                    "contents": [{
+                                    "type": "bubble",
+                                    "body": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "選擇日期時間",
+                                            "weight": "bold",
+                                            "size": "xl"
+                                        },
+                                        {
+                                            "type": "text",
+                                            "text": f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款時間」",
+                                            "wrap": True
+                                        }
+                                        ]
+                                    },
+                                    "footer": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "spacing": "sm",
+                                        "contents": [
+                                        {
+                                            "type": "button",
+                                            "style": "link",
+                                            "height": "sm",
+                                            "action": {
+                                            "type": "datetimepicker",
+                                            "label": "點擊選擇日期與時間",
+                                            "data": "匯款時間",
+                                            "mode": "datetime"
+                                            }
+                                        }
+                                        ],
+                                        "flex": 0
+                                    }
+                                    }]   
+                                    } 
+                                )
+            check_text = template_message
+            state1[id] = 'mtime'
+        else:
+            message_storage[id + 'money_time'] = 'NULL'
+            check_text = TextSendMessage(text=f"{message_storage[id+'purchase_all']}\n確認後請輸入OK")
+            state1[id] = 'end'
     elif state1[id] == 'mtime':
-        message_storage[id + 'money_time'] = message
-        message_storage[id+'purchase_all'] += f'\n您輸入的匯款時間： {message}\n確認後請輸入OK'
-        check_text = f"{message_storage[id+'purchase_all']}"
+        check_text = f"{message_storage[id+'purchase_all']}\n確認後請輸入OK"
         check_text = TextSendMessage(text=check_text)
         state1[id] = 'end'
     elif state1[id] == 'end':
@@ -91,49 +138,162 @@ def nepurchase_info():
             message_storage[id + 'money_time']
         )
         if result == 'ok':
-            purchase_pid = message_storage[id + "purchase_pid"].strip('{}')
-            check_text = check_ok(purchase_pid)
+            check_text = '進貨預購商品成功！'
+            check_text = TextSendMessage(text=check_text)
         else:
-            check_text = '進貨預購商品失敗！稍後再試'
+            check_text = '進貨預購商品失敗！稍後再試' 
             check_text = TextSendMessage(text=check_text)
         state[id] = 'normal'
         state1[id] = 'NAN'
     return check_text
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###########新增現購
 def ingnepurchase_info():
     id = manager.user_id
     state = manager.user_state
     state1 = manager.user_state1
     message = manager.msg
-
+    message_storage = manager.storage
     #if message.isdigit():
     if message == '取消':
         state[id] = 'normal'
         state1[id] = 'NAN'
     elif state1[id] == 'num':
         message_storage[id + 'purchase_num'] = int(message)
-        message_storage[id+'purchase_all'] += f'\n您輸入的進貨數量： {message}'
+        message_storage[id+'purchase_all'] = f'\n您輸入的進貨數量： {message}'
         check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨單價」"
         check_text = TextSendMessage(text=check_text)
         state1[id] = 'cost'
     elif state1[id] == 'cost':
         message_storage[id + 'purchase_cost'] = int(message)
         message_storage[id+'purchase_all'] += f'\n您輸入的進貨單價： {message}'
-        check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨時間」"
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'ptime'
+        if message_storage[id + 'dbmanuinf'] == 'ok':
+            #商品ID, 現預購商品, 付款方式, 行庫名, 行庫代號, 匯款帳號
+            '''
+            message_storage[id + 'dbmanuinf'][0][1]
+            message_storage[id + 'dbmanuinf'][0][2]
+            message_storage[id + 'dbmanuinf'][0][3]
+            message_storage[id + 'dbmanuinf'][0][4]
+            message_storage[id + 'dbmanuinf'][0][5]'''
+            #if message_storage[id + 'dbmanuinf'][0][2] == '現金':
+            template_message = FlexSendMessage(
+                                alt_text='進貨時間選擇',
+                                contents={
+                                    "type": "carousel",
+                                    "contents": [{
+                                    "type": "bubble",
+                                    "body": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "選擇日期時間",
+                                            "weight": "bold",
+                                            "size": "xl"
+                                        },
+                                        {
+                                            "type": "text",
+                                            "text": f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨時間」",
+                                            "wrap": True
+                                        }
+                                        ]
+                                    },
+                                    "footer": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "spacing": "sm",
+                                        "contents": [
+                                        {
+                                            "type": "button",
+                                            "style": "link",
+                                            "height": "sm",
+                                            "action": {
+                                            "type": "datetimepicker",
+                                            "label": "點擊選擇日期與時間",
+                                            "data": "進貨時間",
+                                            "mode": "datetime"
+                                            }
+                                        }
+                                        ],
+                                        "flex": 0
+                                    }
+                                    }]   
+                                    } 
+                                )
+            check_text = template_message
+            state1[id] = 'ptime'
+        else:
+            check_text = TextSendMessage(text='商品出現問題，請稍後再試！')
     elif state1[id] == 'ptime':
-        message_storage[id + 'purchase_time'] = message
-        message_storage[id+'purchase_all'] += f'\n您輸入的進貨時間： {message}'
         check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款金額」"
         check_text = TextSendMessage(text=check_text)
         state1[id] = 'mmoney'
     elif state1[id] == 'mmoney':
         message_storage[id + 'give_money'] = int(message)
         message_storage[id+'purchase_all'] += f'\n您輸入的匯款金額： {message}'
-        check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款時間」"
-        check_text = TextSendMessage(text=check_text)
+        template_message = FlexSendMessage(
+                            alt_text='匯款時間選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": [{
+                                "type": "bubble",
+                                "body": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "選擇日期時間",
+                                        "weight": "bold",
+                                        "size": "xl"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款時間」",
+                                        "wrap": True
+                                    }
+                                    ]
+                                },
+                                "footer": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "spacing": "sm",
+                                    "contents": [
+                                    {
+                                        "type": "button",
+                                        "style": "link",
+                                        "height": "sm",
+                                        "action": {
+                                        "type": "datetimepicker",
+                                        "label": "點擊選擇日期與時間",
+                                        "data": "匯款時間",
+                                        "mode": "datetime"
+                                        }
+                                    }
+                                    ],
+                                    "flex": 0
+                                }
+                                }]   
+                                } 
+                            )
+        check_text = template_message
         state1[id] = 'mtime'
     elif state1[id] == 'mtime':
         message_storage[id + 'money_time'] = message
@@ -153,7 +313,7 @@ def ingnepurchase_info():
             message_storage[id + 'money_time']
         )
         if result == 'ok':
-            purchase_pid = message_storage[id + "purchase_pid"].strip('{}')
+            purchase_pid = message_storage[id + "purchase_pid"]
             check_text = check_okok(purchase_pid)
         else:
             check_text = '進貨現購商品失敗！稍後再試'
@@ -162,33 +322,78 @@ def ingnepurchase_info():
         state1[id] = 'NAN'
     return check_text
 
-
-##1011可成功連接
 def renepurchase_info():
     id = manager.user_id
     state = manager.user_state
     state1 = manager.user_state1
     message = manager.msg
-
+    message_storage = manager.storage
     #if message.isdigit():
     if message == '取消':
         state[id] = 'normal'
         state1[id] = 'NAN'
     elif state1[id] == 'num':
         message_storage[id + 'purchase_num'] = int(message)
-        message_storage[id+'purchase_all'] += f'\n您修改的進貨數量： {message}'
+        message_storage[id+'purchase_all'] = f'\n您輸入的進貨數量： {message}'
         check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨單價」"
         check_text = TextSendMessage(text=check_text)
         state1[id] = 'cost'
     elif state1[id] == 'cost':
         message_storage[id + 'purchase_cost'] = int(message)
-        message_storage[id+'purchase_all'] += f'\n您輸入的進貨單價： {message}'
-        check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨時間」"
-        check_text = TextSendMessage(text=check_text)
+        purchase_num = message_storage[id + 'purchase_num']
+        purchase_cost = message_storage[id + 'purchase_cost']
+        payment_amount = purchase_num * purchase_cost
+        message_storage[id + 'give_money'] = payment_amount
+        message_storage[id + 'purchase_all'] += f'\n您輸入的進貨單價： {message}'
+        message_storage[id + 'purchase_all'] += f'\n您輸入的匯款金額： {payment_amount}'  # 這裡顯示計算出的支付金額
+        template_message = FlexSendMessage(
+                            alt_text='進貨時間選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": [{
+                                "type": "bubble",
+                                "body": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "選擇日期時間",
+                                        "weight": "bold",
+                                        "size": "xl"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"{message_storage[id+'purchase_all']}\n=>請接著輸入「進貨時間」",
+                                        "wrap": True
+                                    }
+                                    ]
+                                },
+                                "footer": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "spacing": "sm",
+                                    "contents": [
+                                    {
+                                        "type": "button",
+                                        "style": "link",
+                                        "height": "sm",
+                                        "action": {
+                                        "type": "datetimepicker",
+                                        "label": "點擊選擇日期與時間",
+                                        "data": "進貨時間",
+                                        "mode": "datetime"
+                                        }
+                                    }
+                                    ],
+                                    "flex": 0
+                                }
+                                }]   
+                                } 
+                            )
+        check_text = template_message
         state1[id] = 'ptime'
     elif state1[id] == 'ptime':
-        message_storage[id + 'purchase_time'] = message
-        message_storage[id+'purchase_all'] += f'\n您輸入的進貨時間： {message}'
         check_text = f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款金額」"
         check_text = TextSendMessage(text=check_text)
         state1[id] = 'mmoney'
@@ -210,21 +415,29 @@ def renepurchase_info():
             message_storage[id + 'purchase_pid'],
             message_storage[id + 'purchase_num'],
             message_storage[id + 'purchase_cost'],
+            message_storage[id + 'purchase_unit'],
             message_storage[id + 'purchase_time'],
             message_storage[id + 'give_money'],
             message_storage[id + 'money_time']
         )
         if result == 'ok':
-            purchase_pid = message_storage[id + "purchase_pid"].strip('{}')
-            check_text = checkquick_ok(purchase_pid) 
+            purchase_pid = message_storage[id + "purchase_pid"]
+            check_text = checkquick_ok(purchase_pid)
         else:
             check_text = '快速進貨失敗！稍後再試'
             check_text = TextSendMessage(text=check_text)
-        #check_text = TextSendMessage(text=check_text)
         state[id] = 'normal'
         state1[id] = 'NAN'
     return check_text
 
+##快速進貨
+
+def format_time(selected_time):
+    # 这里需要根据实际情况来解析和格式化时间
+    # 下面的示例只是一个基本的示例
+    # 请根据实际需求进行适当修改
+    formatted_time = selected_time  # 假设 selected_time 已经是 "yyyy-mm-dd HH:MM:SS" 格式
+    return formatted_time
 #######廠商管理開始
 #-------------------廠商管理-新增廠商----------------------
 def new_manufacturer():

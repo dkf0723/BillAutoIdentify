@@ -440,7 +440,8 @@ def nopur_inf_flex_msg(result):
             button = ButtonComponent(
                 style='link',
                 height='sm',
-                action=MessageAction(label=row[1], text=f"預購商品ID:{str(row[0])+str(row[2])}")
+                action = MessageAction(label=row[1],text=f"預購商品ID:{str(row[0])}~{str(row[2])}!{str(row[3])}/{str(row[4])}"
+                )
             )
             bubble.body.contents.append(button)
 
@@ -470,59 +471,7 @@ def product_ing_flex_msg(result):
         flex_message = FlexSendMessage(alt_text='商品ID列表', contents=bubble)
         return flex_message
 
-
-def check_ok(purchase_pid):
-    bubble = {
-            "type": "bubble",
-            "body": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                {
-                    "type": "text",
-                    "weight": "bold",
-                    "size": "xl",
-                    "margin": "none",
-                    "text": "您已成功新增預購進貨商品",
-                    "gravity": "center",
-                    "align": "center"
-                },
-                {
-                    "type": "separator",
-                    "margin": "sm"
-                },
-                {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "margin": "md",
-                    "contents": [
-                    {
-                        "type": "button",
-                        "action": {
-                        "type": "message",
-                        "label": "完成",
-                        "text": f"您已成功新增預購進貨商品 {purchase_pid}"
-                        },
-                        "margin": "xs",
-                        "position": "relative",
-                        "style": "primary",
-                        "gravity": "center"
-                    }
-                    ],
-                    "spacing": "xs"
-                }
-                ],
-                "margin": "none",
-                "spacing": "none"
-            },
-            "styles": {
-                "footer": {
-                "separator": True
-                }
-            }
-            }
-    return FlexSendMessage(alt_text="新增確認選項", contents = bubble)
-
+##新增現購成功訊息
 def check_okok(purchase_pid):
     bubble = {
             "type": "bubble",
@@ -784,3 +733,5 @@ def Order_preorder_selectionscreen(): #管理者-預購/未取
                                 } 
                             )
     return screen
+
+
