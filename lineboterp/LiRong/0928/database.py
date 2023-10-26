@@ -18,9 +18,10 @@ def gettime():
   modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
   formatted_millisecond = modified_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
   formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')# 格式化日期和時間，不包含毫秒部分
+  formatted_datetime2 = modified_datetime.strftime('%Y-%m-%dT%H:%M')# 給日期選擇器的
   formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
   order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
-  return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date,'formatted_millisecond':formatted_millisecond}
+  return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date,'formatted_millisecond':formatted_millisecond,'formatted_datetime2':formatted_datetime2}
 #-------------------資料庫連線----------------------
 #連線
 def databasetest(db_pool, serial_number):
@@ -186,35 +187,30 @@ def db_manufacturers():
   result = retry(category,query)
   return result
 #--------------此廠商所有商品----------------
-def db_products_manufacturers(manufacturer_id):
-  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價 FROM Product_information NATURAL JOIN Purchase_Information WHERE 廠商編號 = '{manufacturer_id}'"
+def db_products_manufacturers(manufacturer_id,choose):
+  if choose != 'stop':
+    test1 = f"廠商編號 = '{manufacturer_id}' and 現預購商品 <> '現購停售'and 現預購商品 <> '預購截止'"
+  else:
+    test1 = f"現預購商品 = '現購停售' or 現預購商品 = '預購截止'"
+  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價,現預購商品 FROM Product_information NATURAL JOIN Purchase_Information WHERE {test1}"
   category = 'select'  # 重試類別 select/notselect
   result = retry(category, query)
   return result
 #-------------分類下所有商品列表------------
-def test_categoryate(selected_category):
-  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價 FROM Product_information NATURAL JOIN Purchase_Information WHERE 商品ID LIKE '{selected_category}%'"
+def db_categoryate(selected_category):
+  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價,現預購商品 FROM Product_information NATURAL JOIN Purchase_Information WHERE 商品ID LIKE '{selected_category}%' and 現預購商品 <> '現購停售'and 現預購商品 <> '預購截止'"
   category = 'select' #重試類別 select/notselect
   result = retry(category,query)
   return result
-#---------------圓圓打得----------------
-def product_info(product_id):
-  query = f"SELECT * FROM Product_information WHERE 商品ID = '{product_id}'"
-  category = 'select'  # 重試類別 select/notselect
-  result = retry(category, query)
-  return result
-#---------------修改商品名稱-----------------
-def MP_information_Pname(product_name, pid): 
-  query = f"UPDATE Product_information SET 商品名稱 = '{product_name}' WHERE 商品ID = '{pid}'"
-  category = 'notselect' # 重試類別 select/notselect
-  result = retry(category, query) # 成功回傳 ok
-  return result
-#---------------修改商品簡介-----------------
-def MP_information_Pintroduction(product_introduction, pid): 
-  query = f"UPDATE Product_information SET 商品簡介 = '{product_introduction}' WHERE 商品ID = '{pid}'"
-  category = 'notselect' # 重試類別 select/notselect
-  result = retry(category, query) # 成功回傳 ok
-  return result
+# ---------------修改商品系列-----------------
+def MP_information_modify(field_to_modify, new_value, pid):
+    if field_to_modify in ["商品名稱", "商品簡介", "售出單價", "售出單價2", "預購數量限制_倍數","預購截止時間","商品圖片"]:
+        query = f"UPDATE Product_information SET {field_to_modify} = '{new_value}' WHERE 商品ID = '{pid}'"
+        category = 'notselect' # 重試類別 select/notselect
+        result = retry(category, query) # 成功回傳 ok
+        return result
+    else:
+        return "無效欄位名稱"    
 #--------------辨識商品狀態進而選擇FM------------
 def Product_status():
   user_id = manager.user_id
@@ -228,162 +224,22 @@ def Product_status():
     product_status = '查無'
   return product_status    
 #--------------現購FM函數------------------------
-# def Now_Product(pname):
-#   user_id = manager.user_id
-#   pid = manager.product[user_id + 'Product_Modification_Product_id']
-#   query = f"SELECT 商品名稱,商品簡介,售出單價,售出單價2 FROM Product_information natural join Purchase_Information WHERE 商品名稱 = '{pname}', 商品簡介 = '{pid}',售出單價  = '{sell_price}',售出單價2  = '{sell_price2}"
-#   category = 'select'  # 重試類別 select/notselect
-#   result = retry(category, query)
-#   return result  
-# def Now_Product(pname,introduction,sell_price,sell_price2,pphoto):
-#   query = f"SELECT 商品名稱,商品簡介,售出單價,售出單價2,商品圖片 FROM Product_information natural join Purchase_Information WHERE 商品名稱 = '{pname}' AND 商品簡介 = '{introduction}' AND 售出單價 = '{sell_price}' AND 售出單價2 = '{sell_price2}' AND 商品圖片 = '{pphoto}'"
-#   category = 'select'  # 重試類別 select/notselect
-#   result = retry(category, query)
-#   return result                                              
-# #-------------------查詢資料SELECT-------------
-# def test_datasearch():
-#   #測試讀取資料庫願望清單(所有)
-#   implement = databasetest()
-#   conn = implement['conn']
-#   cursor = implement['cursor']
-#   query = "SELECT * FROM wishlist;"
-#   cursor.execute(query)
-#   result = cursor.fetchall()
-#   if result is not None:
-#     testmsg = "願望清單讀取內容：\n"
-#     for row in result:
-#       # 透過欄位名稱獲取資料
-#       uid = row[0]#'UID'
-#       name = row[1]#'商品名稱'
-#       #商品圖片
-#       reason = row[3]#'推薦原因'
-#       time = row[4]#'願望建立時間'
-#       member = row[5]#'會員_LINE_ID'
-#       # 在這裡進行資料處理或其他操作
-#       testmsg += ('第%s筆\n推薦會員:\n%s\n商品名稱：\n%s\n推薦原因：\n%s\n願望建立時間：\n%s\n---\n' %(uid,member,name,reason,time))
-#   else:
-#     testmsg = "找不到符合條件的資料。"
-#   # -----------------關閉游標與連線--------------------------
-#   testmsg += "(end)"
-#   cursor.close()
-#   conn.close()
-#   return testmsg
+def Now_Product(id):
+  query = f"SELECT 商品名稱, 商品簡介, 售出單價, 售出單價2,商品圖片 FROM Product_information natural join Purchase_Information WHERE 商品ID = '{id}'"
+  category = 'select'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result                        
 
-# #修改資料UPDATE
-# def test_dataUPDATE():
-#   return
-# #-------------------圖片取得並發送----------------------
-# def imagesent():
-#     implement = databasetest()  # 定義 databasetest() 函式並返回相關物件
-#     img = []
-#     send = []
-#     conn = implement['conn']
-#     cursor = implement['cursor']
-#     #query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 1 OFFSET 0;"#0開始1筆
-#     query = "SELECT 商品名稱, 商品圖片 FROM Product_information LIMIT 2 OFFSET 0;"
-#     cursor.execute(query)
-#     result = cursor.fetchall()
-    
-#     if result is not None:
-#         for row in result:
-#             productname = row[0] # 圖片商品名稱
-#             output_path = row[1] # 圖片連結
-#             # 發送圖片
-#             text_msg = TextSendMessage(text=productname)
-#             image_msg = ImageSendMessage(
-#                 original_content_url=output_path,  # 圖片原圖
-#                 preview_image_url=output_path  # 圖片縮圖
-#             )
-#             img.append(text_msg)
-#             img.append(image_msg)
-#     else:
-#         img.append(TextSendMessage(text='找不到符合條件的資料。'))
-    
-#     # 關閉游標與連線
-#     cursor.close()
-#     conn.close()
-#     send = tuple(img)  # 將列表轉換為元組最多五個
-#     return send
+#--------------預購FM函數------------------------
+def Per_Product(id):
+  query = f"SELECT 商品名稱, 商品簡介, 售出單價, 售出單價2,商品圖片,預購數量限制_倍數,預購截止時間 FROM Product_information natural join Purchase_Information WHERE 商品ID = '{id}'"
+  category = 'select'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result                 
 
-# #-------------------刪除images資料夾中所有----------------------
-# def delete_images():
-#     folder_path = 'images'  # 資料夾路徑
-#     file_list = os.listdir(folder_path)
-    
-#     for file_name in file_list:
-#         file_path = os.path.join(folder_path, file_name)
-#         if os.path.isfile(file_path):
-#             os.remove(file_path)
-#             print(f"已刪除圖片檔案：{file_path}")
-
-# #-------------------images資料夾中圖片轉連結----------------------
-# def imagetolink():
-#   imgurdata = imgurinfo()
-#   image_storage = []
-#   folder_path = 'images'# 設定資料夾路徑
-#   # 使用 glob 模組取得資料夾中的 JPG 和 PNG 圖片檔案
-#   image_files = glob.glob(f"{folder_path}/*.jpg") + glob.glob(f"{folder_path}/*.png")
-#   # 讀取所有圖片檔案
-#   for file in image_files:
-#     # 獲取檔案名稱及副檔名
-#     filename, file_extension = os.path.splitext(file)
-#     filename = filename+file_extension# 檔案位置加副檔名
-#     image_storage.append(filename)
-
-#   #執行轉換連結
-#   for img_path in image_storage:
-#     CLIENT_ID = imgurdata['CLIENT_ID_data']
-#     PATH = img_path #A Filepath to an image on your computer"
-#     title = img_path
-#     im = pyimgur.Imgur(CLIENT_ID)
-#     uploaded_image = im.upload_image(PATH, title=title)
-#     #image = uploaded_image.title + "連結：" + uploaded_image.link
-#     imagetitle = uploaded_image.title
-#     imagelink = uploaded_image.link
-#     print( imagetitle + "連結：" + imagelink)
-#     #delete_images()#刪除images檔案圖片
-#   return {'imagetitle':imagetitle,'imagelink':imagelink}
-
-# #-------------------取出未取名單---------------------------------
-# def order_details():
-#   OrderId = []
-#   LineId = []
-#   PhoneNumber = []
-#   OrderTime = []
-#   PickuptTime = []
-#   amount = []
-#   count = 0
-#   #讀取訂單資料(所有)
-#   implement = databasetest()
-#   conn = implement['conn']
-#   cursor = implement['cursor']
-#   query = "SELECT * FROM Order_information;"
-#   cursor.execute(query)
-#   result = cursor.fetchall()
-#   if result is not None:
-#     testmsg = "願望清單讀取內容：\n"
-#     for row in result:
-#       if row[5] == "未取":
-#         # 透過欄位名稱獲取資料
-#         OrderId.append(row[0])#'訂單編號'
-#         LineId.append(row[1])#'LineId'
-#         PhoneNumber.append(row[2])#電話
-#         OrderTime.append(row[3])#'下定時間'
-#         PickuptTime.append(row[4])#'取貨完成時間'
-#         amount.append(row[10])#'總額'
-#         # 在這裡進行資料處理或其他操作
-#         testmsg += ('共%s筆未取訂單\n---\n' %(count))
-#   else:
-#     testmsg = "找不到符合條件的資料。"
-#   # 關閉游標與連線
-#   testmsg += "(end)"
-#   cursor.close()
-#   conn.close()
-#   return testmsg
-
-# def test_manufacturers():
-#     query = "SELECT * FROM Manufacturer_Information;"
-#     category = 'select' #重試類別 select/notselect
-#     result = retry(category,query)
-#     return result
-
+#---------------停售-----------------------------
+def stop_time(pid):
+  query = f"UPDATE Product_information SET 現預購商品 = '現購停售' WHERE 商品ID = '{pid}'"
+  category = 'notselect'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result

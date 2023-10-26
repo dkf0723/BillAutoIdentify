@@ -1,17 +1,13 @@
 from flask import Flask, request, abort
-from linebot import (
-    LineBotApi, WebhookHandler
-)
-from linebot.exceptions import (
-    InvalidSignatureError
-)
+from linebot import (LineBotApi, WebhookHandler)
+from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 #======這裡是呼叫的檔案內容=====
 from FM import *
 from database import *
-from FM import manager_products_manufacturers_list,manager_manufacturers_list,test_categoryate_FM
 from test_check import *
 from relevant_information import linebotinfo,dbinfo
+from FM import manager_products_manufacturers_list,manager_manufacturers_list,manager_categoryate_list
 #======python的函式庫==========
 from mysql.connector import pooling
 import tempfile, os
@@ -23,7 +19,9 @@ import time
 import requests
 import string #字符串處理相關的工具
 import random #隨機產生
+selected_category = None
 #======python的函數庫==========
+from datetime import datetime
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 linebotdata = linebotinfo()
@@ -31,7 +29,6 @@ linebotdata = linebotinfo()
 line_bot_api = LineBotApi(linebotdata['LineBotApidata'])
 # Channel Secret
 handler = WebhookHandler(linebotdata['WebhookHandlerdata'])
-
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -59,6 +56,8 @@ global db
 db = {}
 global list_page
 list_page = {}
+global storage
+storage = {}
 
 #資料庫pool設定數量4個
 dbdata = dbinfo()
@@ -81,6 +80,7 @@ def handle_message(event):
     global user_id
     global msg
     global user_state
+    global duplicate_save
     msg = event.message.text
     user_id = event.source.user_id
     if user_id not in user_state:
@@ -118,13 +118,17 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',
                 template=ButtonsTemplate(
-                    text='請選擇商品服務：\n【查詢/修改/下架】或【新增上架】',
+                    text='請選擇商品服務：\n【查詢/修改/下架】或【停售及截止商品列表 】或【新增上架】',
                     actions=[
                         MessageAction(
                             label='【查詢/修改/下架】',
                             text='【查詢/修改/下架】',
                         ),
                         MessageAction(
+                            label='【停售及截止商品列表 】',
+                            text='【停售及截止商品列表 】'
+                        ),
+                         MessageAction(
                             label='【新增上架】',
                             text='【新增上架】'
                         )
@@ -148,15 +152,46 @@ def handle_message(event):
                     ]
                 )
             ))
+        #-------------【依類別】查詢------------------------   
         elif '【依類別】查詢' in msg:
             send_category_selection(event, line_bot_api)
         elif msg in ['test','frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
-            selected_category = msg
-            result = test_categoryate(selected_category)
-            flex_message = test_categoryate_FM(result)
-            line_bot_api.reply_message(event.reply_token, flex_message)
+            duplicate_save[user_id+"selected_category"] = msg
+            list_page[user_id+'廠商數量min'] = 0
+            list_page[user_id+'廠商數量max'] = 9
+            show3 = manager_categoryate_list(duplicate_save[user_id+"selected_category"])
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                    alt_text='【商品查詢】列表',
+                    contents={
+                        "type": "carousel",
+                        "contents": show3      
+                        } 
+                    ))
+        elif'【商品列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【商品列表下一頁】"的位置
+            start_index = original_string.find("【商品列表下一頁】")
+            if start_index != -1:
+                # 從"【商品列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【商品列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'廠商數量min'] = min-1
+            list_page[user_id+'廠商數量max'] = max
+            show3 = manager_categoryate_list(duplicate_save[user_id+"selected_category"])
+            if 'TextSendMessage' in show3:
+                line_bot_api.reply_message(event.reply_token,show3)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show3 
+                    } 
+                ))
+         #-------------【依廠商】查詢------------------------         
         elif '【依廠商】查詢'in msg:
-            # result = db_manufacturers()
             list_page[user_id+'廠商數量min'] = 0
             list_page[user_id+'廠商數量max'] = 9
             show = manager_manufacturers_list() #這個show是變數隨便取
@@ -191,46 +226,37 @@ def handle_message(event):
                     } 
                 ))
         elif msg.startswith('選我選我'):
-            # manufacturer_id = msg[5:]  # 提取廠商編號
-            # # 檢查格式
-            # if manufacturer_id == '':
-            #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text="格式不正確，请重新输入。"))
-            # else:
-            #     product[user_id + 'Product_Modification_manufacturer_id'] = manufacturer_id
-            #     result = db_products_manufacturers(manufacturer_id)  #套進db函數 
-            #     flex_message = manager_products_manufacturers_list(result)  #套進FM 
-            #     line_bot_api.reply_message(event.reply_token, flex_message)
-            manufacturer_id = msg[5:]  # 提取廠商編號
+            duplicate_save[user_id+"manufacturer_id"] = msg[5:]  # 提取廠商編號
             # 檢查格式
-            if manufacturer_id == '':
-                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text="格式不正確，请重新输入。"))
+            if duplicate_save[user_id+"manufacturer_id"] == '':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此廠商，请重新输入。"))
             else:
-                product[user_id + 'Product_Modification_manufacturer_id'] = manufacturer_id
+                product[user_id + 'Product_Modification_manufacturer_id'] = duplicate_save[user_id+"manufacturer_id"]
                 list_page[user_id+'廠商數量min'] = 0
                 list_page[user_id+'廠商數量max'] = 9
-                show2 = manager_products_manufacturers_list(manufacturer_id)
+                show2 = manager_products_manufacturers_list(duplicate_save[user_id+"manufacturer_id"],'no')
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                    alt_text='【廠商查詢】列表',
+                    alt_text='【商品查詢】列表',
                     contents={
-                        "type": "carousel",
-                        "contents": show2      
-                        } 
+                    "type": "carousel",
+                    "contents": show2      
+                    } 
                     ))
-        elif '【廠商列表下一頁】' in msg:
+        elif '【此廠商商品列表下一頁】' in msg:
             original_string = msg
             # 找到"【商品列表下一頁】"的位置
-            start_index = original_string.find("【商品列表下一頁】")
+            start_index = original_string.find("【此廠商商品列表下一頁】")
             if start_index != -1:
                 # 從"【商品列表下一頁】"後面開始切割字串
-                substr = original_string[start_index + len("【商品列表下一頁】"):]
+                substr = original_string[start_index + len("【此廠商商品列表下一頁】"):]
                 # 切割取得前後文字
                 min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
                 max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
-            list_page[user_id+'商品數量min'] = min-1
-            list_page[user_id+'商品數量max'] = max
-            show2 = manager_products_manufacturers_list()
+            list_page[user_id+'廠商數量min'] = min-1
+            list_page[user_id+'廠商數量max'] = max
+            show2 = manager_products_manufacturers_list(duplicate_save[user_id+"manufacturer_id"],'no')
             if 'TextSendMessage' in show2:
-                line_bot_api.reply_message(event.reply_token,show)
+                line_bot_api.reply_message(event.reply_token,show2)
             else:
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(
                 alt_text='【商品】列表',
@@ -239,8 +265,46 @@ def handle_message(event):
                     "contents": show2      
                     } 
                 ))
-
-
+        elif msg.startswith('【停售及截止商品列表 】'):
+            duplicate_save[user_id+"manufacturer_id"] = msg[5:]  # 提取廠商編號
+            # 檢查格式
+            if duplicate_save[user_id+"manufacturer_id"] == '':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此廠商，请重新输入。"))
+            else:
+                product[user_id + 'Product_Modification_manufacturer_id'] = duplicate_save[user_id+"manufacturer_id"]
+                list_page[user_id+'stop數量min'] = 0
+                list_page[user_id+'stop數量max'] = 9
+                show2 = manager_products_manufacturers_list('','stop')
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                    alt_text='【stop商品】列表',
+                    contents={
+                    "type": "carousel",
+                    "contents": show2      
+                    } 
+                    ))
+        elif '【stop商品列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【商品列表下一頁】"的位置
+            start_index = original_string.find("【stop商品列表下一頁】")
+            if start_index != -1:
+                # 從"【商品列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【stop商品列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'stop數量min'] = min-1
+            list_page[user_id+'stop數量max'] = max
+            show2 = manager_products_manufacturers_list('','stop')
+            if 'TextSendMessage' in show2:
+                line_bot_api.reply_message(event.reply_token,show2)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【stop商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show2      
+                    } 
+                ))
         elif '【修改商品資訊】' in msg:
             id = msg[8:]#【修改商品資訊】{pid}
             product[user_id + 'Product_Modification_Product_id'] = id
@@ -279,20 +343,14 @@ def handle_message(event):
                     ]
                 )
             ))
-        # elif '【舊廠商】'in msg:
-        #     result = db_manufacturers()
-        #     flex_message = test_manufacturers_FM(result)
-        #     line_bot_api.reply_message(event.reply_token, flex_message)
-        #     #line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
-        # elif '【新廠商】'in msg:
-        #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
-
-        # elif '未取名單' in msg:
-        #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
-        # elif '報表管理' in msg:
-        #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
-        # elif '廠商管理' in msg:
-        #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='廠商管理'))
+        elif '【停售】' in msg:
+            a = stop_time(msg[4:])#【停售】{pid}
+            if a == 'ok':
+                message = '此商品已停售'
+            else:
+                message = '停售指令失敗'
+            # message = f"+{id}+\n+{product_status}+"
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
             #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
             #databasetest_msg = databasetest()['databasetest_msg']
@@ -337,6 +395,22 @@ def send_category_selection(event, line_bot_api):
                 QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),   
             ]))
     line_bot_api.reply_message(event.reply_token, message)
+
+#日期時間選擇器
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    global msg
+    #postback_data = event.postback.data
+    if 'datetime' in event.postback.params:
+        # 獲取使用者選擇的日期和時間
+        selected_datetime = event.postback.params['datetime']
+        tdelete_datetime = selected_datetime.replace('T', ' ')
+        #轉換格式2023-10-18T21:00 -> 2023-10-18 21:00:00
+        date_time_obj = datetime.strptime(tdelete_datetime , '%Y-%m-%d %H:%M')
+        restock_datetime = date_time_obj.strftime('%Y-%m-%d %H:%M')
+        msg = str(restock_datetime)
+        response = inventory_check()
+        line_bot_api.reply_message(event.reply_token, response)
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
 #資料庫連線1
