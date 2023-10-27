@@ -2,9 +2,9 @@ from linebot.models import TextSendMessage,FlexSendMessage,LocationSendMessage
 from product.buy_now import Order_buynow
 from product.product_preorder import Order_preorder
 import lineboterp
-from ask_wishes.ask import ask,stockonly,unitsearch
+from ask_wishes.ask import ask
 from ask_wishes.wishes import wishes
-from database import recent_phone_call, quickcalculation,order_create,cartadd,revise,cartsearch,cartordergo
+from database import recent_phone_call, quickcalculation,order_create,cartadd,revise,cartsearch,cartordergo,stockonly,unitsearch
 from product.cartlist import cart_list,addcart,cartrevise
 from selection_screen import (Order_phonenum_screen,Single_order_confirmation_screen,Order_establishment_message,
                               Cart_join_success_message,Cancel_fail_message,Cart_order_screen,Cartordercheck_establishment_message,
