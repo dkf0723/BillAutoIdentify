@@ -37,7 +37,7 @@ def databasetest(db_pool, serial_number):
     except mysql.connector.Error as err:
       if conn:
         conn.close()
-      elif err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+      if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         databasetest_msg = '使用者或密碼有錯'
       elif err.errno == errorcode.ER_BAD_DB_ERROR:
         databasetest_msg = '資料庫不存在或其他錯誤'
@@ -62,8 +62,8 @@ def databasetest(db_pool, serial_number):
     if db['conn'] is not None:
       try:
         db['conn'].close()
-      except mysql.connector.Error as mysql_err:
-        databasetest_msg = mysql_err
+      except:#except mysql.connector.Error as mysql_err:
+        databasetest_msg = '主要1的重新連線(3分鐘)關閉連線錯誤！'
     db['databasetest_msg'] = databasetest_msg
     db['databaseup'] = formatted_datetime
     db['databasenext'] = new_formatted_datetime
@@ -73,8 +73,8 @@ def databasetest(db_pool, serial_number):
     if db['conn1'] is not None:
       try:
         db['conn1'].close()
-      except mysql.connector.Error as mysql_err:
-        databasetest_msg = mysql_err
+      except:#except mysql.connector.Error as mysql_err:
+        databasetest_msg = '備用1的重新連線(5分鐘)關閉連線錯誤！'
     db['databasetest_msg1'] = databasetest_msg
     db['databaseup1'] = formatted_datetime
     db['databasenext1'] = new_formatted_datetime
@@ -113,30 +113,40 @@ def next_time(check, check1,nowtime, addhours):
 
 #-------------------錯誤重試----------------------
 def retry(category,query):#select/notselect
+  indb_pool = lineboterp.db_pool
   block = 0#結束點是1
-  step = 0 #第幾輪
   stepout = 0 #離開標記
+  step = 0 #預設起始
   while block == 0:
     max = 3  # 最大重試次數
     count = 0  # 初始化重試計數
     connobtain = 'ok' #檢查是否取得conn連線資料
+    connobtain1 = 'ok'#檢查是否取得conn1連線資料
     while count<max:
       try:
         if step == 0:
+          num = 3
           conn = lineboterp.db['conn']
           cursor = conn.cursor()#重新建立游標
           break
         elif step == 1:
+          num = 4
           conn = lineboterp.db['conn1']
           cursor = conn.cursor()#重新建立游標
           stepout = 1 #第二輪標記，完成下面動作可退出
           break
       except (mysql.connector.Error,AttributeError):
-        count += 1 #重試次數累加
-        connobtain = 'no'
+        if count != 2:
+          count += 1 #重試次數累加
+        else:
+          databasetest(indb_pool,num)
+          if step == 0:
+            connobtain = 'no'
+          else:
+            connobtain1 = 'no'
         
     count = 0  # 重試次數歸零，用於後面的步驟
-    if connobtain == 'ok':
+    if connobtain == 'ok' or connobtain1 == 'ok':
       while count<max:
         step = 1 #下一輪設定
         stepout = 0 #回合恢復
@@ -154,26 +164,36 @@ def retry(category,query):#select/notselect
             result2 = 'ok'#購物車新增用
           stepout = 1 #不進行第二輪
           break
-        except mysql.connector.Error as e:
+        except:#except mysql.connector.Error as e:
           count += 1 #重試次數累加
           result = [] #錯誤回傳內容
           result2 = 'no'#購物車新增用
-          step = 1
-          stepout = 1
+          if count == 2 and step == 1:
+            stepout = 1
           time.sleep(1)
       if stepout == 1:#成功取得資料後退出或兩輪都失敗退出迴圈
+        cursor.close()#關閉第一輪游標的
         block = 1
     else:
-      if step == 1:
-        cursor.close()#關閉第一輪游標的
-      step = 1 #conn沒取到進入切換conn1
       if stepout == 1 and step == 1:#兩輪都失敗退出迴圈
+        cursor.close()#關閉第一輪游標的
         block = 1
         if category == 'select':
           result = []
         else:
           result = 'no'
         result2 = 'no'
+      if connobtain == 'no' and connobtain1 == 'no':
+        block = 1
+        if category == 'select':
+          result = []
+        else:
+          result = 'no'
+        result2 = 'no'
+      elif step == 0 and connobtain == 'no':
+        step = 1 #conn沒取到進入切換conn1
+      elif step == 1 and connobtain1 == 'no':
+        step = 0
   return result,result2
 
 #-------------------檢查連線超時----------------------
@@ -790,7 +810,6 @@ def cartadd(id,product_id,num):
   return result2
 #-------------------購物車單商品數量修改----------------------
 def revise(id,product_id,num):
-  conn = lineboterp.db['conn']
   query = f"select 現預購商品,訂單剩餘,售出單價2 from Product_information where 商品ID = '{product_id}'"
   category ='select' #重試類別select/notselect
   inventory_result,result2 = retry(category,query)
@@ -832,9 +851,6 @@ def revise(id,product_id,num):
       result,result2 = retry(category,query1)
   else:
     result2 = 'Null'
-  #錯誤時恢復狀態
-  if result2 == 'no':
-    conn.rollback()  # 撤銷操作恢復到操作前的狀態
   return result2
 #-------------------修改購物車清單----------------------
 def removecart(user_id, product_id):
@@ -985,24 +1001,15 @@ def cartordergo(phonenum):
 #-------------------許願商品建立----------------------
 def wishessend(wishesname,wishesreason,wishessource,img):
   userid = lineboterp.user_id
-  try:
-    conn = lineboterp.db['conn']
-    cursor = conn.cursor()#重新建立游標
-    timeget = gettime()
-    formatted_datetimeget = timeget['formatted_datetime']
-    query =f"""
-            INSERT INTO wishlist (商品名稱,推薦原因,資料來源,商品圖片,願望建立時間,會員_LINE_ID)
-            VALUES ( '{wishesname}', '{wishesreason}','{wishessource}','{img}','{formatted_datetimeget}','{userid}');    
-              """
-    cursor.execute(query)
-    conn.commit()
-    confirmationmessage = 'ok'
-  except Exception as e: #例外處理
-      cursor.close()#游標關閉
-      conn.rollback()  # 撤銷操作恢復到操作前的狀態
-      #text = f'Commit failed: {str(e)}'
-      confirmationmessage = 'no'
-  return confirmationmessage
+  timeget = gettime()
+  formatted_datetimeget = timeget['formatted_datetime']
+  query =f"""
+          INSERT INTO wishlist (商品名稱,推薦原因,資料來源,商品圖片,願望建立時間,會員_LINE_ID)
+          VALUES ( '{wishesname}', '{wishesreason}','{wishessource}','{img}','{formatted_datetimeget}','{userid}');    
+            """
+  category ='notselect' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  return result
 
 #-------------------(單張)images資料夾中圖片轉連結、完成並刪除----------------------
 def single_imagetolink():

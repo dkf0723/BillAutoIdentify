@@ -79,9 +79,11 @@ global msgtype
 
 #資料庫pool設定數量4個
 dbdata = dbinfo()
+global db_pool
 db_pool = pooling.MySQLConnectionPool(
             pool_name="db_pool",
             pool_size=4,
+            #pool_reset_session=True,
             host= dbdata['host'],
             user=dbdata['user'],
             password=dbdata['password'],
@@ -359,7 +361,10 @@ def dbconnect_job():
 #資料庫連線2
 def dbconnect1_job():
     databasetest(db_pool,4)#備用1的重新連線(5分鐘)
-
+'''#保持連線
+def conn_job():
+    conn = db_pool.get_connection()
+    conn.close()'''
 #檢測資料庫連線
 def checkdb():
     timeget = gettime()
