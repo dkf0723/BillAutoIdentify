@@ -1,0 +1,4 @@
+﻿Field,Type,Null,Key,Default,Extra
+UID,int,NO,PRI,NULL,auto_increment
+年月,varchar(7),NO,,NULL,
+data,blob,YES,,NULL,

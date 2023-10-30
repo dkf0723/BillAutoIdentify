@@ -1,0 +1,11 @@
+﻿Field,Type,Null,Key,Default,Extra
+UID,int,NO,PRI,NULL,auto_increment
+商品ID,char(18),NO,MUL,NULL,
+廠商方商品序號,char(20),YES,,NULL,
+進貨數量,int,NO,,NULL,
+進貨單價,int,NO,,NULL,
+商品單位,char(3),NO,,NULL,
+進貨時間,datetime,YES,,NULL,
+匯款時間,datetime,YES,,NULL,
+匯款金額,int,YES,,NULL,
+進貨狀態,char(3),NO,,NULL,

@@ -1,0 +1,13 @@
+T01-Manufacturer_Information							
+資料檔說明		廠商資料					
+Field	Type	Null	Key	Default	Extra		
+廠商編號	char(18)	NO	PRI	NULL			
+廠商名	char(20)	NO		NULL			
+負責或對接人	char(10)	NO		NULL			
+市話	char(12)	YES		NULL			
+電話	char(10)	YES		NULL			
+付款方式	char(2)	NO		NULL			
+行庫名	char(30)	YES		NULL			
+行庫代號	char(3)	YES		NULL			
+匯款帳號	char(14)	YES		NULL			
+建立時間	datetime	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED		

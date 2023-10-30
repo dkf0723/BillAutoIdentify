@@ -1,0 +1,12 @@
+﻿Field,Type,Null,Key,Default,Extra
+訂單編號,char(18),NO,PRI,NULL,
+會員_LINE_ID,char(33),NO,MUL,NULL,
+電話,char(10),NO,,NULL,
+訂單成立時間,datetime,NO,,NULL,
+取貨完成時間,datetime,YES,,NULL,
+訂單狀態未取已取,char(5),NO,,NULL,
+評分數,float,YES,,NULL,
+評語內容,char(100),YES,,NULL,
+評分時間,datetime,YES,,NULL,
+商品圖片_顧客上傳,text,YES,,NULL,
+總額,int,YES,,NULL,

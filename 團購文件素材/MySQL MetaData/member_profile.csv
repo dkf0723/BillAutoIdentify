@@ -1,0 +1,5 @@
+﻿Field,Type,Null,Key,Default,Extra
+會員_LINE_ID,char(33),NO,PRI,NULL,
+會員信賴度_取貨率退貨率,float,YES,,NULL,
+加入時間,datetime,NO,,NULL,
+身分別,char(3),NO,,NULL,
