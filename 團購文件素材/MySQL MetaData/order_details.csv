@@ -1,0 +1,6 @@
+﻿Field,Type,Null,Key,Default,Extra
+UID,int,NO,PRI,NULL,auto_increment
+訂單編號,char(18),NO,MUL,NULL,
+商品ID,char(18),NO,MUL,NULL,
+訂購數量,int,NO,,NULL,
+商品小計,int,NO,,NULL,

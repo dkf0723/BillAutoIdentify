@@ -1,0 +1,5 @@
+﻿Field,Type,Null,Key,Default,Extra
+UID,int,NO,PRI,NULL,auto_increment
+類別,char(50),NO,,NULL,
+問題,char(100),NO,,NULL,
+回答,char(255),NO,,NULL,
