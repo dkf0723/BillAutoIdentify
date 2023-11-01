@@ -395,7 +395,7 @@ def send_category_selection(event, line_bot_api):
                 QuickReplyButton(action=MessageAction(label="飲品", text="drinks")),   
             ]))
     line_bot_api.reply_message(event.reply_token, message)
-
+    
 #日期時間選擇器
 @handler.add(PostbackEvent)
 def handle_postback(event):

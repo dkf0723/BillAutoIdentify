@@ -145,7 +145,6 @@ def product_modification():
                                 } 
                             )
             flex_message = template_message
-            # flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的預購截止時間:')
         elif '更換商品圖片' == info:
             state[id] = 'Product_Modification_Photo'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入新的商品圖片連結:')
@@ -200,5 +199,3 @@ def get_product_modification_flex_message(product_status, product_id):
         return Pre_Product_Modification_FM(product_id)
     elif product_status == '查無':
         return TextSendMessage(text='商品有誤！')
-
-            

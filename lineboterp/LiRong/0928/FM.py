@@ -1185,5 +1185,3 @@ def Pre_Product_Modification_FM(id):
     else:
         flex_message = TextSendMessage(text="找不到符合條件的廠商商品。")
     return flex_message
-
-
