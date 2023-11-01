@@ -750,6 +750,29 @@ def cartsearch():
   if cart_result == []:
     cart_result = '資料庫搜尋不到'
   return cart_result
+
+#-------------------購物車單一修正金額----------------------
+def cartcheckprice(pid,pnum,lastprice):
+  userid = lineboterp.user_id
+  subtotal_result,nuit,price,discount = quickcalculation(pid,pnum)
+  if subtotal_result == '計算小計時發生錯誤！':
+    newprice = lastprice
+  else:
+    if lastprice != subtotal_result:
+      query1 = f"""
+              UPDATE order_details
+              SET 商品小計 = '{subtotal_result}'
+              WHERE 訂單編號 = (
+              select 訂單編號
+              from Order_information
+              where 會員_LINE_ID = '{userid}' and 訂單編號 like 'cart%') and 商品ID = '{pid}';
+                """
+      category ='notselect' #重試類別select/notselect
+      result,result2 = retry(category,query1)
+      newprice = subtotal_result
+    else:
+      newprice = lastprice
+  return newprice
 #-------------------購物車單一商品小計查詢----------------------
 def cartsubtotal(pid):
   userid = lineboterp.user_id
