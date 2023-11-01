@@ -1,6 +1,6 @@
 from linebot.models import TextSendMessage,FlexSendMessage,QuickReplyButton,MessageAction,QuickReply
 import lineboterp
-from database import cartsearch,unitsearch,stock,removecart,revise,cartsubtotal,stockonly
+from database import cartsearch,unitsearch,stock,removecart,revise,cartsubtotal,stockonly,cartcheckprice
 from selection_screen import Cart_add_screen
 
 #-------------------購物車資料查詢----------------------
@@ -18,12 +18,13 @@ def cart_list():
         #訂單編號, 商品ID, 商品名稱, 訂購數量, 商品單位, 商品小計
         totalcost = 0
         for totallist in db_cartshow:
+            changesub = cartcheckprice(totallist[1],totallist[3],totallist[5])#修正金額
             dbstock,dbrnum,order = stock(totallist[1],totallist[3])
             if dbstock == 'ok':
                 if totallist[3] == dbrnum:
                     changenum = str(totallist[3])
-                    subtotal = totallist[5]
-                    add = totallist[5]
+                    subtotal = changesub 
+                    add = changesub 
                 else:
                     changenum = str(dbrnum)
                     listnum += 1
