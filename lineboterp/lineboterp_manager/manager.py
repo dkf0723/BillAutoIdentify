@@ -1,17 +1,18 @@
 from flask import Flask, request, abort
-from linebot import (
-    LineBotApi, WebhookHandler
-)
-from linebot.exceptions import (
-    InvalidSignatureError
-)
+from linebot import (LineBotApi, WebhookHandler)
+from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from linebot.models import TextSendMessage
+#======這裡是呼叫的檔案內容-蓉=====
+from FM import * #因為蓉的程式碼很多所以多建一個FM
+from FM import manager_products_manufacturers_list,manager_manufacturers_list,manager_categoryate_list
+# from test_check import * #蓉所需
+selected_category = None
 #======這裡是呼叫的檔案內容=====
 from flexmsg import *
-from database import *
+from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,alls_manufacturers_name,allr_manufacturers_name,revm_pur_info,revc_pur_info,stock_manufacturers,stock_categoryate,puring_trastate,bankpay,puring_pro,pured_pro
 from relevant_information import linebotinfo,dbinfo
-from nepurinf import *
+from nepurinf import purchase_check,gettime
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_edit_screen,Manufacturer_list_and_new_chosen_screen
 from vendor_management import Manufacturer_list,Manufacturer_edit 
 from DidnotPickedup import *
@@ -94,6 +95,8 @@ user_state = {}
 def handle_message(event):
     global user_id
     global msg
+    global user_state #蓉
+    global duplicate_save#蓉
     msg = event.message.text
     user_id = event.source.user_id 
     if user_id not in user_state:
@@ -126,18 +129,22 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
             elif msg[4:] == '訂單編號':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
-        #--------商品管理----------------#           
+        #--------商品管理【查詢/修改/下架】或【停售及截止商品列表 】或【新增上架】蓉----------------#           
         elif '商品管理' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',
                 template=ButtonsTemplate(
-                    text='請選擇商品服務：\n【查詢/修改/下架】或是【新增上架】',
+                    text='請選擇商品服務：\n【查詢/修改/下架】或【停售及截止商品列表 】或【新增上架】',
                     actions=[
                         MessageAction(
                             label='【查詢/修改/下架】',
                             text='【查詢/修改/下架】',
                         ),
                         MessageAction(
+                            label='【停售及截止商品列表 】',
+                            text='【停售及截止商品列表 】'
+                        ),
+                         MessageAction(
                             label='【新增上架】',
                             text='【新增上架】'
                         )
@@ -148,7 +155,7 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',
                 template=ButtonsTemplate(
-                    text='請選擇商品查詢方式：\n【依類別】或是【依廠商】',
+                    text='請選擇商品查詢方式：\n【依類別】或【依廠商】',
                     actions=[
                         MessageAction(
                             label='【依類別】',
@@ -161,9 +168,6 @@ def handle_message(event):
                     ]
                 )
             ))
-        elif '【依類別】查詢' in msg:
-                send_category_selection(event, line_bot_api)
-                line_bot_api.reply_message(event.reply_token, message)    
         elif '【新增上架】' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',
@@ -181,12 +185,191 @@ def handle_message(event):
                     ]
                 )
             ))
-        elif '【舊廠商】'in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))
-        elif '【新廠商】'in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='列出所有廠商名稱'))   
-        elif '報表管理' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='報表管理'))
+         #-------------【依類別】查詢-蓉------------------
+        elif '【依類別】查詢' in msg:
+                 send_category_selection(event, line_bot_api)
+        elif msg in ['test','frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
+            duplicate_save[user_id+"selected_category"] = msg
+            list_page[user_id+'廠商數量min'] = 0
+            list_page[user_id+'廠商數量max'] = 9
+            show3 = manager_categoryate_list(duplicate_save[user_id+"selected_category"])
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                    alt_text='【商品查詢】列表',
+                    contents={
+                        "type": "carousel",
+                        "contents": show3      
+                        } 
+                    ))
+        elif'【商品列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【商品列表下一頁】"的位置
+            start_index = original_string.find("【商品列表下一頁】")
+            if start_index != -1:
+                # 從"【商品列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【商品列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'廠商數量min'] = min-1
+            list_page[user_id+'廠商數量max'] = max
+            show3 = manager_categoryate_list(duplicate_save[user_id+"selected_category"])
+            if 'TextSendMessage' in show3:
+                line_bot_api.reply_message(event.reply_token,show3)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show3 
+                    } 
+                ))
+        #-------------【依廠商】查詢-蓉------------------
+        elif '【依廠商】查詢'in msg:
+            list_page[user_id+'廠商數量min'] = 0
+            list_page[user_id+'廠商數量max'] = 9
+            show = manager_manufacturers_list() #這個show是變數隨便取
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【廠商查詢】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
+        elif '【廠商列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【廠商列表下一頁】"的位置
+            start_index = original_string.find("【廠商列表下一頁】")
+            if start_index != -1:
+                # 從"【廠商列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【廠商列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'廠商數量min'] = min-1
+            list_page[user_id+'廠商數量max'] = max
+            show = manager_manufacturers_list()
+            if 'TextSendMessage' in show:
+                line_bot_api.reply_message(event.reply_token,show)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【廠商】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
+        elif msg.startswith('選我選我'):
+            duplicate_save[user_id+"manufacturer_id"] = msg[5:]  # 提取廠商編號
+            # 檢查格式
+            if duplicate_save[user_id+"manufacturer_id"] == '':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此廠商，请重新输入。"))
+            else:
+                product[user_id + 'Product_Modification_manufacturer_id'] = duplicate_save[user_id+"manufacturer_id"]
+                list_page[user_id+'廠商數量min'] = 0
+                list_page[user_id+'廠商數量max'] = 9
+                show2 = manager_products_manufacturers_list(duplicate_save[user_id+"manufacturer_id"],'no')
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                    alt_text='【商品查詢】列表',
+                    contents={
+                    "type": "carousel",
+                    "contents": show2      
+                    } 
+                    ))
+        elif '【此廠商商品列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【商品列表下一頁】"的位置
+            start_index = original_string.find("【此廠商商品列表下一頁】")
+            if start_index != -1:
+                # 從"【商品列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【此廠商商品列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'廠商數量min'] = min-1
+            list_page[user_id+'廠商數量max'] = max
+            show2 = manager_products_manufacturers_list(duplicate_save[user_id+"manufacturer_id"],'no')
+            if 'TextSendMessage' in show2:
+                line_bot_api.reply_message(event.reply_token,show2)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show2      
+                    } 
+                ))
+            #-------------【停售及截止商品列表】-蓉--------------------
+        elif msg.startswith('【停售及截止商品列表 】'):
+            duplicate_save[user_id+"manufacturer_id"] = msg[5:]  # 提取廠商編號
+            # 檢查格式
+            if duplicate_save[user_id+"manufacturer_id"] == '':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此廠商，请重新输入。"))
+            else:
+                product[user_id + 'Product_Modification_manufacturer_id'] = duplicate_save[user_id+"manufacturer_id"]
+                list_page[user_id+'stop數量min'] = 0
+                list_page[user_id+'stop數量max'] = 9
+                show2 = manager_products_manufacturers_list('','stop')
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                    alt_text='【stop商品】列表',
+                    contents={
+                    "type": "carousel",
+                    "contents": show2      
+                    } 
+                    ))
+        elif '【stop商品列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【商品列表下一頁】"的位置
+            start_index = original_string.find("【stop商品列表下一頁】")
+            if start_index != -1:
+                # 從"【商品列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【stop商品列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'stop數量min'] = min-1
+            list_page[user_id+'stop數量max'] = max
+            show2 = manager_products_manufacturers_list('','stop')
+            if 'TextSendMessage' in show2:
+                line_bot_api.reply_message(event.reply_token,show2)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【stop商品】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show2      
+                    } 
+                ))
+        #-------------【修改商品資訊】-蓉------------------------
+        elif '【修改商品資訊】' in msg:
+            id = msg[8:]#【修改商品資訊】{pid}
+            product[user_id + 'Product_Modification_Product_id'] = id
+            product_status = Product_status()# Product_status()開頭是大寫不要搞錯
+            product[user_id + 'Product_Modification_Product_status'] = product_status
+            if product_status == '現購':
+                flex_message = Now_Product_Modification_FM(id)
+            elif product_status == '預購':
+                flex_message = Pre_Product_Modification_FM(id)
+            elif product_status == '預購進貨':
+                flex_message = Pre_Product_Modification_FM(id)
+            elif product_status == '預購未取':
+                flex_message = Pre_Product_Modification_FM(id)
+            elif product_status == '預購截止':
+                flex_message = Pre_Product_Modification_FM(id)
+            elif product_status == '查無':
+                user_state = 'normal'
+                flex_message = TextSendMessage(text='商品有誤！')
+            user_state[user_id] = 'Product_Modification_Product'
+            line_bot_api.reply_message(event.reply_token, flex_message)
+            return
+           #-------------【停售】-蓉-------------
+        elif '【停售】' in msg:
+            a = stop_time(msg[4:])#【停售】{pid}
+            if a == 'ok':
+                message = '此商品已停售'
+            else:
+                message = '停售指令失敗'
+            # message = f"+{id}+\n+{product_status}+"
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))   
 ######################################庫存管理及功能選擇按鈕########################################################
         elif '庫存管理' in msg: 
             message = TextSendMessage(text='請點選以下操作功能',
@@ -204,12 +387,8 @@ def handle_message(event):
                     text='請選擇新增或快速進貨商品：',
                     actions=[
                         MessageAction(
-                            label='【新增預購】',
-                            text='【進貨商品】新增預購商品',
-                        ),
-                        MessageAction(
-                            label='【新增現購】',
-                            text='【進貨商品】新增現購商品',
+                            label='【新增】',
+                            text='【進貨商品】新增',
                         ),
                         MessageAction(
                             label='【快速進貨】',
@@ -219,33 +398,50 @@ def handle_message(event):
                 )
             ))
         elif '【進貨商品】' in msg:
-            if msg[6:] == '新增預購商品':
+            if msg[6:] == '新增':
+                line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+                alt_text='預購及現購選擇',
+                template= ButtonsTemplate(
+                    text='請選擇預購或現購商品：',
+                    actions=[
+                        MessageAction(
+                            label='【新增預購】',
+                            text='【新增】預購',
+                        ),
+                        
+                        MessageAction(
+                            label='【新增現購】',
+                            text='【新增】現購'
+                        )
+                    ]
+                )
+            ))
+            elif msg[6:] == '快速進貨':
+                    line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
+                                    alt_text='商品查詢選擇',
+                                    template=ButtonsTemplate(
+                                        text='請選擇商品查詢方式：',
+                                        actions=[
+                                            MessageAction(
+                                                label='【依類別】',
+                                                text='【快速進貨】類別',
+                                            ),
+                                            MessageAction(
+                                                label='【依廠商】',
+                                                text='【快速進貨】廠商'
+                                            )
+                                        ]
+                                    )
+                                ))
+        elif msg.startswith('【新增】預購'):
                 result = nopur_inf()
                 flex_message = nopur_inf_flex_msg(result)
                 line_bot_api.reply_message(event.reply_token, flex_message)
-            elif msg[6:] == '快速進貨':
-                line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-                                alt_text='商品查詢選擇',
-                                template=ButtonsTemplate(
-                                    text='請選擇商品查詢方式：',
-                                    actions=[
-                                        MessageAction(
-                                            label='【依類別】',
-                                            text='【快速進貨】類別',
-                                        ),
-                                        MessageAction(
-                                            label='【依廠商】',
-                                            text='【快速進貨】廠商'
-                                        )
-                                    ]
-                                )
-                            ))
-            elif msg[6:] == '新增現購商品':
+        elif msg.startswith('【新增】現購'):
                 result = product_ing()
                 flex_message = product_ing_flex_msg(result)
                 line_bot_api.reply_message(event.reply_token, flex_message)
-        elif msg.startswith('預購商品ID:'):##########我不會切割1025
-            #預購商品ID:test00010~顆!測試廠商/現金
+        elif msg.startswith('預購商品ID:'):
             parts = msg.split("~")
             pid = parts[0].split(":")[1]
             unit = parts[1].split("!")[0]
@@ -269,11 +465,8 @@ def handle_message(event):
             storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
             check_text = f"{storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
             user_state1[user_id] = 'num'
-            getmanuinf()#取得現預購類別及廠商付款方式
+            #getmanuinf()#取得現預購類別及廠商付款方式
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-        elif msg.startswith('您已成功新增現購進貨商品'): ##1014庫存數量(訂單剩餘還沒處理)
-            succc_np_pid = msg[13:]
-            nping_statechange(succc_np_pid)
         elif '【快速進貨】' in msg:
             if msg[6:] == '類別':
                 message = TextSendMessage(text='請點選查詢類別',
@@ -305,7 +498,12 @@ def handle_message(event):
             result = revm_pur_info(manufacturerR_id)
             flex_message = rev_pur_info_flex_msg(result)
             line_bot_api.reply_message(event.reply_token, flex_message)
-        elif msg.startswith('快速進貨-商品'):
+        elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
+            selectedr_category = msg.rstrip("1")
+            result = revc_pur_info(selectedr_category)
+            flex_message = revc_pur_info_flex_msg(result)
+            line_bot_api.reply_message(event.reply_token, flex_message)
+        elif msg.startswith('快速進貨-商品'):##太奇怪了
             ppid = msg[7:]
             user_state[user_id] = 'repurchase_ck'
             storage[user_id + 'purchase_pid'] = ppid
@@ -313,14 +511,6 @@ def handle_message(event):
             check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
             user_state1[user_id] = 'num'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-        elif msg.startswith('您已成功快速進貨商品'):
-            suc_np_pid = msg[11:]
-            np_statechange(suc_np_pid)
-        elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
-            selectedr_category = msg.rstrip("1")
-            result = revc_pur_info(selectedr_category)
-            flex_message = revc_pur_info_flex_msg(result)
-            line_bot_api.reply_message(event.reply_token, flex_message)
             #--------------------------查詢商品庫存----------------------------------
         elif '查詢商品庫存' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -346,11 +536,11 @@ def handle_message(event):
                     text='請選擇商品庫存查詢方式：\n【廠商】或是【類別】',
                     actions=[
                         MessageAction(
-                            label='【庫存查詢廠商】',
+                            label='【依廠商】',
                             text='【庫存查詢】廠商',
                         ),
                         MessageAction(
-                            label='【庫存查詢類別】',
+                            label='【依類別】',
                             text='【庫存查詢】類別'
                         )
                     ]
@@ -428,10 +618,27 @@ def handle_message(event):
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未知指令'))
         elif msg.startswith('商品已到貨'):
-            manufacturerV_id = msg[5:]
-            puring_trastate(manufacturerV_id)
+            parts = msg.split("~")
+            if len(parts) == 3:  
+                manufacturerV_id = parts[1]  
+                payment = parts[2] 
+                if payment == '現金':
+                    result = bankpay(manufacturerV_id) ##1031是不是這裡抓不到值
+                    checkchange = '完成1'
+                else:
+                    checkchange = '完成2'
+                if result == 'ok':
+                    result1 = puring_trastate(manufacturerV_id)
+                    if result1 == 'ok':
+                        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=checkchange))
+                    else:
+                        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='已到貨修改失敗'))
+                else:
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='現金進貨第一階段失敗'))
+            else:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='消息格式不正确'))
 
-            #line_bot_api.reply_message(event.reply_token, result)
+            # line_bot_api.reply_message(event.reply_token, result)
         #-------------------廠商管理-新增廠商----------------------
         elif '廠商管理' in msg:
             line_bot_api.reply_message(event.reply_token, Manufacturer_list_and_new_chosen_screen())
@@ -577,8 +784,9 @@ def send_category_selection(event, line_bot_api):
 #日期時間選擇器
 @handler.add(PostbackEvent)
 def handle_postback(event):
+    global msg
     storage = manager.storage
-    #postback_data = event.postback.data
+    postback_data = event.postback.data
     if 'datetime' in event.postback.params:
         # 獲取使用者選擇的日期和時間
         selected_datetime = event.postback.params['datetime']
@@ -586,14 +794,16 @@ def handle_postback(event):
         #轉換格式2023-10-18T21:00 -> 2023-10-18 21:00:00
         date_time_obj = datetime.strptime(tdelete_datetime , '%Y-%m-%d %H:%M')
         restock_datetime = date_time_obj.strftime('%Y-%m-%d %H:%M')
-        storage[user_id + 'money_time'] = str(restock_datetime)
-        storage[user_id+'purchase_all'] += f'\n您輸入的匯款時間： {str(restock_datetime)}'
+        if postback_data in ['新增進貨預購商品匯款時間','快速進貨商品匯款時間']:
+            storage[user_id + 'money_time'] = str(restock_datetime)
+            storage[user_id+'purchase_all'] += f'\n您輸入的匯款時間： {str(restock_datetime)}'
+           
+        elif postback_data == '修改商品資訊-預購截止時間':
+            msg = str(restock_datetime)
         response = purchase_check()
         line_bot_api.reply_message(event.reply_token, response)
-        #response = f"您選擇的日期和時間是 {restock_datetime}"
-        '''else:
-            response = "未能獲取日期和時間資訊."
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response))'''
+        
+
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
 #資料庫連線1

@@ -1,18 +1,13 @@
-from linebot.models import FlexSendMessage
 import mysql.connector
-import requests
 from datetime import datetime, timedelta
 from mysql.connector import errorcode
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
 from linebot.models import *
 from relevant_information import imgurinfo
 import os, io, pyimgur, glob
 import manager
 import time
-import random #隨機產生
-import pytz
+
 
 #-------------------取得現在時間----------------------
 def gettime():
@@ -22,7 +17,8 @@ def gettime():
   formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')# 格式化日期和時間，不包含毫秒部分
   formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
   order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
-  return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date,'formatted_millisecond':formatted_millisecond}
+  formatted_datetime2 = modified_datetime.strftime('%Y-%m-%dT%H:%M')# 給日期選擇器的-蓉
+  return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date,'formatted_millisecond':formatted_millisecond,'formatted_datetime2':formatted_datetime2}
 #-------------------資料庫連線----------------------
 #連線
 def databasetest(db_pool, serial_number):
@@ -164,96 +160,25 @@ def retry(category,query):#select/notselect
         else:
           result = []
   return result
-#----------------快速進貨-依廠商查詢所有廠商名稱--------------------
-def allr_manufacturers_name():
-  query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
-  category ='select'
-  result = retry(category,query)
-  return result
-#-----------------快速進貨->依廠商查詢所有商品的商品ID及商品名稱-----------------1008
-def revm_pur_info(manufacturerR_id):
-  query = f"""SELECT Product_information.商品ID, Product_information.商品名稱, Purchase_Information.進貨時間
-             FROM Product_information INNER JOIN Purchase_Information ON Product_information.商品ID = Purchase_Information.商品ID 
-             INNER JOIN Manufacturer_Information ON Product_information.廠商編號 = Manufacturer_Information.廠商編號 
-             WHERE Manufacturer_Information.廠商編號 LIKE '{manufacturerR_id}%' AND Purchase_Information.進貨時間 IS NOT NULL"""
-  category ='select'
-  result = retry(category,query)
-  return result
-#-----------------快速進貨->依分類查詢已存在進貨資訊的商品-----------------
-def revc_pur_info(selectedr_category):
-  query = f"""SELECT Product_information.商品ID, Product_information.商品名稱, Purchase_Information.進貨時間 FROM Product_information INNER JOIN Purchase_Information ON Product_information.商品ID = Purchase_Information.商品ID
-          WHERE Product_information.商品ID LIKE '{selectedr_category}%' AND Purchase_Information.進貨時間 IS NOT NULL"""
-  category ='select'
-  result = retry(category,query)
-  return result
-#-----------------1011快速進貨(修改)->依分類查詢已存在進貨資訊的商品-----------------
-def quick_pur_inf(purchase_pid, purchase_num, purchase_cost, purchase_time, give_money, money_time):
-  query = f"""UPDATE Purchase_Information 
-              SET 商品ID = '{purchase_pid}', 
-                  進貨數量 = {purchase_num}, 
-                  進貨單價 = '{purchase_cost}', 
-                  進貨狀態 = '進貨中', 
-                  進貨時間 = '{purchase_time}', 
-                  匯款金額 = '{give_money}', 
-                  匯款時間 = '{money_time}' 
-              WHERE 商品ID = '{purchase_pid}';"""
-  category = 'notselect'
-  result = retry(category, query)
-  return result
-#----------------庫存-查詢所有廠商編號及廠商名--------------------
-def alls_manufacturers_name():
-  query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
-  category ='select'
-  result = retry(category,query)
-  return result
-#--------------依廠商->庫存資訊---------------
-def stock_manufacturers(manufacturer_id):
-  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM Product_information WHERE 廠商編號 = '{manufacturer_id}'"
-  category ='select'
-  result = retry(category,query)
-  return result
-#-----------------依分類->庫存資訊-----------------
-def stock_categoryate(selectedD_category):
-  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM  Product_information WHERE 商品ID LIKE '{selectedD_category}%'"
-  category ='select'
-  result = retry(category,query)
-  return result
-#-----------------依廠商->進貨資訊---------------
-def purchase_manufacturers(manufacturerA_id):
-  query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Purchase_Information NATURAL JOIN Product_information WHERE 廠商編號 = '{manufacturerA_id}'"
-  category ='select'
-  result = retry(category,query)
-  return result
-#-----------------依分類->進貨資訊-----------------
-def purchase_categoryate(selectedA_category):
-  query = f"SELECT * FROM Manufacturer_Information NATURAL JOIN Purchase_Information NATURAL JOIN Product_information WHERE 商品ID LIKE '{selectedA_category}%'"
-  category ='select'
-  result = retry(category,query)
-  return result
-##1009完成新增進貨商品資料庫內容
-
-#-----------------點擊要進貨時的商品及廠商資訊-----------------
-def getmanuinf():
-  id = manager.user_id
-  pid = manager.storage[id + 'purchase_pid']
-  message_storage = manager.storage
-  query = f"""select 商品ID, 現預購商品, 付款方式, 行庫名, 行庫代號, 匯款帳號
-              from Product_information natural join Manufacturer_Information
-              where 商品ID = '{pid}'
-              """
-  category ='select'
-  message_storage[id + 'dbmanuinf'] = retry(category,query)
-
-#-----------------抓取未有進貨資訊的商品ID---------------
+#-----------------抓取未有進貨資訊的預購商品列表---------------
 def nopur_inf():
-  # query = f"SELECT P.商品ID,P.商品名稱,P.商品單位 FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID WHERE PI.商品ID IS NULL AND P.現預購商品 = '預購';"
   query =f"""SELECT P.商品ID,P.商品名稱,P.商品單位,廠商名,付款方式 
             FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID natural join Manufacturer_Information
             WHERE PI.商品ID IS NULL AND P.現預購商品 = '預購';"""
   category ='select'
   result = retry(category,query)
   return result
-#----------------1025將使用者輸入的新增預購進貨資訊存到資料庫-------------
+
+#------------------抓取未有進貨資訊的現購商品列表------------------
+def product_ing():
+  query = f"""SELECT P.商品ID,P.商品名稱,P.商品單位 
+            FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID 
+            WHERE PI.商品ID IS NULL AND P.現預購商品 = '現購';"""
+  category ='select'
+  result = retry(category,query)
+  return result
+
+#------------------新增預購進貨資訊、狀態更新------------------------
 def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
   if money_time != 'NULL':
     change_money_time = f"'{money_time}'"
@@ -282,38 +207,145 @@ def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_
       result1 = retry(category_three, query_three)
 
   return result1
-#----------------將使用者輸入的新增現購進貨資訊存到資料庫-------------
+
+#--------------------新增現購進貨資訊、狀態更新---------------------
 def newingtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):
+  if money_time != 'NULL':
+    change_money_time = f"'{money_time}'"
+  else:
+    change_money_time = money_time
   query = f"""INSERT INTO Purchase_Information (商品ID,進貨數量, 進貨單價, 商品單位, 進貨狀態, 進貨時間, 匯款金額,匯款時間) 
-            VALUES ('{purchase_pid}','{purchase_num}','{purchase_cost}','{purchase_unit}','已到貨','{purchase_time}','{give_money}','{money_time}');"""
+            VALUES ('{purchase_pid}','{purchase_num}','{purchase_cost}','{purchase_unit}','已到貨','{purchase_time}','{give_money}',{change_money_time});"""
   category ='notselect'
   result = retry(category, query)
+  
+  query_one = f"UPDATE Product_information SET 庫存數量 = Product_information.庫存數量 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{purchase_pid}') WHERE 商品ID = '{purchase_pid}';"
+  category_one = 'notselect' ##管理者
+  result = retry(category_one, query_one)
+
+  ##1031下面好像沒改到(因為訂單剩餘是null嗎)
+  query_two = f"UPDATE Product_information SET 訂單剩餘 = Product_information.訂單剩餘 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{purchase_pid}') WHERE 商品ID = '{purchase_pid}';"
+  category_two = 'notselect' ##消費者
+  result = retry(category_two, query_two)
+
   return result
-#------------------新增預購進貨資訊後的狀態改變-快速進貨(是否不用更改狀態1025)---------------------
-def np_statechange(suc_np_pid):
-    query_one = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{suc_np_pid}';"
-    category_one = 'notselect'
-    retry(category_one, query_one)
+#---------------------------快速進貨-依廠商查詢所有廠商名稱-------------------------------
+def allr_manufacturers_name():
+  query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
+  category ='select'
+  result = retry(category,query)
+  return result
+
+#-----------------快速進貨->依廠商查詢所有商品的商品ID及商品名稱-----------------
+def revm_pur_info(manufacturerR_id):
+  query = f"""SELECT Product_information.商品ID, Product_information.商品名稱, Purchase_Information.進貨時間
+             FROM Product_information INNER JOIN Purchase_Information ON Product_information.商品ID = Purchase_Information.商品ID 
+             INNER JOIN Manufacturer_Information ON Product_information.廠商編號 = Manufacturer_Information.廠商編號 
+             WHERE Manufacturer_Information.廠商編號 LIKE '{manufacturerR_id}' AND Purchase_Information.進貨時間 IS NOT NULL"""
+  category ='select'
+  result = retry(category,query)
+  return result
+
+#------------------快速進貨->依分類查詢所有商品的商品ID及商品名稱-------------------
+def revc_pur_info(selectedr_category):
+  query = f"""SELECT Product_information.商品ID, Product_information.商品名稱, Purchase_Information.進貨時間 FROM Product_information INNER JOIN Purchase_Information ON Product_information.商品ID = Purchase_Information.商品ID
+          WHERE Product_information.商品ID LIKE '{selectedr_category}%' AND Purchase_Information.進貨時間 IS NOT NULL"""
+  category ='select'
+  result = retry(category,query)
+  return result
+
+#-----------------快速進貨預購->更新已存在進貨資訊的商品(加入狀態改變世界宇宙奇怪的地方)！！！！！！！！！-----------------
+def quick_pur_inf(purchase_pid, purchase_num, purchase_cost, purchase_time, give_money, money_time):
+  query = f"""UPDATE Purchase_Information 
+              SET 商品ID = '{purchase_pid}', 
+                  進貨數量 = {purchase_num}, 
+                  進貨單價 = '{purchase_cost}', 
+                  進貨狀態 = '進貨中', 
+                  進貨時間 = '{purchase_time}', 
+                  匯款金額 = '{give_money}', 
+                  匯款時間 = '{money_time}' 
+              WHERE 商品ID = '{purchase_pid}';"""
+  category = 'notselect'
+  result = retry(category, query)
+  
+
+  query_one = f"UPDATE Product_information SET 現預購商品 = '預購進貨' WHERE 商品ID = '{purchase_pid}';"
+  category_one = 'notselect'
+  retry(category_one, query_one)
 
   ##1016先獨立select出訂單編號寫進陣列存下，再去UPDATE for迴圈
-    query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購進貨' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{suc_np_pid}')"
-    category_two = 'notselect'
-    retry(category_two, query_two)
-#------------------新增現購進貨資訊後的狀態改變---------------------
-def nping_statechange(succc_np_pid): 
-    query_one = f"UPDATE Product_information SET 庫存數量 = Product_information.庫存數量 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{succc_np_pid}') WHERE 商品ID = '{succc_np_pid}';"
-    category_one = 'notselect' ##管理者
-    retry(category_one, query_one)
+  query_two = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購進貨' WHERE 訂單編號 IN (SELECT 訂單編號 FROM order_details WHERE 商品ID = '{purchase_pid}')"
+  category_two = 'notselect'
+  retry(category_two, query_two)
+  return result
 
-    query_two = f"UPDATE Product_information SET 訂單剩餘 = Product_information.訂單剩餘 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{succc_np_pid}') WHERE 商品ID = '{succc_np_pid}';"
-    category_two = 'notselect' ##消費者
-    retry(category_two, query_two)
-#-----------------抓取進貨中商品-----------------
+#-----------------快速進貨現購->更新已存在進貨資訊的商品
+def qqquick_pur_inf(purchase_pid, purchase_num, purchase_cost, purchase_time, give_money, money_time):
+  query = f"""UPDATE Purchase_Information 
+              SET 商品ID = '{purchase_pid}', 
+                  進貨數量 = {purchase_num}, 
+                  進貨單價 = '{purchase_cost}', 
+                  進貨狀態 = '已到貨', 
+                  進貨時間 = '{purchase_time}', 
+                  匯款金額 = '{give_money}', 
+                  匯款時間 = '{money_time}' 
+              WHERE 商品ID = '{purchase_pid}';"""
+  category = 'notselect'
+  result = retry(category, query)
+  
+  query_one = f"UPDATE Product_information SET 庫存數量 = Product_information.庫存數量 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{purchase_pid}') WHERE 商品ID = '{purchase_pid}';"
+  category_one = 'notselect' ##管理者
+  result = retry(category_one, query_one)
+
+  ##1031下面好像沒改到(因為訂單剩餘是null嗎)
+  query_two = f"UPDATE Product_information SET 訂單剩餘 = Product_information.訂單剩餘 + (SELECT 進貨數量 FROM Purchase_Information WHERE 商品ID = '{purchase_pid}') WHERE 商品ID = '{purchase_pid}';"
+  category_two = 'notselect' ##消費者
+  result = retry(category_two, query_two)
+
+  return result
+
+
+
+
+
+
+
+
+#--------------------庫存-查詢所有廠商編號及廠商名-----------------------
+def alls_manufacturers_name():
+  query = "SELECT 廠商編號,廠商名 FROM Manufacturer_Information;"
+  category ='select'
+  result = retry(category,query)
+  return result
+
+#-------------------庫存->選擇此廠商的商品庫存資訊------------------------
+def stock_manufacturers(manufacturer_id):
+  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM Product_information WHERE 廠商編號 = '{manufacturer_id}'"
+  category ='select'
+  result = retry(category,query)
+  return result
+
+#-------------------庫存->選擇此類別的商品庫存資訊------------------------
+def stock_categoryate(selectedD_category):
+  query = f"SELECT 商品ID,商品名稱,庫存數量,售出單價 FROM  Product_information WHERE 商品ID LIKE '{selectedD_category}%'"
+  category ='select'
+  result = retry(category,query)
+  return result
+
+#-------------------進貨狀態-抓取進貨中商品------------------------
 def puring_pro():
-  query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='進貨中'"
+  query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間,付款方式 FROM Purchase_Information natural join Product_information natural join Manufacturer_Information WHERE 進貨狀態 ='進貨中'"
   category ='select' 
   result = retry(category,query)
   return result
+
+#-------------------進貨狀態-抓取已到貨商品-------------------------
+def pured_pro():
+  query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間,付款方式 FROM Purchase_Information natural join Product_information natural join Manufacturer_Information WHERE 進貨狀態 ='已到貨'"
+  category ='select'
+  result = retry(category,query)
+  return result
+
 #------------------商品已到貨後的狀態改變及庫存數量更動-預購未取-----------
 def puring_trastate(manufacturerV_id):
   queryone = f"UPDATE Purchase_Information SET 進貨狀態 = '已到貨' WHERE 商品ID = '{manufacturerV_id}'"
@@ -337,33 +369,35 @@ def puring_trastate(manufacturerV_id):
     order_numbers.append(row[0])
 
   for order_num in order_numbers:
-      query_five = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購未取' WHERE 訂單編號 = '{order_num}'"
-      category_five = 'notselect'
-      result2 = retry(category_five, query_five)
+    query_five = f"UPDATE Order_information SET 訂單狀態未取已取 = '預購未取' WHERE 訂單編號 = '{order_num}'"
+    category_five = 'notselect'
+    result2 = retry(category_five, query_five)
   return result2
 
-  ##這裡是現金付款的
-
-# def bankpay():
-#   timeget = gettime()['formatted_datetime']
-#   queryfive = f"UPDATE Purchase_information SET 匯款時間 = '{timeget}' WHERE 商品ID = '{manufacturerV_id}'"
-#   categoryfive ='notselect'
-#   retry(categoryfive,queryfive)
+  ##這裡是現金付款的 需再次修改
+def bankpay(manufacturerV_id):
+  timeget = gettime()['formatted_datetime']
+  queryfive = f"""
+              UPDATE Purchase_Information
+              SET 匯款時間 = '{timeget}' 
+              WHERE 商品ID = '{manufacturerV_id}' AND 進貨狀態 = '進貨中';
+              """
+  categoryfive ='notselect'
+  result = retry(categoryfive,queryfive)
+  return result
   
-#-----------------抓取已到貨商品-----------------
-def pured_pro():
-  query = f"SELECT 商品ID,商品名稱,進貨數量,進貨狀態,進貨時間 FROM Purchase_Information natural join Product_information WHERE 進貨狀態 ='已到貨'"
+
+#-----------------點擊要進貨時的商品及廠商資訊-----------------
+def getmanuinf():
+  id = manager.user_id
+  pid = manager.storage[id + 'purchase_pid']
+  message_storage = manager.storage
+  query = f"""select 商品ID, 現預購商品, 付款方式, 行庫名, 行庫代號, 匯款帳號
+              from Product_information natural join Manufacturer_Information
+              where 商品ID = '{pid}'
+              """
   category ='select'
-  result = retry(category,query)
-  return result
-#------------------抓取現購商品------------------
-def product_ing():
-  query = f"""SELECT P.商品ID,P.商品名稱,P.商品單位 
-            FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID 
-            WHERE PI.商品ID IS NULL AND P.現預購商品 = '現購';"""
-  category ='select'
-  result = retry(category,query)
-  return result
+  message_storage[id + 'dbmanuinf'] = retry(category,query)
 
 #-------------------圖片取得並發送----------------------
 def imagesent():
@@ -587,3 +621,71 @@ def inquiry_list():
   result = retry(category,query)
   return result
 #-----------------------------------------------------海碧
+
+#---------------蓉的資料庫語法--------------------------#
+#-------------所有廠商名稱列出---------------
+def db_manufacturers():
+  query = "SELECT * FROM Manufacturer_Information;"
+  category = 'select' #重試類別 select/notselect
+  result = retry(category,query)
+  return result
+#--------------此廠商所有商品----------------
+def db_products_manufacturers(manufacturer_id,choose):
+  if choose != 'stop':
+    test1 = f"廠商編號 = '{manufacturer_id}' and 現預購商品 <> '現購停售'and 現預購商品 <> '預購截止'"
+  else:
+    test1 = f"現預購商品 = '現購停售' or 現預購商品 = '預購截止'"
+  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價,現預購商品 FROM Product_information NATURAL JOIN Purchase_Information WHERE {test1}"
+  category = 'select'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result
+#-------------分類下所有商品列表------------
+def db_categoryate(selected_category):
+  query = f"SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價,現預購商品 FROM Product_information NATURAL JOIN Purchase_Information WHERE 商品ID LIKE '{selected_category}%' and 現預購商品 <> '現購停售'and 現預購商品 <> '預購截止'"
+  category = 'select' #重試類別 select/notselect
+  result = retry(category,query)
+  return result
+# ---------------修改商品系列-----------------
+def MP_information_modify(field_to_modify, new_value, pid):
+    if field_to_modify in ["商品名稱", "商品簡介", "售出單價", "售出單價2", "預購數量限制_倍數","預購截止時間","商品圖片"]:
+        query = f"UPDATE Product_information SET {field_to_modify} = '{new_value}' WHERE 商品ID = '{pid}'"
+        category = 'notselect' # 重試類別 select/notselect
+        result = retry(category, query) # 成功回傳 ok
+        return result
+    else:
+        return "無效欄位名稱" 
+#--------------辨識商品狀態進而選擇FM------------
+def Product_status():
+  user_id = manager.user_id
+  pid = manager.product[user_id + 'Product_Modification_Product_id']
+  query = f"SELECT 現預購商品,商品名稱,商品ID FROM Product_information WHERE 商品ID = '{pid}'"
+  category = 'select'  # 重試類別 select/notselect
+  result = retry(category, query)
+  if result != []:
+    product_status = result[0][0]
+  else:
+    product_status = '查無'
+  return product_status  
+#--------------現購FM函數------------------------
+def Now_Product(id):
+  query = f"SELECT 商品名稱, 商品簡介, 售出單價, 售出單價2,商品圖片 FROM Product_information natural join Purchase_Information WHERE 商品ID = '{id}'"
+  category = 'select'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result                        
+
+#--------------預購FM函數------------------------
+def Per_Product(id):
+  query = f"SELECT 商品名稱, 商品簡介, 售出單價, 售出單價2,商品圖片,預購數量限制_倍數,預購截止時間 FROM Product_information natural join Purchase_Information WHERE 商品ID = '{id}'"
+  category = 'select'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result                 
+
+#---------------停售-----------------------------
+def stop_time(pid):
+  query = f"UPDATE Product_information SET 現預購商品 = '現購停售' WHERE 商品ID = '{pid}'"
+  category = 'notselect'  # 重試類別 select/notselect
+  result = retry(category, query)
+  return result
+
+#---------------蓉的資料庫語法--------------------------#
+
