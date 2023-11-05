@@ -366,11 +366,11 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '您的回覆：「'+msg+'」\n不在功能中！\n請重新輸入。'))
         #return user_id,user_state
 
-@handler.add(PostbackEvent)
+@handler.add(PostbackEvent)#1
 def handle_message(event):
     print(event.postback.data)
 
-@handler.add(MemberJoinedEvent)
+@handler.add(MemberJoinedEvent)#2
 def welcome(event):
     uid = event.joined.members[0].user_id
     gid = event.source.group_id
