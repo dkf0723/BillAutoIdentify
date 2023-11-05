@@ -623,7 +623,7 @@ def handle_message(event):
                 manufacturerV_id = parts[1]  
                 payment = parts[2] 
                 if payment == '現金':
-                    result = bankpay(manufacturerV_id) ##1031是不是這裡抓不到值
+                    result = bankpay(manufacturerV_id) 
                     checkchange = '完成1'
                 else:
                     checkchange = '完成2'
@@ -637,8 +637,6 @@ def handle_message(event):
                     line_bot_api.reply_message(event.reply_token, TextSendMessage(text='現金進貨第一階段失敗'))
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='消息格式不正确'))
-
-            # line_bot_api.reply_message(event.reply_token, result)
         #-------------------廠商管理-新增廠商----------------------
         elif '廠商管理' in msg:
             line_bot_api.reply_message(event.reply_token, Manufacturer_list_and_new_chosen_screen())
