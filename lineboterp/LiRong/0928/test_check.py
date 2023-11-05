@@ -11,8 +11,6 @@ message_storage = {}
 def inventory_check():
     id = manager.user_id
     state = manager.user_state
-    if state[id] in 'adding': #判斷user狀態
-        check_text = add_goods()
     if 'Product_Modification' in state[id]:#商品修改
         check_text = product_modification()
     '''if state[id] in 'searching_single': #判斷user狀態
@@ -21,50 +19,6 @@ def inventory_check():
         check_text = search_allinf()
     if state[id] in 'end': #判斷user狀態
         check_text = end_stop()'''
-    return check_text
-#-------------------新增商品狀態檢查----------------------
-def add_goods():
-     # 若使用者已經在等待回覆狀態，則根據回覆進行處理
-    id = manager.user_id
-    state = manager.user_state
-    state1 = manager.user_state1
-    message = manager.msg
-    product = manager.product
-    if state1[id] == 'name':
-        message_storage[id+'pname'] = '品名：'+ message
-        product[id] = message
-        check_text = ('您輸入的品名： %s' %(message))
-        check_text += '\n=>請接著輸入「進貨數量」'
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'one'
-    elif state1[id] == 'one':
-        message_storage[id+'num'] = '進貨數量：' + message
-        check_text = ('%s\n進貨數量： %s' %(message_storage[id+'pname'],message_storage[id+'num']))
-        check_text += '\n=>請接著輸入「進貨成本」'
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'two'
-    elif state1[id] == 'two':
-        message_storage[id+'cost'] = '進貨成本：' + message
-        check_text = ('%s\n%s\n進貨成本：%s' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost']))
-        check_text += '\n=>請接著輸入「廠商名」'
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'three'
-    elif state1[id] == 'three':
-        message_storage[id+'fname'] = '廠商名：' + message
-        check_text = ('%s\n%s\n%s\n進貨成本： %s' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost'],message_storage[id+'fname']))
-        check_text += '\n=>請接著輸入「商品有效期限」\nex:2023/07/24'
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'four'
-    elif state1[id] == 'four':
-        message_storage[id+'exp'] = '商品有效期限：' + message
-        check_text = ('%s\n%s\n%s\n%s\n%s\n請輸入確認' %(message_storage[id+'pname'],message_storage[id+'num'],message_storage[id+'cost'],message_storage[id+'fname'],message_storage[id+'exp']))
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'end'
-    elif state1[id] == 'end':
-        state[id] = 'normal'
-        state1[id] = 'NaN'
-        check_text = ('您的商品：%s\n已新增成功！' %(product[id]))
-        check_text = TextSendMessage(text=check_text)
     return check_text
 #-----------修改商品資訊-----------------
 def product_modification():
@@ -76,7 +30,8 @@ def product_modification():
     product_id = product.get(id + 'Product_Modification_Product_id')
     flex_message = None
     storage= manager.storage
-
+    before_all = db_infotmation(product_id)
+    
     if state[id] == 'Product_Modification_Product':#這邊是按鈕按下去後的流程
         info = message[8:]
         if '商品名稱' == info:
@@ -155,35 +110,69 @@ def product_modification():
             flex_message = TextSendMessage(text=f'「{message}」錯誤內容指令')
 
 
-        if message == '取消':
+        if message == '退出修改':
             state[id] = 'normal'
             flex_message = TextSendMessage(text='已經取消囉！')
-            
-    elif state[id] in ['Product_Modification_Product_Pname', 'Product_Modification_Pintroduction', 'Product_Modification_Punit_price_sold', 'Product_Modification_Punit_price_sold2','Product_Modification_order_multiple','Product_Modification_order_deadline','Product_Modification_Photo']:
+        
+    elif state[id] in ['Product_Modification_Product_Pname', 'Product_Modification_Pintroduction', 'Product_Modification_Punit_price_sold', 
+                       'Product_Modification_Punit_price_sold2','Product_Modification_order_multiple','Product_Modification_order_deadline',
+                       'Product_Modification_Photo']:
+        #商品名稱,商品簡介,售出單價,售出單價2,預購數量限制_倍數,預購截止時間,商品圖片
         field_to_modify = None
         if state[id] == 'Product_Modification_Product_Pname':
-            field_to_modify = '商品名稱'
+            if before_all[0][0] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '商品名稱'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Pintroduction':
-            field_to_modify = '商品簡介'
+            if before_all[0][1] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '商品簡介'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Punit_price_sold':
-            field_to_modify = '售出單價'
+            if before_all[0][2] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '售出單價'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Punit_price_sold2':
-            field_to_modify = '售出單價2'
+            if before_all[0][3] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '售出單價2'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_order_multiple':
-            field_to_modify = '預購數量限制_倍數'
+            if before_all[0][4] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '預購數量限制_倍數'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_order_deadline':
-            field_to_modify = '預購截止時間'
+            if before_all[0][5] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '預購截止時間'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Photo':
-            field_to_modify = '商品圖片'
+            if before_all[0][6] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '商品圖片'
+                checkbefore = 'ok'
 
         if message != '取消':
-            result = MP_information_modify(field_to_modify, message, product_id)
-            if result == 'ok':
-                flex_message = TextSendMessage(text=f'{field_to_modify} 修改成功！')
-                flex_message = get_product_modification_flex_message(product_status, product_id)
-            else:
-                flex_message = TextSendMessage(text=f'{field_to_modify} 修改失敗，请稍后再试')
-            state[id] = 'Product_Modification_Product'
+            if checkbefore == 'ok':
+                result = MP_information_modify(field_to_modify, message, product_id)
+                if result == 'ok':
+                    # flex_message = TextSendMessage(text=f'{field_to_modify} 修改成功！')
+                    flex_message = get_product_modification_flex_message(product_status, product_id)
+                else:
+                    flex_message = TextSendMessage(text=f'{field_to_modify} 修改失敗，请稍后再试')
+        else:
+            flex_message = get_product_modification_flex_message(product_status, product_id)
+        state[id] = 'Product_Modification_Product'
     return flex_message
 
 def get_product_modification_flex_message(product_status, product_id):
