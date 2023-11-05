@@ -202,6 +202,12 @@ def db_categoryate(selected_category):
   category = 'select' #重試類別 select/notselect
   result = retry(category,query)
   return result
+#-----------抓取商品資訊----------------------
+def db_infotmation(pid):
+  query = f"SELECT 商品名稱,商品簡介,售出單價,售出單價2,預購數量限制_倍數,預購截止時間,商品圖片 FROM Product_information WHERE 商品ID = '{pid}'"
+  category = 'select' #重試類別 select/notselect
+  result = retry(category,query)
+  return result
 # ---------------修改商品系列-----------------
 def MP_information_modify(field_to_modify, new_value, pid):
     if field_to_modify in ["商品名稱", "商品簡介", "售出單價", "售出單價2", "預購數量限制_倍數","預購截止時間","商品圖片"]:
