@@ -737,8 +737,8 @@ def Now_Product_Modification_FM(id):
             "style": "secondary",
             "action": {
               "type": "message",
-              "label": "取消修改動作",
-              "text": "取消"
+             "label": "退出修改動作",
+              "text": "退出修改"
             },
             "color": "#EAD880",
             "margin": "xl"
@@ -843,8 +843,8 @@ def Now_Product_Modification_FM(id):
                   "color": "#EAD880",
                   "action": {
                     "type": "message",
-                    "text": "取消",
-                    "label": "取消修改動作"
+                    "text": "退出修改",
+                    "label": "退出修改動作"
                   },
                   "margin": "xl"
                 }
@@ -1044,8 +1044,8 @@ def Pre_Product_Modification_FM(id):
             "style": "secondary",
             "action": {
               "type": "message",
-              "label": "取消修改動作",
-              "text": "取消"
+              "label": "退出修改動作",
+              "text": "退出修改"
             },
             "color": "#EAD880",
             "margin": "xl"
@@ -1169,8 +1169,8 @@ def Pre_Product_Modification_FM(id):
               "color": "#EAD880",
               "action": {
                 "type": "message",
-                "text": "取消",
-                "label": "取消修改動作"
+                 "text": "退出修改",
+                "label": "退出修改動作"
               },
               "margin": "xl"
             }

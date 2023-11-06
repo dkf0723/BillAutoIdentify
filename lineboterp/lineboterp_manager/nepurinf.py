@@ -2,7 +2,7 @@ from linebot.models import TextSendMessage,FlexSendMessage
 from datetime import datetime
 import manager
 import pytz
-from database import newtopur_inf, quick_pur_inf, newingtopur_inf,manufacturer,Manufacturer_infochange,MP_information_modify,gettime
+from database import newtopur_inf, quick_pur_inf, newingtopur_inf,manufacturer,Manufacturer_infochange,MP_information_modify,gettime,qqquick_pur_inf,db_infotmation
 from flexmsg import *
 ###廠商管理---
 from relevant_information import bank,Citytalk#廠商建立用，未來拔掉
@@ -21,10 +21,10 @@ def purchase_check():
         check_texts = nepurchase_info()
     elif state[id] == 'purchasing_ck':
         check_texts = ingnepurchase_info()
-    elif state[id] == 'repurchase_ck': ##快速進貨預購
-        check_texts = renepurchase_info()
-    # elif state[id] == 'rerepurchase_ck':
-    #     check_texts = quick_now_purchase()##更改
+    elif state[id] == 'repurchase_ck': 
+        check_texts = renepurchase_info()##快速進貨預購(須修正)
+    elif state[id] == 'rerepurchase_ck':
+        check_texts = quick_now_purchase()##快速進貨現購(須修正)
     elif 'Product_Modification' in state[id]:#商品修改-蓉
         check_texts = product_modification()
     
@@ -308,58 +308,58 @@ def renepurchase_info():
     return check_text
 
 #---------------快速進貨-現購---------------------
-# def quick_now_purchase():
-#     id = manager.user_id
-#     state = manager.user_state
-#     state1 = manager.user_state1
-#     message = manager.msg
-#     message_storage = manager.storage
+def quick_now_purchase():
+    id = manager.user_id
+    state = manager.user_state
+    state1 = manager.user_state1
+    message = manager.msg
+    message_storage = manager.storage
     
-#     if message == '取消':
-#         state[id] = 'normal'
-#         state1[id] = 'NAN'
-#     elif state1[id] == 'num':
-#         message_storage[id + 'purchase_num'] = int(message)
-#         message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
-#         check_text = f"{message_storage[id + 'purchase_all']}\n=>請接著輸入「進貨單價」"
-#         check_text = TextSendMessage(text=check_text)
-#         state1[id] = 'cost'
-#     elif state1[id] == 'cost':
-#         message_storage[id + 'purchase_cost'] = int(message)
-#         purchase_num = message_storage[id + 'purchase_num']
-#         purchase_cost = message_storage[id + 'purchase_cost']
-#         payment_amount = purchase_num * purchase_cost
-#         message_storage[id + 'give_money'] = payment_amount
-#         message_storage[id + 'purchase_all'] += f'\n您輸入的進貨單價： {message}'
-#         message_storage[id + 'purchase_all'] += f'\n您輸入的匯款金額： {payment_amount}'  
-#         taiwan_timezone = pytz.timezone('Asia/Taipei')
-#         current_time_taiwan = datetime.now(taiwan_timezone)
-#         current_time_str = current_time_taiwan.strftime("%Y-%m-%d %H:%M:%S")
-#         message_storage[id + 'purchase_time'] = current_time_str  
-#         message_storage[id + 'purchase_all'] += f'\n您輸入的進貨時間： {current_time_str}'
-#         message_storage[id + 'money_time'] = 'NULL'
-#         check_text = TextSendMessage(text=f"{message_storage[id+'purchase_all']}\n確認後請輸入OK")
-#         state1[id] = 'end'
-#     elif state1[id] == 'end':
-#         if message in ['ok','Ok','oK','OK']:
-#             result = qqquick_pur_inf(
-#             message_storage[id + 'purchase_pid'],
-#             message_storage[id + 'purchase_num'],
-#             message_storage[id + 'purchase_cost'],
-#             message_storage[id + 'purchase_unit'],
-#             message_storage[id + 'purchase_time'],
-#             message_storage[id + 'give_money'],
-#             message_storage[id + 'money_time']
-#         )
-#         if result == 'ok':
-#             check_text = '快速進貨現購商品成功！'
-#             check_text = TextSendMessage(text=check_text)
-#         else:
-#             check_text = '快速進貨現購商品失敗！稍後再試' 
-#             check_text = TextSendMessage(text=check_text)
-#         state[id] = 'normal'
-#         state1[id] = 'NAN'
-#     return check_text
+    if message == '取消':
+        state[id] = 'normal'
+        state1[id] = 'NAN'
+    elif state1[id] == 'num':
+        message_storage[id + 'purchase_num'] = int(message)
+        message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
+        check_text = f"{message_storage[id + 'purchase_all']}\n=>請接著輸入「進貨單價」"
+        check_text = TextSendMessage(text=check_text)
+        state1[id] = 'cost'
+    elif state1[id] == 'cost':
+        message_storage[id + 'purchase_cost'] = int(message)
+        purchase_num = message_storage[id + 'purchase_num']
+        purchase_cost = message_storage[id + 'purchase_cost']
+        payment_amount = purchase_num * purchase_cost
+        message_storage[id + 'give_money'] = payment_amount
+        message_storage[id + 'purchase_all'] += f'\n您輸入的進貨單價： {message}'
+        message_storage[id + 'purchase_all'] += f'\n您輸入的匯款金額： {payment_amount}'  
+        taiwan_timezone = pytz.timezone('Asia/Taipei')
+        current_time_taiwan = datetime.now(taiwan_timezone)
+        current_time_str = current_time_taiwan.strftime("%Y-%m-%d %H:%M:%S")
+        message_storage[id + 'purchase_time'] = current_time_str  
+        message_storage[id + 'purchase_all'] += f'\n您輸入的進貨時間： {current_time_str}'
+        message_storage[id + 'money_time'] = 'NULL'
+        check_text = TextSendMessage(text=f"{message_storage[id+'purchase_all']}\n確認後請輸入OK")
+        state1[id] = 'end'
+    elif state1[id] == 'end':
+        if message in ['ok','Ok','oK','OK']:
+            result = qqquick_pur_inf(
+            message_storage[id + 'purchase_pid'],
+            message_storage[id + 'purchase_num'],
+            message_storage[id + 'purchase_cost'],
+            message_storage[id + 'purchase_unit'],
+            message_storage[id + 'purchase_time'],
+            message_storage[id + 'give_money'],
+            message_storage[id + 'money_time']
+        )
+        if result == 'ok':
+            check_text = '快速進貨現購商品成功！'
+            check_text = TextSendMessage(text=check_text)
+        else:
+            check_text = '快速進貨現購商品失敗！稍後再試' 
+            check_text = TextSendMessage(text=check_text)
+        state[id] = 'normal'
+        state1[id] = 'NAN'
+    return check_text
 
 
 
@@ -961,7 +961,8 @@ def product_modification():
     product_id = product.get(id + 'Product_Modification_Product_id')
     flex_message = None
     storage= manager.storage
-
+    before_all = db_infotmation(product_id)
+    
     if state[id] == 'Product_Modification_Product':#這邊是按鈕按下去後的流程
         info = message[8:]
         if '商品名稱' == info:
@@ -1018,7 +1019,7 @@ def product_modification():
                                         "action": {
                                         "type": "datetimepicker",
                                         "label": "點擊選擇日期與時間",
-                                        "data": "修改商品資訊-預購截止時間",
+                                        "data": "預購截止時間",
                                         "mode": "datetime",
                                         "min": f"{datetime}"
                                         }
@@ -1040,35 +1041,69 @@ def product_modification():
             flex_message = TextSendMessage(text=f'「{message}」錯誤內容指令')
 
 
-        if message == '取消':
+        if message == '退出修改':
             state[id] = 'normal'
             flex_message = TextSendMessage(text='已經取消囉！')
-            
-    elif state[id] in ['Product_Modification_Product_Pname', 'Product_Modification_Pintroduction', 'Product_Modification_Punit_price_sold', 'Product_Modification_Punit_price_sold2','Product_Modification_order_multiple','Product_Modification_order_deadline','Product_Modification_Photo']:
+        
+    elif state[id] in ['Product_Modification_Product_Pname', 'Product_Modification_Pintroduction', 'Product_Modification_Punit_price_sold', 
+                       'Product_Modification_Punit_price_sold2','Product_Modification_order_multiple','Product_Modification_order_deadline',
+                       'Product_Modification_Photo']:
+        #商品名稱,商品簡介,售出單價,售出單價2,預購數量限制_倍數,預購截止時間,商品圖片
         field_to_modify = None
         if state[id] == 'Product_Modification_Product_Pname':
-            field_to_modify = '商品名稱'
+            if before_all[0][0] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '商品名稱'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Pintroduction':
-            field_to_modify = '商品簡介'
+            if before_all[0][1] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '商品簡介'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Punit_price_sold':
-            field_to_modify = '售出單價'
+            if before_all[0][2] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '售出單價'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Punit_price_sold2':
-            field_to_modify = '售出單價2'
+            if before_all[0][3] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '售出單價2'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_order_multiple':
-            field_to_modify = '預購數量限制_倍數'
+            if before_all[0][4] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '預購數量限制_倍數'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_order_deadline':
-            field_to_modify = '預購截止時間'
+            if before_all[0][5] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '預購截止時間'
+                checkbefore = 'ok'
         elif state[id] == 'Product_Modification_Photo':
-            field_to_modify = '商品圖片'
+            if before_all[0][6] == message:
+                checkbefore = 'no'#不做資料庫
+            else:
+                field_to_modify = '商品圖片'
+                checkbefore = 'ok'
 
         if message != '取消':
-            result = MP_information_modify(field_to_modify, message, product_id)
-            if result == 'ok':
-                flex_message = TextSendMessage(text=f'{field_to_modify} 修改成功！')
-                flex_message = get_product_modification_flex_message(product_status, product_id)
-            else:
-                flex_message = TextSendMessage(text=f'{field_to_modify} 修改失敗，请稍后再试')
-            state[id] = 'Product_Modification_Product'
+            if checkbefore == 'ok':
+                result = MP_information_modify(field_to_modify, message, product_id)
+                if result == 'ok':
+                    # flex_message = TextSendMessage(text=f'{field_to_modify} 修改成功！')
+                    flex_message = get_product_modification_flex_message(product_status, product_id)
+                else:
+                    flex_message = TextSendMessage(text=f'{field_to_modify} 修改失敗，请稍后再试')
+        else:
+            flex_message = get_product_modification_flex_message(product_status, product_id)
+        state[id] = 'Product_Modification_Product'
     return flex_message
 
 def get_product_modification_flex_message(product_status, product_id):
