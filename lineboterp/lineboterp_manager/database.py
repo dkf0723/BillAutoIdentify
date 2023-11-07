@@ -247,7 +247,7 @@ def db_quickmanu_pro(manufacturerR_id):
   return result
 
 #------------------快速進貨->依分類查詢所有商品的商品ID及商品名稱-------------------
-def revc_pur_info(selectedr_category):
+def db_quick_catepro(selectedr_category):
   query = f"""SELECT Product_information.商品ID, Product_information.商品名稱, Purchase_Information.進貨時間,Product_information.現預購商品 FROM Product_information INNER JOIN Purchase_Information ON Product_information.商品ID = Purchase_Information.商品ID
           WHERE Product_information.商品ID LIKE '{selectedr_category}%' AND Purchase_Information.進貨時間 IS NOT NULL"""
   category ='select'
@@ -390,7 +390,7 @@ def puring_trastate(manufacturerV_id):
     result2 = retry(category_five, query_five)
   return result2
 
-  ##這裡是現金付款的 需再次修改
+
 def bankpay(manufacturerV_id):
   timeget = gettime()['formatted_datetime']
   queryfive = f"""

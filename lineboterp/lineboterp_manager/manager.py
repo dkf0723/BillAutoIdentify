@@ -11,7 +11,7 @@ selected_category = None
 #======這裡是呼叫的檔案內容=====
 from flexmsg import *
 from flexmsg import quick_purchase_manufacturers_list,quickmanu_pro_list
-from database import databasetest,Product_status,stop_time,nopur_inf,db_stock_manufacturers_name,product_ing,db_quickmanu_pro,revc_pur_info,puring_trastate,bankpay,db_puring_pro,db_pured_pro,db_stock_manuinf,db_stock_categoryinf
+from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import purchase_check,gettime
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_edit_screen,Manufacturer_list_and_new_chosen_screen
@@ -533,14 +533,11 @@ def handle_message(event):
                     ))
         elif '【快速進貨商品列表下一頁】' in msg:
             original_string = msg
-            # 找到"【商品列表下一頁】"的位置
             start_index = original_string.find("【快速進貨商品列表下一頁】")
             if start_index != -1:
-                # 從"【商品列表下一頁】"後面開始切割字串
                 substr = original_string[start_index + len("【快速進貨商品列表下一頁】"):]
-                # 切割取得前後文字
-                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
-                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+                min = int(substr.split("～")[0].strip()) 
+                max = int(substr.split("～")[1].strip()) 
             list_page[user_id+'廠商數量min'] = min-1
             list_page[user_id+'廠商數量max'] = max
             showb = quickmanu_pro_list(duplicate_save[user_id+"manufacturerR_id"])
@@ -555,27 +552,65 @@ def handle_message(event):
                     } 
                 ))
         elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
-            selectedr_category = msg.rstrip("1")#!!還沒改畫面#######
-            result = revc_pur_info(selectedr_category)
-            flex_message = revc_pur_info_flex_msg(result)
-            line_bot_api.reply_message(event.reply_token, flex_message)
+            selectedr_category = msg.rstrip("1")
+            duplicate_save[user_id+" selectedr_category"] = selectedr_category
+            if selectedr_category == '':
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此類別，请重新输入。"))
+            else:
+                list_page[user_id+'廠商數量min'] = 0
+                list_page[user_id+'廠商數量max'] = 9
+                showi = quick_catepro_list(selectedr_category)
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                    alt_text='【快速進貨商品查詢】列表',
+                    contents={
+                    "type": "carousel",
+                    "contents":  showi      
+                    } 
+                    ))
+        elif '【類別快速進貨商品列表下一頁】' in msg:
+            original_string = msg
+            start_index = original_string.find("【類別快速進貨商品列表下一頁】")
+            if start_index != -1:
+                substr = original_string[start_index + len("【類別快速進貨商品列表下一頁】"):]
+                min = int(substr.split("～")[0].strip()) 
+                max = int(substr.split("～")[1].strip()) 
+            list_page[user_id+'廠商數量min'] = min-1
+            list_page[user_id+'廠商數量max'] = max
+            showi = quick_catepro_list(duplicate_save[user_id+" selectedr_category"])
+            if 'TextSendMessage' in  showi:
+                line_bot_api.reply_message(event.reply_token, showi)
+            else:
+                line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【快速進貨商品查詢】列表',
+                contents={
+                    "type": "carousel",
+                    "contents":  showi      
+                    } 
+                ))
             ###################################################################################
-        elif msg.startswith('快速進貨-預購'):########輸出=快速進貨-預購未取~test000001 還不能跑出來，因為輸出不是-預購(考慮用現預購分類)
-            ppid = msg[7:]
-            user_state[user_id] = 'repurchase_ck'
-            storage[user_id + 'purchase_pid'] = ppid
-            storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
-            check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
-            user_state1[user_id] = 'num'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-        elif msg.startswith('快速進貨-現購'):##########還不能跑出來，因為輸出不是-現購
-            ppid = msg[7:]
-            user_state[user_id] = 'rerepurchase_ck'
-            storage[user_id + 'purchase_pid'] = ppid
-            storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
-            check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
-            user_state1[user_id] = 'num'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
+        elif msg.startswith('快速進貨-'): #(有問題)
+            parts = msg.split("~")
+            if len(parts) == 2:
+                sta_pro = parts[0].split('-')[1].strip()  # 获取 "預購"，并移除首尾空白
+                pppid = parts[1]  # 获取 "test000001"
+                if sta_pro == '預購':
+                    ppid = pppid
+                    user_state[user_id] = 'repurchase_ck'
+                    storage[user_id + 'purchase_pid'] = ppid
+                    storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
+                    check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
+                    user_state1[user_id] = 'num'
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
+                else:
+                    ppid = pppid
+                    user_state[user_id] = 'rerepurchase_ck'
+                    storage[user_id + 'purchase_pid'] = ppid
+                    storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
+                    check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
+                    user_state1[user_id] = 'num'
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
+            else:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='消息格式不正确'))
             #--------------------------查詢商品庫存----------------------------------
         elif '查詢商品庫存' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
