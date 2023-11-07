@@ -7,7 +7,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from relevant_information import imgurinfo
 import manager
-from database import db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro
+from database import db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro
 
 #--------------------未有進貨資訊的預購商品列表---------------------------
 def nopur_inf_flex_msg(result):
@@ -397,70 +397,198 @@ def quickmanu_pro_list(manufacturerR_id):
     })
     return quickmanupro_show   
 #------------------快速進貨->依分類查詢所有商品的商品ID及商品名稱-------------------
-###################
-def revc_pur_info_flex_msg(result):
-    if result is not None:
-        bubbles = []
-        for row in result:
-            pid = row[0]  
-            pname = row[1]  
-            purtime = row[2]
-            statepro = row[3]
-
-            bubble = {
-                "type": "bubble",
-                "body": {
+def quick_catepro_list(selectedr_category):
+    catepro_quick_show = []
+    catepro_quick_list = db_quick_catepro(selectedr_category)
+    if catepro_quick_list == '找不到符合條件的資料。':
+      catepro_quick_show = TextSendMessage(text = catepro_quick_list)
+    else:
+      pagemin = manager.list_page[manager.user_id+'廠商數量min']
+      pagemax = manager.list_page[manager.user_id+'廠商數量max']
+      db_quick_catepros = catepro_quick_list[pagemin:pagemax] 
+      catepro_quick_show = [] 
+      pid = [] 
+      pname = []
+      pur_time = []
+      stat_pro = []
+      
+      for catepro_quick_list in db_quick_catepros: 
+        zero = catepro_quick_list[0]
+        pid.append(zero)
+        one = catepro_quick_list[1]
+        pname.append(one)
+        two= catepro_quick_list[2]
+        pur_time .append(two)
+        three = catepro_quick_list[3]
+        stat_pro.append(three)
+        
+      for i in range(len(pid)):
+        catepro_quick_show.append({
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "【類別】快速進貨商品",
+                "weight": "bold",
+                "size": "xl"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "lg",
+                "spacing": "sm",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "商品ID：",
+                        "size": "sm",
+                        "flex": 1
+                    },
+                    {
+                        "type": "text",
+                        "text": f"{pid[i]}",
+                        "wrap": True,
+                        "color": "#666666",
+                        "size": "sm",
+                        "flex": 5
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "商品名稱：",
+                        "size": "sm",
+                        "flex": 1
+                    },
+                    {
+                        "type": "text",
+                        "text": f"{pname[i]}",
+                        "wrap": True,
+                        "color": "#666666",
+                        "size": "sm",
+                        "flex": 5
+                    }
+                    ]
+                },
+                {
                     "type": "box",
                     "layout": "vertical",
                     "contents": [
-                        {"type": "text", "text": f"商品ID：{pid}"},
-                        {"type": "text", "text": f"商品名稱：{pname}"},
-                        {"type": "text", "text": f"上次進貨時間：\n{purtime}"},
-                        {"type": "text", "text": f"現預購商品：\n{statepro}"}
+                    {
+                        "type": "text",
+                        "text": "上次進貨時間：",
+                        "size": "sm",
+                        "flex": 1
+                    },
+                    {
+                        "type": "text",
+                        "text": f"{pur_time[i]}",
+                        "wrap": True,
+                        "color": "#666666",
+                        "size": "sm",
+                        "flex": 5
+                    }
                     ]
                 },
-                    "footer": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                        {
-                            "type": "button",
-                            "style": "primary",
-                            "color": "#905c44",
-                            "margin": "none",
-                            "action": {
-                            "type": "message",
-                            "label": "快速進貨商品",
-                            "text": f"快速進貨-{statepro}商品{pid}"
-                            },
-                            "height": "md",
-                            "offsetEnd": "none",
-                            "offsetBottom": "sm"
-                        }
-                        ],
-                        "spacing": "none",
-                        "margin": "none"
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "現預購商品：",
+                        "size": "sm",
+                        "flex": 1
+                    },
+                    {
+                        "type": "text",
+                        "text": f"{stat_pro[i]}",
+                        "wrap": True,
+                        "color": "#666666",
+                        "size": "sm",
+                        "flex": 5
                     }
+                    ]
+                }
+                ]
+            }
+            ]
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "spacing": "sm",
+            "contents": [
+            {
+                "type": "button",
+                "style": "primary",
+                "height": "sm",
+                "action": {
+                "type": "message",
+                "label": "選擇此商品",
+                "text": f"快速進貨-{stat_pro[i]}~{pid[i]}"
+                }
+            }
+            ],
+            "flex": 0
+        }
+        })
+      if len(catepro_quick_show) >= 9:
+        catepro_quick_show.append({
+          "type": "bubble",
+          "body": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": [
+                  {
+                    "type": "button",
+                    "flex": 1,
+                    "gravity": "center",
+                    "action": {
+                      "type": "message",
+                      "label": "''點我''下一頁",
+                      "text": "【類別快速進貨商品列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
+                      }
                     }
-            bubbles.append(bubble)
-
-        flex_message = FlexSendMessage(
-            alt_text="類別下所有商品",
-            contents={
-                "type": "carousel",
-                "contents": bubbles
+                ]
             }
-        )
-    else:
-        flex_message = FlexSendMessage(
-            alt_text="類別下所有商品",
-            contents={
-                "type": "text",
-                "text": "找不到符合條件的資料。"
-            }
-        )
-    return flex_message
-
+        })
+      else: 
+        catepro_quick_show.append({
+          "type": "bubble",
+          "body": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": [
+                  {
+                    "type": "button",
+                    "flex": 1,
+                    "gravity": "center",
+                    "action": {
+                      "type": "message",
+                      "label":"'點我回到'【快速進貨類別選項】",
+                      "text": "【快速進貨】類別",
+                    }
+                  }
+              ]
+          }
+      })
+    return catepro_quick_show
 #-----------------------庫存-查詢所有廠商編號及廠商名------------------------
 def stock_manufacturers_name_list(): 
     stock_manufacturers_show = []
