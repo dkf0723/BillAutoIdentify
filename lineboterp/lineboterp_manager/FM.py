@@ -51,27 +51,50 @@ def manager_manufacturers_list():
         "type": "box",
         "layout": "vertical",
         "contents": [
-          {
+         {
           "type": "text",
-          "text": f"廠商的編號 : {mid[i]}",
-          "weight": "bold",
-          "margin": "xs",
-          "flex": 0},
+          "text": "※廠商編號：",
+          "size": "md",
+          "flex": 1,
+          "color": "#3b5a5f",
+          "weight": "bold"},
           {
-          "type": "text",
-          "text": f"廠商名稱 : {mname[i]}",
-          "flex": 0,
-          "margin": "sm",
-          "weight": "bold"}
-          ]
-          }
+           "type": "text",
+            "text": f" {mid[i]}",
+            "wrap": True,
+            "color": "#666666",
+            "size": "md",
+            "flex": 5,
+            "weight": "bold"}
           ]
         },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "spacing": "sm",
+          "contents": [
           {
-          "type": "separator",
-          "margin": "lg",
-          "color": "#888888"}
+              "type": "text",
+                "text": "※廠商名稱：",
+              "size": "md",
+              "flex": 1,
+              "color": "#3b5a5f",
+              "weight": "bold"
+          },
+          {
+              "type": "text",
+              "text":f" {mname[i]}",
+              "wrap": True,
+              "color": "#666666",
+              "size": "md",
+              "flex": 5,
+              "weight": "bold"
+          }
           ]
+                }
+                ]
+            }
+            ]
         },
         "footer": {
         "type": "box",
@@ -80,7 +103,7 @@ def manager_manufacturers_list():
         {
         "type": "button",
         "style": "primary",
-        "color": "#019858",
+        "color": "#cfa091",
         "margin": "none",
         "action": {
                   "type": "message",
@@ -129,7 +152,7 @@ def manager_manufacturers_list():
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"已經到底囉！ '點我回到'【查詢/修改/下架】",
+                      "label":"已底囉！點我回到【查詢/修改/下架】",
                       "text": "【查詢/修改/下架】",
                     }
                   }
@@ -370,7 +393,7 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":f"已經到底囉！ '點我回到'{test1}",
+                      "label":f"已到底囉！點我回到{test1}",
                       "text": f"{test2}",
                       }
                   }
@@ -588,7 +611,7 @@ def manager_categoryate_list(selected_category):
                   "gravity": "center",
                   "action": {
                     "type": "message",
-                    "label":"已經到底囉！ '點我回到'【查詢/修改/下架】",
+                    "label":"已到底囉！點我回到【查詢/修改/下架】",
                     "text": "【查詢/修改/下架】查詢",
                     }
                 }

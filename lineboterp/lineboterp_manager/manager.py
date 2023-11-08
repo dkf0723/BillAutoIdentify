@@ -632,12 +632,12 @@ def handle_message(event):
                     text='請選擇商品庫存查詢方式：\n【廠商】或是【類別】',
                     actions=[
                         MessageAction(
-                            label='【依廠商】',
-                            text='【庫存查詢】廠商',
+                            label='【依類別】',
+                            text='【庫存查詢】類別',
                         ),
                         MessageAction(
-                            label='【依類別】',
-                            text='【庫存查詢】類別'
+                            label='【依廠商】',
+                            text='【庫存查詢】廠商'
                         )
                     ]
                 )
