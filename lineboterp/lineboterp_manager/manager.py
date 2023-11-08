@@ -14,7 +14,7 @@ from flexmsg import quick_purchase_manufacturers_list,quickmanu_pro_list
 from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import purchase_check,gettime
-from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_edit_screen,Manufacturer_list_and_new_chosen_screen
+from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_list_and_new_chosen_screen
 from vendor_management import Manufacturer_list,Manufacturer_edit 
 from DidnotPickedup import *
 from Preorder import *
@@ -432,12 +432,18 @@ def handle_message(event):
                                 ))
         elif msg.startswith('【新增】預購'):
                 result = nopur_inf()
-                flex_message = nopur_inf_flex_msg(result)
-                line_bot_api.reply_message(event.reply_token, flex_message)
+                if result is None:
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='無可顯示的預購商品'))
+                else:
+                    flex_message = nopur_inf_flex_msg(result)
+                    line_bot_api.reply_message(event.reply_token, flex_message)
         elif msg.startswith('【新增】現購'):
                 result = product_ing()
-                flex_message = product_ing_flex_msg(result)
-                line_bot_api.reply_message(event.reply_token, flex_message)
+                if result is None:
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='無可顯示的現購商品'))
+                else:
+                    flex_message = product_ing_flex_msg(result)
+                    line_bot_api.reply_message(event.reply_token, flex_message)
         elif msg.startswith('預購商品ID:'):
             parts = msg.split("~")
             pid = parts[0].split(":")[1]
@@ -484,7 +490,7 @@ def handle_message(event):
             elif msg[6:] == '廠商': 
                 list_page[user_id+'廠商數量min'] = 0
                 list_page[user_id+'廠商數量max'] = 9
-                showa =  quick_purchase_manufacturers_list() #這個showa是變數隨便取
+                showa =  quick_purchase_manufacturers_list()
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(
                     alt_text='【廠商查詢】列表',
                     contents={
@@ -494,14 +500,11 @@ def handle_message(event):
                     ))
         elif '【廠商查詢列表下一頁】' in msg:
             original_string = msg
-            # 找到"【廠商查詢列表下一頁】"的位置
             start_index = original_string.find("【廠商查詢列表下一頁】")
             if start_index != -1:
-                # 從"【廠商查詢列表下一頁】"後面開始切割字串
                 substr = original_string[start_index + len("【廠商查詢列表下一頁】"):]
-                # 切割取得前後文字
-                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
-                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+                min = int(substr.split("～")[0].strip()) 
+                max = int(substr.split("～")[1].strip()) 
             list_page[user_id+'廠商數量min'] = min-1
             list_page[user_id+'廠商數量max'] = max
             showa = quick_purchase_manufacturers_list()
@@ -520,7 +523,6 @@ def handle_message(event):
             if duplicate_save[user_id+"manufacturerR_id"] == '':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此廠商，请重新输入。"))
             else:
-                # product[user_id + 'faster_Product_Modification_manufacturer_id'] = duplicate_save[user_id+"manufacturerR_id"] 
                 list_page[user_id+'廠商數量min'] = 0
                 list_page[user_id+'廠商數量max'] = 9
                 showb = quickmanu_pro_list(duplicate_save[user_id+"manufacturerR_id"])
@@ -587,30 +589,24 @@ def handle_message(event):
                     "contents":  showi      
                     } 
                 ))
-            ###################################################################################
-        elif msg.startswith('快速進貨-'): #(有問題)
-            parts = msg.split("~")
-            if len(parts) == 2:
-                sta_pro = parts[0].split('-')[1].strip()  # 获取 "預購"，并移除首尾空白
-                pppid = parts[1]  # 获取 "test000001"
-                if sta_pro == '預購':
-                    ppid = pppid
+        elif msg.startswith('快速進貨-'): 
+            parts = msg.split('~')
+            if len(parts) >= 2:
+                sta_pro = parts[0].split('-')[1][:2]
+                pid = parts[1].split('!')[0]
+                unit = parts[1].split('!')[1].split('@')[0]
+                payment = parts[1].split('!')[1].split('@')[1]
+                storage[user_id + 'purchase_pid'] = pid
+                storage[user_id + 'purchase_unit'] = unit
+                storage[user_id + 'manu_payment'] = payment
+                if sta_pro[:2] == '預購':
                     user_state[user_id] = 'repurchase_ck'
-                    storage[user_id + 'purchase_pid'] = ppid
-                    storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
-                    check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
-                    user_state1[user_id] = 'num'
-                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
                 else:
-                    ppid = pppid
                     user_state[user_id] = 'rerepurchase_ck'
-                    storage[user_id + 'purchase_pid'] = ppid
-                    storage[user_id+'purchase_all'] = f"商品ID： {ppid}"
-                    check_text = f"{storage[user_id+'purchase_all']}\n=>請接著修改「進貨數量」"
-                    user_state1[user_id] = 'num'
-                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-            else:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='消息格式不正确'))
+                storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}\n付款方式：{payment}"
+                check_text = f"{storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
+                user_state1[user_id] = 'num'
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
             #--------------------------查詢商品庫存----------------------------------
         elif '查詢商品庫存' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -849,24 +845,26 @@ def handle_message(event):
                     "contents": showf      
                     } 
                 ))        
-        elif msg.startswith('商品已到貨'):
-            parts = msg.split("~")
-            if len(parts) == 3:  
-                manufacturerV_id = parts[1]  
-                payment = parts[2] 
+        elif msg.startswith('商品已到貨'): #商品已到貨~test00001~現金~預購進貨
+            parts = msg.split('~')
+            if len(parts) >= 3:
+                manufacturerV_id = parts[1]
+                payment = parts[2]
+                stapro = parts[3][:2]
                 if payment == '現金':
-                    result = bankpay(manufacturerV_id) 
+                    result = bankpay(manufacturerV_id)
+                    result1 = puring_trastate(manufacturerV_id,stapro)
                     checkchange = '完成1'
                 else:
+                    result1 = puring_trastate(manufacturerV_id,stapro)
                     checkchange = '完成2'
-                if result == 'ok':
-                    result1 = puring_trastate(manufacturerV_id)
+                if result1 == 'ok':
                     if result1 == 'ok':
                         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=checkchange))
                     else:
                         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='已到貨修改失敗'))
                 else:
-                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='現金進貨第一階段失敗'))
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='完全失敗'))
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='消息格式不正确'))
         #-------------------廠商管理-新增廠商----------------------
