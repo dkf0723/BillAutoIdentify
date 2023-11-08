@@ -6,13 +6,13 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
-from linebot.models import MessageEvent,TextSendMessage,ImageMessage
+from linebot.models import MessageEvent,TextSendMessage,ImageMessage,TextMessage,MemberJoinedEvent
 
 #======這裡是呼叫的檔案內容=====
 from product.product_preorder import product_preorder_list,Order_preorder
 from product.buy_now import Order_buynow,product_buynow_list
 from product.check import product_check,business_information,recent_phone_call,Cart_order_screen
-from database import gettime, databasetest,member_profile,test_datasearch,imagesent,Connection_timeout
+from database import gettime, databasetest,member_profile,test_datasearch,imagesent#,Connection_timeout
 from ask_wishes.ask import *
 from ask_wishes.wishes import initial_fill_screen,wishes
 from relevant_information import linebotinfo,dbinfo
@@ -372,17 +372,16 @@ def checkdb():
     formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
     modified_minutes = formatted_datetime_obj.minute
     minutes = int(modified_minutes)
-    if minutes not in [0,15,30,45]:
+    if minutes not in [0,15,30,45,60]:
         if minutes % 3 == 0:
             dbconnect_job()
         if minutes % 5 == 0:
             dbconnect1_job()
     else:
         dbconnect_job()
-        dbconnect1_job()
     #-----
-    if minutes % 30 == 0:
-        Connection_timeout()#連線逾時 1200 and ip 216
+    '''if minutes % 20 == 0:
+        Connection_timeout()#連線逾時 1000(16.67min) and ip '147','216','49'''
         
 '''# 建立排程函式
 def task_3_minutes():

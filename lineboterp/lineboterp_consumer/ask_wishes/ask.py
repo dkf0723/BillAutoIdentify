@@ -1,8 +1,5 @@
-from linebot.models import *
+from linebot.models import TextSendMessage,FlexSendMessage,QuickReplyButton,MessageAction,QuickReply
 import lineboterp
 
 def ask():
-    '''id = lineboterp.user_id
-    state = lineboterp.user_state
-    message = lineboterp.msg'''
     return
