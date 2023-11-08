@@ -1,11 +1,6 @@
-from linebot.models import FlexSendMessage
+from linebot.models import FlexSendMessage,TextSendMessage,ButtonComponent,MessageAction
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent
-from mysql.connector import errorcode
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
-# 載入對應的函式庫
-from linebot.models import *
-from relevant_information import imgurinfo
+
 import manager
 from database import db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro
 
@@ -219,6 +214,8 @@ def quickmanu_pro_list(manufacturerR_id):
       pname = []  
       purtime = []
       statepro = []
+      unit = []
+      payment = []
       for quickmanupro_list in db_quickmanu_pros:
         zero = quickmanupro_list[0]
         pid.append(zero)
@@ -228,6 +225,10 @@ def quickmanu_pro_list(manufacturerR_id):
         purtime.append(two)
         three= quickmanupro_list[3]
         statepro.append(three)
+        four= quickmanupro_list[4]
+        unit.append(four)
+        five= quickmanupro_list[5]
+        payment.append(five)
       for i in range (len(pid)):
         quickmanupro_show.append({
         "type": "bubble",
@@ -345,7 +346,7 @@ def quickmanu_pro_list(manufacturerR_id):
                 "action": {
                 "type": "message",
                 "label": "選擇此商品",
-                "text": f"快速進貨-{statepro[i]}~{pid[i]}"
+                "text": f"快速進貨-{statepro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
                 },
                 "color": "#EF97B2"
             }
@@ -411,6 +412,8 @@ def quick_catepro_list(selectedr_category):
       pname = []
       pur_time = []
       stat_pro = []
+      unit = []
+      payment = []
       
       for catepro_quick_list in db_quick_catepros: 
         zero = catepro_quick_list[0]
@@ -421,6 +424,10 @@ def quick_catepro_list(selectedr_category):
         pur_time .append(two)
         three = catepro_quick_list[3]
         stat_pro.append(three)
+        four= catepro_quick_list[4]
+        unit.append(four)
+        five= catepro_quick_list[5]
+        payment.append(five)
         
       for i in range(len(pid)):
         catepro_quick_show.append({
@@ -539,7 +546,7 @@ def quick_catepro_list(selectedr_category):
                 "action": {
                 "type": "message",
                 "label": "選擇此商品",
-                "text": f"快速進貨-{stat_pro[i]}~{pid[i]}"
+                "text": f"快速進貨-{stat_pro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
                 }
             }
             ],
@@ -1164,6 +1171,7 @@ def puring_pro_list():
       pur_sta = []
       pur_time = []
       payment = []
+      stat_pro = []
 
       for pro_puring_list in db_puring_pros: 
         zero = pro_puring_list[0]
@@ -1178,6 +1186,8 @@ def puring_pro_list():
         pur_time.append(four)
         five = pro_puring_list[5]
         payment.append(five)
+        six = pro_puring_list[6]
+        stat_pro.append(six)
       for i in range(len(pid)):
         pro_puring_show.append({
         "type": "bubble",
@@ -1337,7 +1347,7 @@ def puring_pro_list():
                 "action": {
                 "type": "message",
                 "label": "商品已到貨",
-                "text": f"商品已到貨~{pid[i]}~{payment[i]}",
+                "text": f"商品已到貨~{pid[i]}~{payment[i]}~{stat_pro[i]}",
                 },
                 "style": "primary"
             }

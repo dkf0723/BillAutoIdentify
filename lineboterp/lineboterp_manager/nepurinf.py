@@ -2,7 +2,7 @@ from linebot.models import TextSendMessage,FlexSendMessage
 from datetime import datetime
 import manager
 import pytz
-from database import newtopur_inf, quick_pur_inf, newingtopur_inf,manufacturer,Manufacturer_infochange,MP_information_modify,gettime,qqquick_pur_inf,db_infotmation
+from database import newtopur_inf,newingtopur_inf,manufacturer,Manufacturer_infochange,MP_information_modify,gettime,db_infotmation
 from flexmsg import *
 ###廠商管理---
 from relevant_information import bank,Citytalk#廠商建立用，未來拔掉
@@ -18,9 +18,11 @@ def purchase_check():
     id = manager.user_id
     state = manager.user_state
     if state[id] == 'pre_purchase_ck':
-        check_texts = nepurchase_info()
+        check_texts = purchase_info()
+        # nepurchase_info()
     elif state[id] == 'purchasing_ck':
-        check_texts = ingnepurchase_info()
+        check_texts = purchase_info()
+        # ingnepurchase_info()
     elif state[id] == 'repurchase_ck': 
         check_texts = renepurchase_info()##快速進貨預購(須修正)
     elif state[id] == 'rerepurchase_ck':
@@ -40,7 +42,169 @@ def purchase_check():
     #-----------------------------------------
     return check_texts
 #---------------新增預購商品進貨---------------------
-def nepurchase_info():
+# def nepurchase_info():
+#     id = manager.user_id
+#     state = manager.user_state
+#     state1 = manager.user_state1
+#     message = manager.msg
+#     message_storage = manager.storage
+    
+#     if message == '取消':
+#         state[id] = 'normal'
+#         state1[id] = 'NAN'
+#         check_text = TextSendMessage(text="取消新增預購商品！")
+#     elif state1[id] == 'num':
+#         message_storage[id + 'purchase_num'] = int(message)
+#         message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
+#         check_text = f"{message_storage[id + 'purchase_all']}\n=>請接著輸入「進貨單價」"
+#         check_text = TextSendMessage(text=check_text)
+#         state1[id] = 'cost'
+#     elif state1[id] == 'cost':
+#         message_storage[id + 'purchase_cost'] = int(message)
+#         purchase_num = message_storage[id + 'purchase_num']
+#         purchase_cost = message_storage[id + 'purchase_cost']
+#         payment_amount = purchase_num * purchase_cost
+#         message_storage[id + 'give_money'] = payment_amount
+#         message_storage[id + 'purchase_all'] += f'\n您輸入的進貨單價： {message}'
+#         message_storage[id + 'purchase_all'] += f'\n您輸入的匯款金額： {payment_amount}'  
+#         taiwan_timezone = pytz.timezone('Asia/Taipei')
+#         current_time_taiwan = datetime.now(taiwan_timezone)
+#         current_time_str = current_time_taiwan.strftime("%Y-%m-%d %H:%M:%S")
+#         message_storage[id + 'purchase_time'] = current_time_str  
+#         message_storage[id + 'purchase_all'] += f'\n您輸入的進貨時間： {current_time_str}'
+#         if message_storage[id + 'manu_payment'] != '現金':
+#             template_message = FlexSendMessage(
+#                                 alt_text='匯款時間選擇',
+#                                 contents={
+#                                     "type": "carousel",
+#                                     "contents": [{
+#                                     "type": "bubble",
+#                                     "body": {
+#                                         "type": "box",
+#                                         "layout": "vertical",
+#                                         "contents": [
+#                                         {
+#                                             "type": "text",
+#                                             "text": "選擇日期時間",
+#                                             "weight": "bold",
+#                                             "size": "xl"
+#                                         },
+#                                         {
+#                                             "type": "text",
+#                                             "text": f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款時間」",
+#                                             "wrap": True
+#                                         }
+#                                         ]
+#                                     },
+#                                     "footer": {
+#                                         "type": "box",
+#                                         "layout": "vertical",
+#                                         "spacing": "sm",
+#                                         "contents": [
+#                                         {
+#                                             "type": "button",
+#                                             "style": "link",
+#                                             "height": "sm",
+#                                             "action": {
+#                                             "type": "datetimepicker",
+#                                             "label": "點擊選擇日期與時間",
+#                                             "data": "新增進貨預購商品匯款時間",
+#                                             "mode": "datetime"
+#                                             }
+#                                         }
+#                                         ],
+#                                         "flex": 0
+#                                     }
+#                                     }]   
+#                                     } 
+#                                 )
+#             check_text = template_message
+#             state1[id] = 'mtime'
+#         else:
+#             message_storage[id + 'money_time'] = 'NULL'
+#             check_text = TextSendMessage(text=f"{message_storage[id+'purchase_all']}\n確認後請輸入OK")
+#             state1[id] = 'end'
+#     elif state1[id] == 'mtime':
+#         check_text = f"{message_storage[id+'purchase_all']}\n確認後請輸入OK"
+#         check_text = TextSendMessage(text=check_text)
+#         state1[id] = 'end'
+#     elif state1[id] == 'end':
+#         if message in ['ok','Ok','oK','OK']:
+#             result = newtopur_inf(
+#             message_storage[id + 'purchase_pid'],
+#             message_storage[id + 'purchase_num'],
+#             message_storage[id + 'purchase_cost'],
+#             message_storage[id + 'purchase_unit'],
+#             message_storage[id + 'purchase_time'],
+#             message_storage[id + 'give_money'],
+#             message_storage[id + 'money_time']
+#         )
+#         if result == 'ok':
+#             check_text = '進貨預購商品成功！'
+#             check_text = TextSendMessage(text=check_text)
+#         else:
+#             check_text = '進貨預購商品失敗！稍後再試' 
+#             check_text = TextSendMessage(text=check_text)
+#         state[id] = 'normal'
+#         state1[id] = 'NAN'
+#     return check_text
+
+# #---------------新增現購商品進貨---------------------
+# def ingnepurchase_info():
+#     id = manager.user_id
+#     state = manager.user_state
+#     state1 = manager.user_state1
+#     message = manager.msg
+#     message_storage = manager.storage
+    
+#     if message == '取消':
+#         state[id] = 'normal'
+#         state1[id] = 'NAN'
+#         check_text = TextSendMessage(text="取消新增現購商品！")
+#     elif state1[id] == 'num':
+#         message_storage[id + 'purchase_num'] = int(message)
+#         message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
+#         check_text = f"{message_storage[id + 'purchase_all']}\n=>請接著輸入「進貨單價」"
+#         check_text = TextSendMessage(text=check_text)
+#         state1[id] = 'cost'
+#     elif state1[id] == 'cost':
+#         message_storage[id + 'purchase_cost'] = int(message)
+#         purchase_num = message_storage[id + 'purchase_num']
+#         purchase_cost = message_storage[id + 'purchase_cost']
+#         payment_amount = purchase_num * purchase_cost
+#         message_storage[id + 'give_money'] = payment_amount
+#         message_storage[id + 'purchase_all'] += f'\n您輸入的進貨單價： {message}'
+#         message_storage[id + 'purchase_all'] += f'\n您輸入的匯款金額： {payment_amount}'  
+#         taiwan_timezone = pytz.timezone('Asia/Taipei')
+#         current_time_taiwan = datetime.now(taiwan_timezone)
+#         current_time_str = current_time_taiwan.strftime("%Y-%m-%d %H:%M:%S")
+#         message_storage[id + 'purchase_time'] = current_time_str  
+#         message_storage[id + 'purchase_all'] += f'\n您輸入的進貨時間： {current_time_str}'
+#         message_storage[id + 'money_time'] = 'NULL'
+#         check_text = TextSendMessage(text=f"{message_storage[id+'purchase_all']}\n確認後請輸入OK")
+#         state1[id] = 'end'
+#     elif state1[id] == 'end':
+#         if message in ['ok','Ok','oK','OK']:
+#             result = newingtopur_inf(
+#             message_storage[id + 'purchase_pid'],
+#             message_storage[id + 'purchase_num'],
+#             message_storage[id + 'purchase_cost'],
+#             message_storage[id + 'purchase_unit'],
+#             message_storage[id + 'purchase_time'],
+#             message_storage[id + 'give_money'],
+#             message_storage[id + 'money_time']
+#         )
+#         if result == 'ok':
+#             check_text = '進貨現購商品成功！'
+#             check_text = TextSendMessage(text=check_text)
+#         else:
+#             check_text = '進貨現購商品失敗！稍後再試' 
+#             check_text = TextSendMessage(text=check_text)
+#         state[id] = 'normal'
+#         state1[id] = 'NAN'
+#     return check_text
+
+def purchase_info(is_ingnepurchase=False):
     id = manager.user_id
     state = manager.user_state
     state1 = manager.user_state1
@@ -50,6 +214,7 @@ def nepurchase_info():
     if message == '取消':
         state[id] = 'normal'
         state1[id] = 'NAN'
+        check_text = TextSendMessage(text=f"取消新增{'現購' if is_ingnepurchase else '預購'}商品！")
     elif state1[id] == 'num':
         message_storage[id + 'purchase_num'] = int(message)
         message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
@@ -105,7 +270,7 @@ def nepurchase_info():
                                             "action": {
                                             "type": "datetimepicker",
                                             "label": "點擊選擇日期與時間",
-                                            "data": "新增進貨預購商品匯款時間",
+                                            "data": f"新增{'現購' if is_ingnepurchase else '預購'}商品匯款時間",
                                             "mode": "datetime"
                                             }
                                         }
@@ -127,81 +292,37 @@ def nepurchase_info():
         state1[id] = 'end'
     elif state1[id] == 'end':
         if message in ['ok','Ok','oK','OK']:
-            result = newtopur_inf(
-            message_storage[id + 'purchase_pid'],
-            message_storage[id + 'purchase_num'],
-            message_storage[id + 'purchase_cost'],
-            message_storage[id + 'purchase_unit'],
-            message_storage[id + 'purchase_time'],
-            message_storage[id + 'give_money'],
-            message_storage[id + 'money_time']
-        )
-        if result == 'ok':
-            check_text = '進貨預購商品成功！'
-            check_text = TextSendMessage(text=check_text)
-        else:
-            check_text = '進貨預購商品失敗！稍後再試' 
-            check_text = TextSendMessage(text=check_text)
-        state[id] = 'normal'
-        state1[id] = 'NAN'
+            if is_ingnepurchase:
+                result = newingtopur_inf(
+                    message_storage[id + 'purchase_pid'],
+                    message_storage[id + 'purchase_num'],
+                    message_storage[id + 'purchase_cost'],
+                    message_storage[id + 'purchase_unit'],
+                    message_storage[id + 'purchase_time'],
+                    message_storage[id + 'give_money'],
+                    message_storage[id + 'money_time']
+                )
+            else:
+                result = newtopur_inf(
+                    message_storage[id + 'purchase_pid'],
+                    message_storage[id + 'purchase_num'],
+                    message_storage[id + 'purchase_cost'],
+                    message_storage[id + 'purchase_unit'],
+                    message_storage[id + 'purchase_time'],
+                    message_storage[id + 'give_money'],
+                    message_storage[id + 'money_time']
+                )
+            if result == 'ok':
+                check_text = f'進貨{"現購" if is_ingnepurchase else "預購"}商品成功！'
+                check_text = TextSendMessage(text=check_text)
+            else:
+                check_text = f'進貨{"現購" if is_ingnepurchase else "預購"}商品失敗！稍後再試' 
+                check_text = TextSendMessage(text=check_text)
+            state[id] = 'normal'
+            state1[id] = 'NAN'
     return check_text
 
-#---------------新增現購商品進貨---------------------
-def ingnepurchase_info():
-    id = manager.user_id
-    state = manager.user_state
-    state1 = manager.user_state1
-    message = manager.msg
-    message_storage = manager.storage
-    
-    if message == '取消':
-        state[id] = 'normal'
-        state1[id] = 'NAN'
-    elif state1[id] == 'num':
-        message_storage[id + 'purchase_num'] = int(message)
-        message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
-        check_text = f"{message_storage[id + 'purchase_all']}\n=>請接著輸入「進貨單價」"
-        check_text = TextSendMessage(text=check_text)
-        state1[id] = 'cost'
-    elif state1[id] == 'cost':
-        message_storage[id + 'purchase_cost'] = int(message)
-        purchase_num = message_storage[id + 'purchase_num']
-        purchase_cost = message_storage[id + 'purchase_cost']
-        payment_amount = purchase_num * purchase_cost
-        message_storage[id + 'give_money'] = payment_amount
-        message_storage[id + 'purchase_all'] += f'\n您輸入的進貨單價： {message}'
-        message_storage[id + 'purchase_all'] += f'\n您輸入的匯款金額： {payment_amount}'  
-        taiwan_timezone = pytz.timezone('Asia/Taipei')
-        current_time_taiwan = datetime.now(taiwan_timezone)
-        current_time_str = current_time_taiwan.strftime("%Y-%m-%d %H:%M:%S")
-        message_storage[id + 'purchase_time'] = current_time_str  
-        message_storage[id + 'purchase_all'] += f'\n您輸入的進貨時間： {current_time_str}'
-        message_storage[id + 'money_time'] = 'NULL'
-        check_text = TextSendMessage(text=f"{message_storage[id+'purchase_all']}\n確認後請輸入OK")
-        state1[id] = 'end'
-    elif state1[id] == 'end':
-        if message in ['ok','Ok','oK','OK']:
-            result = newingtopur_inf(
-            message_storage[id + 'purchase_pid'],
-            message_storage[id + 'purchase_num'],
-            message_storage[id + 'purchase_cost'],
-            message_storage[id + 'purchase_unit'],
-            message_storage[id + 'purchase_time'],
-            message_storage[id + 'give_money'],
-            message_storage[id + 'money_time']
-        )
-        if result == 'ok':
-            check_text = '進貨現購商品成功！'
-            check_text = TextSendMessage(text=check_text)
-        else:
-            check_text = '進貨現購商品失敗！稍後再試' 
-            check_text = TextSendMessage(text=check_text)
-        state[id] = 'normal'
-        state1[id] = 'NAN'
-    return check_text
-
-   
-#---------------快速進貨-預購---------------------
+#---------------二次進貨-預購---------------------
 def renepurchase_info():
     id = manager.user_id
     state = manager.user_state
@@ -211,6 +332,7 @@ def renepurchase_info():
     if message == '取消':
         state[id] = 'normal'
         state1[id] = 'NAN'
+        check_text = TextSendMessage(text="取消快速進貨預購商品！")
     elif state1[id] == 'num':
         message_storage[id + 'purchase_num'] = int(message)
         message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
@@ -288,7 +410,7 @@ def renepurchase_info():
         state1[id] = 'end'
     elif state1[id] == 'end':
         if message in ['ok','Ok','oK','OK']:
-            result = quick_pur_inf(
+            result = newtopur_inf(
             message_storage[id + 'purchase_pid'],
             message_storage[id + 'purchase_num'],
             message_storage[id + 'purchase_cost'],
@@ -307,7 +429,7 @@ def renepurchase_info():
         state1[id] = 'NAN'
     return check_text
 
-#---------------快速進貨-現購---------------------
+#---------------進貨-現購---------------------
 def quick_now_purchase():
     id = manager.user_id
     state = manager.user_state
@@ -318,6 +440,7 @@ def quick_now_purchase():
     if message == '取消':
         state[id] = 'normal'
         state1[id] = 'NAN'
+        check_text = TextSendMessage(text="取消快速進貨現購商品！")
     elif state1[id] == 'num':
         message_storage[id + 'purchase_num'] = int(message)
         message_storage[id + 'purchase_all'] = f'\n您輸入的進貨數量： {message}'
@@ -342,7 +465,7 @@ def quick_now_purchase():
         state1[id] = 'end'
     elif state1[id] == 'end':
         if message in ['ok','Ok','oK','OK']:
-            result = qqquick_pur_inf(
+            result = newingtopur_inf(
             message_storage[id + 'purchase_pid'],
             message_storage[id + 'purchase_num'],
             message_storage[id + 'purchase_cost'],
