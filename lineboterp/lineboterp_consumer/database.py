@@ -90,22 +90,26 @@ def next_conn_time(formatted_datetime, serial_number):
     addhours = []#小時進位分鐘
     for i in range(57,60):#57～59
       addhours.append(i)
-    modified_add = next_time(check, check1, nowtime, addhours)#下次更新分鐘取得
+    modified_add = next_time(check, check1, nowtime, addhours,'ok')#下次更新分鐘取得
 
   if serial_number in [2,4]:
-    check1 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    #check1 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    check1 = [5, 10, 20, 25, 35, 40, 50, 55]
     addhours = []#小時進位分鐘
     for i in range(55,60):#55～59
       addhours.append(i)
-    modified_add = next_time(check, check1, nowtime, addhours)#下次更新分鐘取得
+    modified_add = next_time(check, check1, nowtime, addhours,'no')#下次更新分鐘取得
   new_formatted_datetime = modified_add.strftime('%Y-%m-%d %H:%M:%S')
   return new_formatted_datetime
 
 #下次更新分鐘取得
-def next_time(check, check1,nowtime, addhours):
+def next_time(check, check1,nowtime, addhours,check2):
   if check in addhours:
     modified_add = nowtime + timedelta(hours=1)
-    modified_add = modified_add.replace(minute=0)
+    if check2 == 'ok':#3min
+      modified_add = modified_add.replace(minute=0)
+    else:
+      modified_add = modified_add.replace(minute=5)
   else:
     next_minute = min([i for i in check1 if i > check])
     modified_add = nowtime.replace(minute=next_minute)
@@ -113,7 +117,7 @@ def next_time(check, check1,nowtime, addhours):
 
 #-------------------錯誤重試----------------------
 def retry(category,query):#select/notselect
-  indb_pool = lineboterp.db_pool
+  #indb_pool = lineboterp.db_pool
   block = 0#結束點是1
   stepout = 0 #離開標記
   step = 0 #預設起始
@@ -139,7 +143,6 @@ def retry(category,query):#select/notselect
         if count != 2:
           count += 1 #重試次數累加
         else:
-          databasetest(indb_pool,num)
           if step == 0:
             connobtain = 'no'
           else:
@@ -197,17 +200,17 @@ def retry(category,query):#select/notselect
   return result,result2
 
 #-------------------檢查連線超時----------------------
-def Connection_timeout():
+'''def Connection_timeout():
   query = """SELECT ID,TIME,HOST
             FROM INFORMATION_SCHEMA.PROCESSLIST;""" 
   category ='select' #重試類別select/notselect
   resulttimeout,result2 = retry(category,query)
   if resulttimeout != []:
     for i in resulttimeout:
-      if (i[1] > 1200) and (i[2].split('.')[0] in ['147','216']):
+      if (i[1] > 1000) and (i[2].split('.')[0] in ['147','216','49']):
         query =f"""KILL '{i[0]}';"""
         category ='notselect' #重試類別select/notselect
-        result,result2 = retry(category,query)
+        result,result2 = retry(category,query)'''
 #----------------------------------------- 
 
 
