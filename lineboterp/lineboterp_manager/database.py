@@ -599,8 +599,8 @@ def orderdt():
 #-------------------取出庫存---------------------------------
 def inquiry_list():
   query = """
-    SELECT 商品名稱, 商品ID, 庫存數量
-    FROM Product_information
+    SELECT 商品名稱, 商品ID, 庫存數量, 現預購商品, 商品單位, 付款方式
+    FROM Product_information natural join Manufacturer_Information 
     WHERE 現預購商品='現購' AND 庫存數量 IS NOT NULL AND 庫存數量<=20
     order by 庫存數量 asc;"""
   category ='select'

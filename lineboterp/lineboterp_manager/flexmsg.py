@@ -97,17 +97,20 @@ def quick_purchase_manufacturers_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "廠商編號",
-                        "size": "sm",
-                        "flex": 1
+                        "text": "※廠商編號：",
+                        "size": "md",
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f" {mid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -118,17 +121,20 @@ def quick_purchase_manufacturers_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "廠商名稱",
-                        "size": "sm",
-                        "flex": 1
+                        "text": "※廠商名稱：",
+                        "size": "md",
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text":f" {mname[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 }
@@ -150,7 +156,7 @@ def quick_purchase_manufacturers_list():
                 "label": "選擇此廠商",
                 "text": f"快速進貨-選擇廠商{mid[i]}"
                 },
-                "color": "#EB6C93"
+                "color": "#cfa091"
             }
             ],
             "flex": 0
@@ -191,7 +197,7 @@ def quick_purchase_manufacturers_list():
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"已經到底囉！ '點我回到'選擇商品查詢方式",
+                      "label":"到底囉！點我回'選擇商品查詢方式'",
                       "text": "【進貨商品】快速進貨",
                     }
                   }
@@ -232,7 +238,7 @@ def quickmanu_pro_list(manufacturerR_id):
       for i in range (len(pid)):
         quickmanupro_show.append({
         "type": "bubble",
-        "body": {
+        "body":{
             "type": "box",
             "layout": "vertical",
             "contents": [
@@ -255,16 +261,19 @@ def quickmanu_pro_list(manufacturerR_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品ID：",
+                        "text": "※商品ID：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{pid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -276,16 +285,19 @@ def quickmanu_pro_list(manufacturerR_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品名稱：",
+                        "text": "※商品名稱：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{pname[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -296,16 +308,19 @@ def quickmanu_pro_list(manufacturerR_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "上次進貨時間：",
+                        "text": "※上次進貨時間：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{purtime[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -316,16 +331,19 @@ def quickmanu_pro_list(manufacturerR_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "現預購商品：",
+                        "text": "※現預購商品：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{statepro[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -348,7 +366,7 @@ def quickmanu_pro_list(manufacturerR_id):
                 "label": "選擇此商品",
                 "text": f"快速進貨-{statepro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
                 },
-                "color": "#EF97B2"
+                "color": "#C9B0A8"
             }
             ],
             "flex": 0
@@ -389,7 +407,7 @@ def quickmanu_pro_list(manufacturerR_id):
                   "gravity": "center",
                   "action": {
                     "type": "message",
-                    "label":"已經到底囉！'點我回到'【所有廠商列表】",
+                    "label":"到底囉！點我回到'所有廠商列表'",
                     "text": "【快速進貨】廠商",
                     }
                 }
@@ -454,17 +472,20 @@ def quick_catepro_list(selectedr_category):
                     "spacing": "sm",
                     "contents": [
                     {
-                        "type": "text",
-                        "text": "商品ID：",
+                       "type": "text",
+                        "text": "※商品ID：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{pid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -476,16 +497,19 @@ def quick_catepro_list(selectedr_category):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品名稱：",
+                        "text": "※商品名稱：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{pname[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -496,16 +520,19 @@ def quick_catepro_list(selectedr_category):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "上次進貨時間：",
+                        "text": "※上次進貨時間：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{pur_time[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -515,17 +542,20 @@ def quick_catepro_list(selectedr_category):
                     "layout": "vertical",
                     "contents": [
                     {
-                        "type": "text",
-                        "text": "現預購商品：",
+                         "type": "text",
+                        "text": "※現預購商品：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f"{stat_pro[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
+                        "size": "md",
+                        "weight": "bold",
                         "flex": 5
                     }
                     ]
@@ -547,7 +577,8 @@ def quick_catepro_list(selectedr_category):
                 "type": "message",
                 "label": "選擇此商品",
                 "text": f"快速進貨-{stat_pro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
-                }
+                },
+                 "color":"#5f5f5f"
             }
             ],
             "flex": 0
@@ -588,7 +619,7 @@ def quick_catepro_list(selectedr_category):
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"'點我回到'【快速進貨類別選項】",
+                      "label":"到底囉!點我回到'快速進貨類別選項'",
                       "text": "【快速進貨】類別",
                     }
                   }
@@ -640,17 +671,20 @@ def stock_manufacturers_name_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "廠商編號",
-                        "size": "sm",
-                        "flex": 1
+                        "text": "※廠商編號：",
+                        "size": "md",
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f" {mid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -661,17 +695,20 @@ def stock_manufacturers_name_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "廠商名稱",
-                        "size": "sm",
-                        "flex": 1
+                         "text": "※廠商名稱：",
+                        "size": "md",
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text":f" {mname[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 }
@@ -693,7 +730,7 @@ def stock_manufacturers_name_list():
                 "label": "選擇此廠商",
                 "text": f"庫存-選擇廠商{mid[i]}"
                 },
-                "color": "#21C49C"
+                "color": "#cfa091"
             }
             ],
             "flex": 0
@@ -734,7 +771,7 @@ def stock_manufacturers_name_list():
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"已經到底囉！ '點我回到'選擇商品查詢方式",
+                      "label":"到底囉！點我回到'選擇商品查詢方式'",
                       "text": "【查詢】所有庫存",
                     }
                   }
@@ -770,7 +807,7 @@ def stock_manuinf_list(manufacturerZ_id):
         four = manuinf_list[4]
         sell_price2.append(four)
       for i in range(len(pid)):
-        manuinf_show.append({
+         manuinf_show.append({
         "type": "bubble",
         "body": {
             "type": "box",
@@ -795,17 +832,20 @@ def stock_manuinf_list(manufacturerZ_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品ID：",
+                        "text": "※商品ID：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text": f" {pid[i]}",
+                        "text":f" {pid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -816,17 +856,20 @@ def stock_manuinf_list(manufacturerZ_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品名稱：",
+                        "text": "※商品名稱：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":f" {pname[i]}",
+                        "text": f" {pname[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -837,17 +880,20 @@ def stock_manuinf_list(manufacturerZ_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "庫存數量：",
+                        "text": "※庫存數量：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":f" {stock_num[i]}",
+                        "text": f" {stock_num[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -858,17 +904,20 @@ def stock_manuinf_list(manufacturerZ_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "售出單價：",
+                        "text": "※售出單價：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f" {sell_price[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -879,17 +928,20 @@ def stock_manuinf_list(manufacturerZ_id):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "售出單價２：",
+                        "text": "※售出單價２：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f" {sell_price2[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 }
@@ -940,7 +992,7 @@ def stock_manuinf_list(manufacturerZ_id):
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"'點我回到'【庫存查詢】",
+                      "label":"到底囉!點我回'庫存查詢'",
                       "text": "【庫存查詢】廠商",
                     }
                   }
@@ -977,7 +1029,7 @@ def stock_categoryinf_list(selectedD_category):
         sell_price2.append(four)
       for i in range(len(pid)):
         categoryinf_show.append({
-        "type": "bubble",
+               "type": "bubble",
         "body": {
             "type": "box",
             "layout": "vertical",
@@ -1001,17 +1053,20 @@ def stock_categoryinf_list(selectedD_category):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品ID：",
+                        "text": "※商品ID：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text": f" {pid[i]}",
+                        "text":f" {pid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -1022,17 +1077,20 @@ def stock_categoryinf_list(selectedD_category):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品名稱：",
+                        "text": "※商品名稱：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":f" {pname[i]}",
+                        "text": f" {pname[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -1043,17 +1101,20 @@ def stock_categoryinf_list(selectedD_category):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "庫存數量：",
+                        "text": "※庫存數量：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":f" {stock_num[i]}",
+                        "text": f" {stock_num[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -1064,17 +1125,20 @@ def stock_categoryinf_list(selectedD_category):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "售出單價：",
+                        "text": "※售出單價：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f" {sell_price[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
@@ -1085,17 +1149,20 @@ def stock_categoryinf_list(selectedD_category):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "售出單價２：",
+                        "text": "※售出單價２：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text": f" {sell_price2[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 }
@@ -1146,7 +1213,7 @@ def stock_categoryinf_list(selectedD_category):
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"'點我回到'【庫存查詢】",
+                      "label":"到底囉!點我回'庫存查詢'",
                       "text": "【庫存查詢】類別",
                     }
                   }
@@ -1390,7 +1457,7 @@ def puring_pro_list():
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"已經到底囉！ '點我回到'選擇查詢進貨狀態",
+                      "label":"到底囉！點我回'選擇查詢進貨狀態'",
                       "text": "進貨商品狀態查詢",
                     }
                   }
@@ -1598,7 +1665,7 @@ def pured_pro_list():
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"已經到底囉！ '點我回到'選擇查詢進貨狀態",
+                      "label":"到底囉！'點我回'選擇查詢進貨狀態",
                       "text": "進貨商品狀態查詢",
                     }
                   }
