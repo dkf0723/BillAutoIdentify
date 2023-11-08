@@ -13,7 +13,7 @@ from product.product_preorder import product_preorder_list,Order_preorder
 from product.buy_now import Order_buynow,product_buynow_list
 from product.check import product_check,business_information,recent_phone_call,Cart_order_screen
 from database import gettime, databasetest,member_profile,test_datasearch,imagesent#,Connection_timeout
-from ask_wishes.ask import *
+from ask_wishes.ask import ask,qasearch_list,QAsearchinfoscreen
 from ask_wishes.wishes import initial_fill_screen,wishes
 from relevant_information import linebotinfo,dbinfo
 from product.cartlist import addcart,cart_list,cartrevise,editcart,removecart
@@ -231,9 +231,14 @@ def handle_message(event):
             phone = recent_phone_call(user_id)#最近一筆電話取得
             errormsg = 'no'
             line_bot_api.reply_message(event.reply_token, Cart_order_screen(phone,errormsg))
-        #-------------------提問及許願----------------------
+        #-------------------QA----------------------
         elif '問題提問' in msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='問題提問'))  
+            line_bot_api.reply_message(event.reply_token, ask())  
+        elif '【QA列表】' in msg:
+            line_bot_api.reply_message(event.reply_token, qasearch_list(msg[6:]))
+        elif '【QA詳細】' in msg:
+            line_bot_api.reply_message(event.reply_token, QAsearchinfoscreen(msg[6:]))
+        #-------------------許願----------------------
         elif '許願商品' in msg:
             user_state[user_id] = 'wishes'
             storage[user_id+'wishesstep'] = 1

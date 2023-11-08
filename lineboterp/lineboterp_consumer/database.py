@@ -1037,6 +1037,35 @@ def wishessend(wishesname,wishesreason,wishessource,img):
   result,result2 = retry(category,query)
   return result
 
+#-------------------Q&A列表----------------------
+def QAsearch(searchtype):
+  query =f"""
+          SELECT UID,問題
+          FROM Questions_and_Answers
+          where 類別 = '{searchtype}'
+          order by UID asc;
+            """
+  category ='select' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  if result == []:
+    info = '找不到符合條件的資料。'
+  else:
+    info = result
+  return info
+#-------------------Q&A回答內容----------------------
+def QAsearchinfo(qasearchinfo):
+  query =f"""
+          SELECT 類別,問題,回答
+          FROM Questions_and_Answers
+          where UID = '{qasearchinfo}';
+            """
+  category ='select' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  if result == []:
+    info = '找不到符合條件的資料。'
+  else:
+    info = result
+  return info
 #-------------------(單張)images資料夾中圖片轉連結、完成並刪除----------------------
 def single_imagetolink():
   id = lineboterp.user_id
