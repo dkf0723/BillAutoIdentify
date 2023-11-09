@@ -51,27 +51,50 @@ def manager_manufacturers_list():
         "type": "box",
         "layout": "vertical",
         "contents": [
-          {
+         {
           "type": "text",
-          "text": f"廠商的編號 : {mid[i]}",
-          "weight": "bold",
-          "margin": "xs",
-          "flex": 0},
+          "text": "※廠商編號：",
+          "size": "md",
+          "flex": 1,
+          "color": "#3b5a5f",
+          "weight": "bold"},
           {
-          "type": "text",
-          "text": f"廠商名稱 : {mname[i]}",
-          "flex": 0,
-          "margin": "sm",
-          "weight": "bold"}
-          ]
-          }
+           "type": "text",
+            "text": f" {mid[i]}",
+            "wrap": True,
+            "color": "#666666",
+            "size": "md",
+            "flex": 5,
+            "weight": "bold"}
           ]
         },
+        {
+          "type": "box",
+          "layout": "vertical",
+          "spacing": "sm",
+          "contents": [
           {
-          "type": "separator",
-          "margin": "lg",
-          "color": "#888888"}
+              "type": "text",
+                "text": "※廠商名稱：",
+              "size": "md",
+              "flex": 1,
+              "color": "#3b5a5f",
+              "weight": "bold"
+          },
+          {
+              "type": "text",
+              "text":f" {mname[i]}",
+              "wrap": True,
+              "color": "#666666",
+              "size": "md",
+              "flex": 5,
+              "weight": "bold"
+          }
           ]
+                }
+                ]
+            }
+            ]
         },
         "footer": {
         "type": "box",
@@ -80,7 +103,7 @@ def manager_manufacturers_list():
         {
         "type": "button",
         "style": "primary",
-        "color": "#019858",
+        "color": "#cfa091",
         "margin": "none",
         "action": {
                   "type": "message",
@@ -129,7 +152,7 @@ def manager_manufacturers_list():
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"已經到底囉！ '點我回到'【查詢/修改/下架】",
+                      "label":"已底囉！點我回到【查詢/修改/下架】",
                       "text": "【查詢/修改/下架】",
                     }
                   }
@@ -138,14 +161,22 @@ def manager_manufacturers_list():
       })
     return manufacturers_show 
 #---------------此廠商所有商品列出-------------------------
-def manager_products_manufacturers_list(manufacturer_id): 
+def manager_products_manufacturers_list(manufacturer_id,choose): 
     products_manufacturers_show = []
-    products_manufacturers_list = db_products_manufacturers(manufacturer_id)
+    products_manufacturers_list = db_products_manufacturers(manufacturer_id,choose)
     if products_manufacturers_list == '找不到符合條件的資料。':
       products_manufacturers_show= TextSendMessage(text =products_manufacturers_list)
     else:
-      pagemin = manager.list_page[manager.user_id+'廠商數量min']
-      pagemax = manager.list_page[manager.user_id+'廠商數量max']#9
+      if choose != 'stop':
+        page = '廠商'
+        test1 = '【依廠商】查詢'
+        test2 = '【依廠商】查詢'
+      else:
+        page = 'stop'
+        test1 = '【停售及截止商品 】'
+        test2 = '【停售及截止商品列表 】'
+      pagemin = manager.list_page[manager.user_id+page+'數量min']
+      pagemax = manager.list_page[manager.user_id+page+'數量max']#9
       db_products_manufacturerss = products_manufacturers_list[pagemin:pagemax]
       products_manufacturers_show = []
       pid = []  # '商品ID'
@@ -155,6 +186,7 @@ def manager_products_manufacturers_list(manufacturer_id):
       pname_unit = []  #  '商品單位'
       purchase_price = [] #'進貨單價'
       sell_price = []  # '售出單價'
+      status = [] # '現預購狀態'
       for products_manufacturers_list in db_products_manufacturerss:
         zero = products_manufacturers_list[0] # '商品ID'
         pid.append(zero)
@@ -173,8 +205,68 @@ def manager_products_manufacturers_list(manufacturer_id):
         purchase_price.append(five)
         six = products_manufacturers_list[6] # '售出單價'
         sell_price.append(six)
+        seven = products_manufacturers_list[7]# '現預購狀態'
+        status.append(seven)
 
       for i in range(len(pid)):
+        button = [{
+                "type": "button",
+                "action": {
+                  "type": "message",
+                  "label": "修改商品資訊",
+                  "text":f"【修改商品資訊】{pid[i]}"
+                },
+                "style": "primary",
+                "color": "#46A3FF",
+                "margin": "none",
+                "height": "md",
+                "offsetBottom": "sm",
+                "offsetEnd": "none",
+                "offsetStart": "xs"
+              }]
+        if status[i] == '現購':
+            button.append(
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "color": "#FF7575",
+                  "margin": "none",
+                  "action": {
+                    "type": "message",
+                    "label": "停售",
+                    "text": f"【停售】{pid[i]}"
+                  },
+                  "height": "md",
+                  "offsetEnd": "none",
+                  "offsetBottom": "sm",
+                  "offsetStart": "none"
+                }
+              )
+        elif status[i] == '現購停售':
+          button = [
+                    {
+                "type": "text",
+                "text": "此商品已停售",
+                "color": "#AE0000",
+                "weight": "bold",
+                "align": "center",
+                "size": "lg",
+                "margin": "none"
+              }
+          ]
+        elif status[i] == '預購截止':
+          button = [
+                   {
+                "type": "text",
+                "text": "此商品已預購截止",
+                "color": "#AE0000",
+                "weight": "bold",
+                "align": "center",
+                "size": "lg",
+                "margin": "none"
+              }
+          ]
+           
         products_manufacturers_show.append({   
         "type": "bubble",
         "hero": {
@@ -259,44 +351,13 @@ def manager_products_manufacturers_list(manufacturer_id):
           ]
         },
         "footer": {
-          "type": "box",
-          "layout": "horizontal",
-          "contents": [
-            {
-              "type": "button",
-              "style": "primary",
-              "color": "#FF7575",
-              "margin": "none",
-              "action": {
-                "type": "message",
-                "label": "停售",
-                "text": "停售"
-              },
-              "height": "md",
-              "offsetEnd": "none",
-              "offsetBottom": "sm",
-              "offsetStart": "none"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "修改商品資訊",
-                "text": f"【修改商品資訊】{pid[i]}"
-              },
-                  "style": "primary",
-                  "color": "#46A3FF",
-                  "margin": "none",
-                  "height": "md",
-                  "offsetBottom": "sm",
-                  "offsetEnd": "none",
-                  "offsetStart": "xs"
-                }
-              ],
-              "spacing": "none",
-              "margin": "none"
-            }
-          })
+            "type": "box",
+            "layout": "horizontal",
+            "contents": button,
+            "spacing": "none",
+            "margin": "none"
+          }
+        })
       if len(products_manufacturers_show) >= 9:
         products_manufacturers_show.append({
             "type": "bubble",
@@ -332,8 +393,8 @@ def manager_products_manufacturers_list(manufacturer_id):
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"已經到底囉！ '點我回到'【依廠商】查詢",
-                      "text": "【依廠商】查詢",
+                      "label":f"已到底囉！點我回到{test1}",
+                      "text": f"{test2}",
                       }
                   }
               ]
@@ -358,6 +419,7 @@ def manager_categoryate_list(selected_category):
       pname_unit = []  #  '商品單位'
       purchase_price = [] #'進貨單價'
       sell_price = []  # '售出單價'
+      status = [] # '現預購狀態'
       for categoryate_list in  db_categoryates :
           zero = categoryate_list[0]
           pid.append(zero)
@@ -376,7 +438,53 @@ def manager_categoryate_list(selected_category):
           purchase_price.append(five)
           six = categoryate_list[6] # '售出單價'
           sell_price.append(six)
+          seven = categoryate_list[7]# '現預購狀態'
+          status.append(seven)
       for i in range(len(pid)):
+          button = [{
+                "type": "button",
+                "action": {
+                  "type": "message",
+                  "label": "修改商品資訊",
+                  "text":f"【修改商品資訊】{pid[i]}"
+                },
+                "style": "primary",
+                "color": "#46A3FF",
+                "margin": "none",
+                "height": "md",
+                "offsetBottom": "sm",
+                "offsetEnd": "none",
+                "offsetStart": "xs"
+              }]
+          if status[i] == '現購':
+            button.append(
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "color": "#FF7575",
+                  "margin": "none",
+                  "action": {
+                    "type": "message",
+                    "label": "停售",
+                    "text": f"【停售】{pid[i]}"
+                  },
+                  "height": "md",
+                  "offsetEnd": "none",
+                  "offsetBottom": "sm",
+                  "offsetStart": "none"
+                }
+              )
+          elif status[i] == '現購停售':
+            button = [
+                      {
+                  "type": "text",
+                  "text": "此商品已停售",
+                  "color": "#AE0000",
+                  "align": "center",
+                  "size": "md",
+                  "weight": "bold"
+                }
+            ]
           categoryate_show.append({ 
             "type": "bubble",
             "hero": {
@@ -463,38 +571,7 @@ def manager_categoryate_list(selected_category):
           "footer": {
             "type": "box",
             "layout": "horizontal",
-            "contents": [
-              {
-                "type": "button",
-                "style": "primary",
-                "color": "#FF7575",
-                "margin": "none",
-                "action": {
-                  "type": "message",
-                  "label": "停售",
-                  "text": "停售"
-                },
-                "height": "md",
-                "offsetEnd": "none",
-                "offsetBottom": "sm",
-                "offsetStart": "none"
-              },
-              {
-                "type": "button",
-                "action": {
-                  "type": "message",
-                  "label": "修該商品資訊",
-                  "text":f"【修改商品資訊】{pid[i]}"
-                },
-                "style": "primary",
-                "color": "#46A3FF",
-                "margin": "none",
-                "height": "md",
-                "offsetBottom": "sm",
-                "offsetEnd": "none",
-                "offsetStart": "xs"
-              }
-            ],
+            "contents": button,
             "spacing": "none",
             "margin": "none"
           }
@@ -534,7 +611,7 @@ def manager_categoryate_list(selected_category):
                   "gravity": "center",
                   "action": {
                     "type": "message",
-                    "label":"已經到底囉！ '點我回到'【查詢/修改/下架】",
+                    "label":"已到底囉！點我回到【查詢/修改/下架】",
                     "text": "【查詢/修改/下架】查詢",
                     }
                 }
@@ -559,91 +636,138 @@ def Now_Product_Modification_FM(id):
       
         # 建立 bubble1
       bubble1 = {
-        "type": "bubble",
-        "hero": {
-            "type": "image",
-            "size": "full",
-            "aspectRatio": "20:13",
-            "aspectMode": "cover",
-            "url": picture
-        },
-        "body": {
+         "type": "bubble",
+      "hero": {
+        "type": "image",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "url": picture
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "text",
+            "text": "現購商品所有資訊",
+            "wrap": True,
+            "weight": "bold",
+            "size": "lg",
+            "align": "center"
+          },
+          {
             "type": "box",
             "layout": "vertical",
-            "spacing": "sm",
             "contents": [
-                {
-                  "type": "text",
-                  "text": "現購商品所有資訊",
-                  "wrap": True,
-                  "weight": "bold",
-                  "size": "xl",
-                  "align": "center"
-                },
-                {
-                  "type": "box",
-                  "layout": "vertical",
-                  "contents": [
-                      {
-                          "type": "text",
-                          "text": f"1.商品名稱：{pname}",
-                          "size": "lg",
-                          "margin": "none",
-                          "wrap": True,
-                          "weight": "bold"
-                      },
-                      {
-                          "type": "text",
-                          "text": f"2.商品簡介：{introduction}",
-                          "weight": "bold",
-                          "wrap": True,
-                          "margin": "lg",
-                          "size": "lg",
-                      },
-                      {
-                          "type": "text",
-                          "text": f"3.商品單價：{sell_price}",
-                          "weight": "bold",
-                          "size": "lg",
-                          "margin": "lg",
-                          "wrap": True,
-                      },
-                      {
-                          "type": "text",
-                          "text": f"4.商品單價2：{sell_price2}",
-                          "weight": "bold",
-                          "size": "lg",
-                          "margin": "lg",
-                          "wrap": True,
-                      }
-                  ],
-                  "margin": "xxl",
-                  "spacing": "none",
-                  "position": "relative"
-                }
+              {
+                "type": "text",
+                "text": "1.商品名稱： ",
+                "size": "md",
+                "margin": "none",
+                "weight": "bold",
+                "color": "#A2B59F",
+                "flex": 1
+              },
+              {
+                "type": "text",
+                "text": f" {pname}",
+                "wrap": True,
+                "flex": 2
+              }
             ],
-            "margin": "xs"
-        },
-        "footer": {
+            "margin": "xxl",
+            "spacing": "none",
+            "position": "relative"
+          },
+          {
             "type": "box",
             "layout": "vertical",
-            "spacing": "sm",
             "contents": [
-                {
-                  "type": "separator"},
-                {
-                  "type": "button",
-                  "style": "secondary",
-                  "action": {
-                    "type": "message",
-                    "label": "取消修改動作",
-                    "text": "取消"
-                  },
-                  "color": "#EAD880",
-                  "margin": "xl"
-                }
+              {
+                "type": "text",
+                "text": "2.商品簡介: ",
+                "weight": "bold",
+                "margin": "none",
+                "size": "md",
+                "color": "#A2B59F",
+                "flex": 1
+              },
+              {
+                "type": "text",
+                "text": f" {introduction}",
+                "flex": 2,
+                "wrap": True
+              }
             ]
-        }
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "3.商品單價： ",
+                "weight": "bold",
+                "size": "md",
+                "margin": "none",
+                "color": "#A2B59F",
+                "flex": 1
+              },
+              {
+                "type": "text",
+                "text": f" {sell_price}",
+                "flex": 2,
+                "wrap": True
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "4.商品單價2： ",
+                "weight": "bold",
+                "size": "md",
+                "margin": "none",
+                "color": "#A2B59F",
+                "flex": 1
+              },
+              {
+                "type": "text",
+                "text": f" {sell_price2}",
+                "flex": 2,
+                "wrap": True
+              }
+            ]
+          }
+        ],
+        "margin": "xs"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "style": "secondary",
+            "action": {
+              "type": "message",
+             "label": "退出修改動作",
+              "text": "退出修改"
+            },
+            "color": "#EAD880",
+            "margin": "xl"
+          }
+        ]
+      }
     }
         # 建立 bubble2
       bubble2 = {
@@ -742,8 +866,8 @@ def Now_Product_Modification_FM(id):
                   "color": "#EAD880",
                   "action": {
                     "type": "message",
-                    "text": "取消",
-                    "label": "取消修改動作"
+                    "text": "退出修改",
+                    "label": "退出修改動作"
                   },
                   "margin": "xl"
                 }
@@ -778,111 +902,180 @@ def Pre_Product_Modification_FM(id):
 
       bubble1 = {
         "type": "bubble",
-        "hero": {
-          "type": "image",
-          "size": "full",
-          "aspectRatio": "20:13",
-          "aspectMode": "cover",
-          "url": picture
-        },
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "spacing": "sm",
-          "contents": [
-            {
-              "type": "text",
-              "text": "預購商品所有資訊",
-              "wrap": True,
-              "weight": "bold",
-              "size": "lg",
-              "align": "center"
-            },
-            {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
-                {
-                  "type": "text",
-                  "text": f"1.商品名稱：{pname}",
-                  "size": "lg",
-                  "margin": "none",
-                  "wrap": True,
-                  "lineSpacing": "16px",
-                  "weight": "bold"
-                },
-                {
-                  "type": "text",
-                  "text":  f"2.商品簡介：{introduction}",
-                  "weight": "bold",
-                  "wrap": True,
-                  "margin": "lg",
-                  "size": "lg"
-                },
-                {
-                  "type": "text",
-                  "text": f"3.商品單價：{sell_price}",
-                  "weight": "bold",
-                  "size": "lg",
-                  "margin": "lg",
-                  "wrap": True,
-                  "lineSpacing": "16px"
-                },
-                {
-                  "type": "text",
-                  "text": f"4.商品單價2：{sell_price2}",
-                  "weight": "bold",
-                  "size": "lg",
-                  "margin": "lg",
-                  "wrap": True,
-                  "lineSpacing": "16px"
-                },
-                {
-                  "type": "text",
-                  "text": f"5.預購數量限制_倍數：{order_multiple} ",
-                  "margin": "lg",
-                  "size": "lg",
-                  "weight": "bold",
-                  "lineSpacing": "16px"
-                },
-                {
-                  "type": "text",
-                  "text": f"6.預購截止時間：{deadline} ",
-                  "size": "lg",
-                  "margin": "lg",
-                  "weight": "bold",
-                  "lineSpacing": "16px"
-                }
-              ],
-              "margin": "xxl",
-              "spacing": "none",
-              "position": "relative"
-            }
-          ],
-          "margin": "xs"
-        },
-        "footer": {
-          "type": "box",
-          "layout": "vertical",
-          "spacing": "sm",
-          "contents": [
-            {
-              "type": "separator"
-            },
-            {
-              "type": "button",
-              "style": "secondary",
-              "action": {
-                "type": "message",
-                "label": "取消修改動作",
-                "text": "取消"
+      "hero": {
+        "type": "image",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "url": picture
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "text",
+            "text": "預購商品所有資訊",
+            "wrap": True,
+            "weight": "bold",
+            "size": "lg",
+            "align": "center"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "1.商品名稱：",
+                "size": "md",
+                "margin": "none",
+                "weight": "bold",
+                "color": "#CE8467",
+                "flex": 1
               },
-              "color": "#EAD880",
-              "margin": "xl"
-            }
-          ]
-        }
+              {
+                "type": "text",
+                "text": f" {pname}",
+                "wrap": True,
+                "flex": 2
+              }
+            ],
+            "margin": "xxl",
+            "spacing": "none",
+            "position": "relative"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text":"2.商品簡介：",
+                "weight": "bold",
+                "margin": "none",
+                "size": "md",
+                "color": "#CE8467",
+                "flex": 1
+              },
+              {
+                "type": "text",
+                "wrap": True,
+                "flex": 2,
+                "text": f" {introduction}"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text":"3.商品單價：",
+                "weight": "bold",
+                "size": "md",
+                "margin": "none",
+                "flex": 1,
+                "color": "#CE8467"
+              },
+              {
+                "type": "text",
+                "text": f" {sell_price}",
+                "flex": 2,
+                "wrap": True
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text":"4.商品單價2：",
+                "weight": "bold",
+                "size": "md",
+                "margin": "none",
+                "flex": 1,
+                "color": "#CE8467"
+              },
+              {
+                "type": "text",
+                "text": f" {sell_price2}",
+                "flex": 2,
+                "wrap": True
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text":"5.預購數量限制_倍數： ",
+                "margin": "none",
+                "size": "md",
+                "weight": "bold",
+                "flex": 1,
+                "color": "#CE8467"
+              },
+              {
+                "type": "text",
+                "text": f" {order_multiple}",
+                "wrap": True,
+                "flex": 2
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text":"6.預購截止時間：",
+                "size": "md",
+                "margin": "none",
+                "weight": "bold",
+                "flex": 1,
+                "color": "#CE8467"
+              },
+              {
+                "type": "text",
+                "text": f" {deadline}",
+                "wrap": True,
+                "flex": 2
+              }
+            ]
+          }
+        ],
+        "margin": "xs"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "style": "secondary",
+            "action": {
+              "type": "message",
+              "label": "退出修改動作",
+              "text": "退出修改"
+            },
+            "color": "#EAD880",
+            "margin": "xl"
+          }
+        ]
       }
+    }
       bubble2 = {
         "type": "bubble",
         "body": {
@@ -999,8 +1192,8 @@ def Pre_Product_Modification_FM(id):
               "color": "#EAD880",
               "action": {
                 "type": "message",
-                "text": "取消",
-                "label": "取消修改動作"
+                 "text": "退出修改",
+                "label": "退出修改動作"
               },
               "margin": "xl"
             }
