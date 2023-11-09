@@ -1,6 +1,5 @@
 from linebot.models import FlexSendMessage,TextSendMessage,ButtonComponent,MessageAction
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent
-
 import manager
 from database import db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro
 

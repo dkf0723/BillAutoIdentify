@@ -1,13 +1,4 @@
-import mysql.connector
-import requests
-from datetime import datetime, timedelta
-from mysql.connector import errorcode
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
-# 載入對應的函式庫
-from linebot.models import *
-from relevant_information import dbinfo,imgurinfo
-import os, io, pyimgur, glob
+from linebot.models import TextSendMessage,FlexSendMessage
 import manager
 from database import Now_Product,Per_Product, db_manufacturers,db_products_manufacturers,db_categoryate
 #-------------所有廠商列出---------------
