@@ -1,6 +1,6 @@
 from linebot.models import TextSendMessage,FlexSendMessage,QuickReplyButton,MessageAction,QuickReply
 import lineboterp
-from database import QAsearch,QAsearchinfo
+from database import QAsearch,QAsearchinfo,wisheslistdb#wisheslistdb未來刪除
 #常見類、操作類、商品類、訂單類
 def ask():
     Ask_screen = []
@@ -398,3 +398,263 @@ def QAsearchinfoscreen(UID):
                 } 
             )
     return qasearch_info
+
+#-------------------許願清單----------------------
+def wishes_list():
+    wishes_show = ''
+    db_wishes_list = wisheslistdb()
+    if db_wishes_list == "找不到符合條件的資料。":
+        wishes_show = TextSendMessage(text=db_wishes_list)
+    else:
+        pagemin = lineboterp.list_page[lineboterp.user_id+'許願min']
+        pagemax = lineboterp.list_page[lineboterp.user_id+'許願max']#9
+        db_preorder = db_wishes_list[pagemin:pagemax] #最多九個+1more
+        #商品圖片,商品名稱,會員_LINE_ID,推薦原因,願望建立時間,資料來源
+        show =[]#輸出全部
+        wishes_img = []#商品圖片
+        wishes_name = []#商品名稱
+        wishes_member = []#會員_LINE_ID
+        wishes_reason = []#推薦原因
+        wishes_timein = []#願望建立時間
+        wishes_source = []#願望來源
+        wishes_sourcecheck = []#願望來源判斷
+        for db_wishes_list in db_preorder:
+            if db_wishes_list[0] is None:
+                break
+            else:
+                if (db_wishes_list[0] is None) or (db_wishes_list[0][:4] != 'http'):
+                    img = 'https://i.imgur.com/rGlTAt3.jpg'
+                else:
+                    img = db_wishes_list[0]#商品圖片
+                wishes_img.append(img)
+                name = db_wishes_list[1]#商品名稱
+                wishes_name.append(name)
+                member = db_wishes_list[2]#會員_LINE_ID
+                wishes_member.append(member)
+                reason = db_wishes_list[3]#推薦原因
+                wishes_reason.append(reason)
+                timein = db_wishes_list[4]#願望建立時間
+                wishes_timein.append(timein)
+                source = db_wishes_list[5]#願望來源
+                wishes_source.append(source)
+                if 'http' in db_wishes_list[5]:
+                    sourcecheck = '連結'#願望來源
+                else:
+                    sourcecheck = db_wishes_list[5]#願望來源判斷
+                wishes_sourcecheck.append(sourcecheck)
+        for i in range(len(wishes_img)):
+            source_button = []
+            if '連結' in wishes_sourcecheck[i]:
+                source_button.append({
+                                "type": "button",
+                                "action": {
+                                "type": "uri",
+                                "label": "前往連結資料來源",
+                                "uri": f"{wishes_source[i]}"
+                                },
+                                "style": "primary",
+                                "color": "#5f5f5f",
+                                "height": "sm"
+                            })
+            show.append({
+                        "type": "bubble",
+                        "hero": {
+                            "type": "image",
+                            "url": f"{wishes_img[i]}",
+                            "size": "full",
+                            "aspectRatio": "20:13",
+                            "aspectMode": "cover"
+                        },
+                        "body": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": f"{wishes_name[i]}",
+                                "weight": "bold",
+                                "size": "xl",
+                                "align": "center",
+                                "color": "#5f5f5f",
+                                "wrap": True,
+                                "offsetBottom": "sm"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": f"{wishes_member[i]}",
+                                    "wrap": True,
+                                    "size": "sm",
+                                    "align": "center",
+                                    "color": "#ffffff"
+                                }
+                                ],
+                                "backgroundColor": "#C9B0A8",
+                                "cornerRadius": "xxl"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                {
+                                    "type": "separator",
+                                    "margin": "lg"
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "margin": "lg",
+                                    "spacing": "sm",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "◇推薦來源：",
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ],
+                                        "maxWidth": "95px"
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"{wishes_sourcecheck[i]}",
+                                            "offsetTop": "sm",
+                                            "wrap": True
+                                        }
+                                        ]
+                                    }
+                                    ]
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "margin": "sm",
+                                    "spacing": "sm",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": "◇推薦原因：",
+                                            "color": "#3b5a5f",
+                                            "size": "md",
+                                            "flex": 5,
+                                            "margin": "sm",
+                                            "weight": "bold"
+                                        }
+                                        ],
+                                        "maxWidth": "95px"
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"{wishes_reason[i]}",
+                                            "offsetTop": "sm",
+                                            "wrap": True
+                                        }
+                                        ]
+                                    }
+                                    ]
+                                },
+                                {
+                                    "type": "box",
+                                    "layout": "horizontal",
+                                    "margin": "xxl",
+                                    "spacing": "sm",
+                                    "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"{wishes_timein[i]}",
+                                            "offsetTop": "sm",
+                                            "color": "#5f5f5f",
+                                            "align": "end",
+                                            "size": "sm"
+                                        }
+                                        ]
+                                    }
+                                    ]
+                                }
+                                ]
+                            }
+                            ]
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": source_button
+                        }
+                        })
+
+        if len(show) >= 9:
+            show.append({
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                        {
+                            "type": "button",
+                            "flex": 1,
+                            "gravity": "center",
+                            "action": {
+                                "type": "message",
+                                "label": "''點我''下一頁",
+                                "text": "【許願列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
+                            }
+                        }
+                    ]
+                }
+            })
+        else:
+            show.append({
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                        {
+                            "type": "button",
+                            "flex": 1,
+                            "gravity": "center",
+                            "action": {
+                                "type": "message",
+                                "label": "已經到底囉！'點我'重新瀏覽",
+                                "text": "【報表管理】許願清單"
+                            }
+                        }
+                    ]
+                }
+            })
+        wishes_show = FlexSendMessage(
+                        alt_text='【許願清單】列表',
+                        contents={
+                            "type": "carousel",
+                            "contents": show      
+                            } 
+                        )
+    return wishes_show

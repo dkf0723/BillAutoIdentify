@@ -1066,6 +1066,20 @@ def QAsearchinfo(qasearchinfo):
   else:
     info = result
   return info
+#-------------------許願清單----------------------
+def wisheslistdb():
+  query =f"""
+          SELECT 商品圖片,商品名稱,會員_LINE_ID,推薦原因,願望建立時間,資料來源
+          FROM wishlist
+          order by 願望建立時間 desc;
+            """
+  category ='select' #重試類別select/notselect
+  result,result2 = retry(category,query)
+  if result == []:
+    info = '找不到符合條件的資料。'
+  else:
+    info = result
+  return info
 #-------------------(單張)images資料夾中圖片轉連結、完成並刪除----------------------
 def single_imagetolink():
   id = lineboterp.user_id

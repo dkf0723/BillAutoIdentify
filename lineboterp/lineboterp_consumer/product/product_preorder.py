@@ -210,7 +210,7 @@ def product_preorder_list():
                 }
         })
 
-        if len(product_show) >= 9:
+        if len(show) >= 9:
             show.append({
                 "type": "bubble",
                 "body": {
