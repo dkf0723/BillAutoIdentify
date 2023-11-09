@@ -1,9 +1,6 @@
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import (InvalidSignatureError)
 # 載入對應的函式庫
-from linebot.models import *
+from linebot.models import TextSendMessage,FlexSendMessage
 from database  import order_list, orderdt
-import manager
 #---------------預購/未取------------
 def manager_order_list():
     db_nottaken = order_list()
