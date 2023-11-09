@@ -13,7 +13,7 @@ from product.product_preorder import product_preorder_list,Order_preorder
 from product.buy_now import Order_buynow,product_buynow_list
 from product.check import product_check,business_information,recent_phone_call,Cart_order_screen
 from database import gettime, databasetest,member_profile,test_datasearch,imagesent#,Connection_timeout
-from ask_wishes.ask import ask,qasearch_list,QAsearchinfoscreen
+from ask_wishes.ask import ask,qasearch_list,QAsearchinfoscreen,wishes_list#wishes_list未來刪除
 from ask_wishes.wishes import initial_fill_screen,wishes
 from relevant_information import linebotinfo,dbinfo
 from product.cartlist import addcart,cart_list,cartrevise,editcart,removecart
@@ -123,13 +123,17 @@ def handle_message(event):
     if (user_id+'預購max') not in list_page:
         list_page[user_id+'預購max'] = 9
 
-    ##下方兩個未來拔掉
+    ##下方未來拔掉
     if (user_id+'廠商列表min') not in list_page:
         list_page[user_id+'廠商列表min'] = 0
     if (user_id+'廠商列表max') not in list_page:
         list_page[user_id+'廠商列表max'] = 9
     if (user_id+'manufacturer_list_id') not in storage:
         storage[user_id+'manufacturer_list_id'] = None
+    if (user_id+'許願min') not in list_page:
+        list_page[user_id+'許願min'] = 0
+    if (user_id+'許願max') not in list_page:
+        list_page[user_id+'許願max'] = 9
     #-------------------確認使用者狀態進行處理----------------------
     #使用者狀態不屬於normal，不允許進行其他動作
     if user_state[user_id] != 'normal':
@@ -305,7 +309,25 @@ def handle_message(event):
             list_page[user_id+'預購max'] = max
             preorderpage = product_preorder_list()
             line_bot_api.reply_message(event.reply_token,preorderpage)
-            
+        #-------------------許願清單----------------------
+        elif '【報表管理】許願清單' in msg:
+            list_page[user_id+'許願min'] = 0
+            list_page[user_id+'許願max'] = 9
+            line_bot_api.reply_message(event.reply_token,wishes_list())
+        #-------------------許願清單下一頁----------------------
+        elif '【許願列表下一頁】' in msg:
+            original_string = msg
+            # 找到"【許願列表下一頁】"的位置
+            start_index = original_string.find("【許願列表下一頁】")
+            if start_index != -1:
+                # 從"【預購列表下一頁】"後面開始切割字串
+                substr = original_string[start_index + len("【許願列表下一頁】"):]
+                # 切割取得前後文字
+                min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
+                max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
+            list_page[user_id+'許願min'] = min-1
+            list_page[user_id+'許願max'] = max
+            line_bot_api.reply_message(event.reply_token,wishes_list())
         #-------------------資料庫連線測試----------------------
         elif '資料庫' in msg:
             #databasetest_msg = databasetest()['databasetest_msg']
@@ -319,7 +341,12 @@ def handle_message(event):
         elif '圖片' in msg:
             imgsend = imagesent()
             line_bot_api.reply_message(event.reply_token, imgsend)
-            
+
+        #姓名測試
+        elif '姓名' in msg:
+            profile = line_bot_api.get_group_member_profile(linebotdata['WebhookHandlerdata'],user_id)
+            name = profile.display_name
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=name))
         #-------------------非上方功能的所有回覆----------------------
         else:
             if '【商品簡介】' not in msg:
