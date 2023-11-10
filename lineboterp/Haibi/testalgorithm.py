@@ -57,8 +57,9 @@ heapsort_result_figure_limited = heapsort_result_figure[arr_len:] #取前四商�
 remaining_total_cost = 0 #取剩餘的成本
 for i in range(arr_len):
   remaining_total_cost +=  int(heapsort_result_figure_limited[i])
+heapsort_result_name_limited.insert(0, '其他')
+heapsort_result_figure_limited.insert(0,remaining_total_cost)
 
 print('取排名')
 print(heapsort_result_name_limited)
 print(heapsort_result_figure_limited)
-print(remaining_total_cost)
