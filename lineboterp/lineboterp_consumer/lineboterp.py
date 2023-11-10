@@ -344,7 +344,7 @@ def handle_message(event):
 
         #姓名測試
         elif '姓名' in msg:
-            profile = line_bot_api.get_group_member_profile(linebotdata['WebhookHandlerdata'],user_id)
+            profile = line_bot_api.get_profile(user_id)
             name = profile.display_name
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=name))
         #-------------------非上方功能的所有回覆----------------------
@@ -377,16 +377,17 @@ def handle_image_message(event):
 
 @handler.add(MemberJoinedEvent)
 def welcome(event):
-    uid = event.joined.members[0].user_id
-    profile = line_bot_api.get_group_member_profile(uid)
-    name = profile.display_name
-    message = TextSendMessage(text=f'{name}歡迎加入')
-    line_bot_api.reply_message(event.reply_token, message)
-    member_profile(uid)#執行會員資料確認
+    for member in event.joined.members:
+        uid = member.user_id
+        profile = line_bot_api.get_profile(uid)
+        name = profile.display_name
+        message = TextSendMessage(text=f'{name}歡迎加入')
+        line_bot_api.reply_message(event.reply_token, message)
+        member_profile(uid)#執行會員資料確認
         
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
-#資料庫連線1
+#資料庫連線1SS
 def dbconnect_job():
     databasetest(db_pool,3)#主要1的重新連線(3分鐘)
 

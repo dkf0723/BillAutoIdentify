@@ -8,7 +8,7 @@ def ask():
                 "type": "bubble",
                 "hero": {
                     "type": "image",
-                    "url": "https://i.imgur.com/m0FDioe.jpg",
+                    "url": "https://i.imgur.com/oq41k9G.jpg",
                     "size": "full",
                     "aspectRatio": "20:13",
                     "aspectMode": "cover"
@@ -51,7 +51,7 @@ def ask():
                 "type": "bubble",
                 "hero": {
                     "type": "image",
-                    "url": "https://i.imgur.com/GxO4bmH.jpg",
+                    "url": "https://i.imgur.com/n17c49n.jpg",
                     "size": "full",
                     "aspectRatio": "20:13",
                     "aspectMode": "cover"
@@ -94,7 +94,7 @@ def ask():
                 "type": "bubble",
                 "hero": {
                     "type": "image",
-                    "url": "https://i.imgur.com/GxO4bmH.jpg",
+                    "url": "https://i.imgur.com/BErjdwI.jpg",
                     "size": "full",
                     "aspectRatio": "20:13",
                     "aspectMode": "cover"
@@ -125,7 +125,7 @@ def ask():
                         "label": "訂單類",
                         "text": "【QA列表】訂單類"
                         },
-                        "color": "#bed0c9",
+                        "color": "#fdd45b",
                         "style": "primary"
                     }
                     ],
@@ -137,7 +137,7 @@ def ask():
             "type": "bubble",
             "hero": {
                 "type": "image",
-                "url": "https://i.imgur.com/hYE8pdn.jpg",
+                "url": "https://i.imgur.com/m2waPov.jpg",
                 "size": "full",
                 "aspectRatio": "20:13",
                 "aspectMode": "cover"
@@ -168,7 +168,7 @@ def ask():
                     "label": "常見類",
                     "text": "【QA列表】常見類"
                     },
-                    "color": "#fdd45b",
+                    "color": "#912B07",
                     "style": "primary"
                 }
                 ],
@@ -193,6 +193,15 @@ def qasearch_list(searchtype):#類別
         qasearch_show = []#發送全部
         orderqasearch_handlelist = []#處理切割db_qasearch資料10筆一組
 
+        if searchtype == '操作類':
+            color = '#fe587b'
+        elif searchtype == '商品類':
+            color = '#8FBC8F'
+        elif searchtype == '訂單類':
+            color = '#FF8C00'#黃澄
+        elif searchtype == '常見類':
+            color = '#912B07'#橘
+
         # 迴圈每次取出10個元素，並將這兩個元素作為一個子陣列存入結果陣列中，直到取完為止
         while len(db_qasearch) > 0:
             two_elements = db_qasearch[:10]  # 取得10個元素
@@ -210,7 +219,7 @@ def qasearch_list(searchtype):#類別
                         "label": f"{totallist[i][1]}",
                         "text": f"【QA詳細】{totallist[i][0]}"
                     },
-                    "color": "#FF8C00"
+                    "color": f"{color}"
                 }
                 buttons.append(button)
 
