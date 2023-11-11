@@ -1,6 +1,232 @@
 from linebot.models import TextSendMessage,FlexSendMessage
 import manager
 from database import Now_Product,Per_Product, db_manufacturers,db_products_manufacturers,db_categoryate
+#-------------商品管理一開始的畫面-------
+def Product_management():
+    Product_management = []
+    info1 = {
+            "type": "bubble",
+            "hero": {
+              "type": "image",
+              "size": "full",
+              "aspectRatio": "20:13",
+              "aspectMode": "fit",
+              "url": "https://i.imgur.com/iajkZJY.jpg"
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "商品 查詢 / 修改 / 下架",
+                  "weight": "bold",
+                  "size": "xl",
+                  "align": "center"
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "margin": "lg",
+                  "spacing": "sm",
+                  "contents": [
+                    {
+                      "type": "box",
+                      "layout": "baseline",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "※商品資料列表與修改",
+                          "color": "#3b5a5f",
+                          "size": "md",
+                          "flex": 5,
+                          "weight": "bold"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "box",
+                      "layout": "vertical",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "※商品停售下架",
+                          "color": "#3b5a5f",
+                          "size": "md",
+                          "flex": 5,
+                          "weight": "bold"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "xs",
+              "contents": [
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "action": {
+                    "type": "message",
+                    "text": "【查詢/修改/下架】",
+                    "label": "查詢 / 修改 / 下架"
+                  },
+                  "height": "sm",
+                  "color": "#7b97cd"
+                }
+              ],
+              "flex": 0,
+              "margin": "xs"
+            }
+          }
+    Product_management.append(info1)
+    info2 = {
+            "type": "bubble",
+            "hero": {
+              "type": "image",
+              "size": "full",
+              "aspectRatio": "20:13",
+              "aspectMode": "fit",
+              "url": "https://i.imgur.com/ggOl79q.jpg"
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "停售及截止商品",
+                  "weight": "bold",
+                  "size": "xl",
+                  "align": "center"
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "margin": "lg",
+                  "spacing": "sm",
+                  "contents": [
+                    {
+                      "type": "box",
+                      "layout": "baseline",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "※停售及截止商品列表顯示",
+                          "color": "#3b5a5f",
+                          "size": "md",
+                          "flex": 5,
+                          "weight": "bold"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "xs",
+              "contents": [
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "action": {
+                    "type": "message",
+                    "text": "【停售及截止商品列表 】",
+                    "label": "停售及截止商品"
+                  },
+                  "height": "sm",
+                  "color": "#7b97cd"
+                }
+              ],
+              "flex": 0,
+              "margin": "xs"
+            }
+          }
+    Product_management.append(info2)
+    info3 = {
+            "type": "bubble",
+            "hero": {
+              "type": "image",
+              "size": "full",
+              "aspectRatio": "20:13",
+              "aspectMode": "fit",
+              "url": "https://i.imgur.com/TdoRVYb.jpg"
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "新增商品",
+                  "weight": "bold",
+                  "size": "xl",
+                  "align": "center"
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "margin": "lg",
+                  "spacing": "sm",
+                  "contents": [
+                    {
+                      "type": "box",
+                      "layout": "baseline",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "※新增商品資訊",
+                          "color": "#3b5a5f",
+                          "size": "md",
+                          "flex": 5,
+                          "weight": "bold"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "footer": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "xs",
+              "contents": [
+                {
+                  "type": "button",
+                  "style": "primary",
+                  "action": {
+                    "type": "message",
+                    "text": "【新增上架】",
+                    "label": "新增商品"
+                  },
+                  "height": "sm",
+                  "color": "#7b97cd"
+                }
+              ],
+              "flex": 0,
+              "margin": "xs"
+            }
+          }
+    Product_management.append(info3)
+    screen =FlexSendMessage(
+                            alt_text='商品管理服務選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": Product_management  
+                                } 
+                            )
+    return screen
 #-------------所有廠商列出---------------
 def manager_manufacturers_list():
     manufacturers_show = []
@@ -32,6 +258,7 @@ def manager_manufacturers_list():
         "type": "text",
         "text": "【依廠商】查詢",
         "size": "xl",
+        "align": "center",
         "weight": "bold"},
         {
         "type": "box",
@@ -123,7 +350,7 @@ def manager_manufacturers_list():
                     "action": {
                       "type": "message",
                       "label": "''點我''下一頁",
-                      "text": "【廠商列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
+                      "text": "【廠商列表下一頁1】"+ str(pagemax+1) +"～"+ str(pagemax+9)
                       }
                     }
                 ]
@@ -208,7 +435,7 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
                   "text":f"【修改商品資訊】{pid[i]}"
                 },
                 "style": "primary",
-                "color": "#46A3FF",
+                "color": "#7b97cd",
                 "margin": "none",
                 "height": "md",
                 "offsetBottom": "sm",
@@ -220,7 +447,7 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
                 {
                   "type": "button",
                   "style": "primary",
-                  "color": "#FF7575",
+                  "color": "#db4d4d",
                   "margin": "none",
                   "action": {
                     "type": "message",
@@ -238,7 +465,7 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
                     {
                 "type": "text",
                 "text": "此商品已停售",
-                "color": "#AE0000",
+                "color": "#db4d4d",
                 "weight": "bold",
                 "align": "center",
                 "size": "lg",
@@ -250,7 +477,7 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
                    {
                 "type": "text",
                 "text": "此商品已預購截止",
-                "color": "#AE0000",
+                "color": "#db4d4d",
                 "weight": "bold",
                 "align": "center",
                 "size": "lg",
@@ -280,6 +507,7 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
               "type": "text",
               "text": "【商品資訊】",
               "size": "xl",
+              "align": "center",
               "weight": "bold"
             },
             {
@@ -293,13 +521,13 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
                   "contents": [
                     {
                       "type": "text",
-                      "text": f"1.商品ID: {pid[i]}",
+                      "text": f"商品ID: {pid[i]}",
                       "weight": "bold",
                       "margin": "xs"
                     },
                     {
                       "type": "text",
-                      "text": f"2.商品名稱：{pname[i]}",
+                      "text": f"商品名稱：{pname[i]}",
                       "flex": 0,
                       "margin": "sm",
                       "weight": "bold",
@@ -307,25 +535,25 @@ def manager_products_manufacturers_list(manufacturer_id,choose):
                     },
                     {
                       "type": "text",
-                      "text": f"3.庫存數量: {stock_num[i]}",
+                      "text": f"庫存數量: {stock_num[i]}",
                       "weight": "bold",
                       "margin": "sm"
                     },
                     {
                       "type": "text",
-                      "text": f"4.商品單位: {pname_unit[i]}",
+                      "text": f"商品單位: {pname_unit[i]}",
                       "weight": "bold",
                       "margin": "sm"
                     },
                     {
                       "type": "text",
-                      "text": f"5.進貨單價: {purchase_price[i]}",
+                      "text": f"進貨單價: {purchase_price[i]}",
                       "weight": "bold",
                       "margin": "sm"
                     },
                     {
                       "type": "text",
-                      "text": f"6.售出單價: {sell_price[i]}",
+                      "text": f"售出單價: {sell_price[i]}",
                       "weight": "bold",
                       "margin": "sm"
                     }
@@ -399,8 +627,8 @@ def manager_categoryate_list(selected_category):
     if categoryate_list == '找不到符合條件的資料。':
        categoryate_show = TextSendMessage(text =categoryate_list) 
     else:
-      pagemin = manager.list_page[manager.user_id+'廠商數量min']
-      pagemax = manager.list_page[manager.user_id+'廠商數量max']#9
+      pagemin = manager.list_page[manager.user_id+'類別商品數量min']
+      pagemax = manager.list_page[manager.user_id+'類別商品數量max']#9
       db_categoryates = categoryate_list[pagemin:pagemax]
       categoryate_show = []
       pid = []  # '商品ID'
@@ -440,7 +668,7 @@ def manager_categoryate_list(selected_category):
                   "text":f"【修改商品資訊】{pid[i]}"
                 },
                 "style": "primary",
-                "color": "#46A3FF",
+                "color": "#7b97cd",
                 "margin": "none",
                 "height": "md",
                 "offsetBottom": "sm",
@@ -452,7 +680,7 @@ def manager_categoryate_list(selected_category):
                 {
                   "type": "button",
                   "style": "primary",
-                  "color": "#FF7575",
+                  "color": "#db4d4d",
                   "margin": "none",
                   "action": {
                     "type": "message",
@@ -470,7 +698,7 @@ def manager_categoryate_list(selected_category):
                       {
                   "type": "text",
                   "text": "此商品已停售",
-                  "color": "#AE0000",
+                  "color": "#db4d4d",
                   "align": "center",
                   "size": "md",
                   "weight": "bold"
@@ -498,6 +726,7 @@ def manager_categoryate_list(selected_category):
                 "type": "text",
                 "text": "【商品資訊】",
                 "size": "xl",
+                "align": "center",
                 "weight": "bold"
               },
               {
@@ -511,13 +740,13 @@ def manager_categoryate_list(selected_category):
                     "contents": [
                       {
                         "type": "text",
-                        "text": f"1.商品ID: {pid[i]}",
+                        "text": f"商品ID: {pid[i]}",
                         "weight": "bold",
                         "margin": "xs"
                       },
                       {
                         "type": "text",
-                        "text": f"2.商品名稱：{pname[i]}",
+                        "text": f"商品名稱：{pname[i]}",
                         "flex": 0,
                         "margin": "sm",
                         "weight": "bold",
@@ -525,25 +754,25 @@ def manager_categoryate_list(selected_category):
                       },
                       {
                         "type": "text",
-                        "text": f"3.庫存數量: {stock_num[i]}",
+                        "text": f"庫存數量: {stock_num[i]}",
                         "weight": "bold",
                         "margin": "sm"
                       },
                       {
                         "type": "text",
-                        "text": f"4.商品單位: {pname_unit[i]}",
+                        "text": f"商品單位: {pname_unit[i]}",
                         "weight": "bold",
                         "margin": "sm"
                       },
                       {
                         "type": "text",
-                        "text": f"5.進貨單價: {purchase_price[i]}",
+                        "text": f"進貨單價: {purchase_price[i]}",
                         "weight": "bold",
                         "margin": "sm"
                       },
                       {
                         "type": "text",
-                        "text": f"6.售出單價: {sell_price[i]}",
+                        "text": f"售出單價: {sell_price[i]}",
                         "weight": "bold",
                         "margin": "sm"
                       }
@@ -1139,17 +1368,7 @@ def Pre_Product_Modification_FM(id):
               "type": "button",
               "action": {
                 "type": "message",
-                "label": "5.更換商品圖片",
-                "text": "【修改商品資訊】更換商品圖片"
-              },
-              "color": "#CE8467",
-              "style": "secondary"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "6.修改_商品預購倍數",
+                "label": "5.修改_商品預購倍數",
                 "text": "【修改商品資訊】預購倍數"
               },
               "style": "secondary",
@@ -1159,11 +1378,21 @@ def Pre_Product_Modification_FM(id):
               "type": "button",
               "action": {
                 "type": "message",
-                "label": "7.修改_商品預購截止時間",
+                "label": "6.修改_商品預購截止時間",
                 "text": "【修改商品資訊】預購截止時間"
               },
               "style": "secondary",
               "color": "#CE8467"
+            },
+             {
+              "type": "button",
+              "action": {
+                "type": "message",
+                "label": "7.更換商品圖片",
+                "text": "【修改商品資訊】更換商品圖片"
+              },
+              "color": "#CE8467",
+              "style": "secondary"
             }
           ]
         },
