@@ -198,20 +198,20 @@ def nopur_inf():
   if result is not None and len(result) > 0:
     prolist = result
   else:
-    prolist = None
+    prolist = "找不到符合條件的資料。"
   return prolist
 ############################################
 #------------------抓取未有進貨資訊的現購商品列表------------------
 def product_ing():
-  query = f"""SELECT P.商品ID,P.商品名稱,P.商品單位 
-            FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID 
+  query = f"""SELECT P.商品ID,P.商品名稱,P.商品單位,廠商名,付款方式 
+            FROM Product_information AS P LEFT JOIN Purchase_Information AS PI ON P.商品ID = PI.商品ID natural join Manufacturer_Information
             WHERE PI.商品ID IS NULL AND P.現預購商品 = '現購';"""
   category ='select'
   result = retry(category,query)
   if result is not None and len(result) > 0:
     prolist2 = result
   else:
-    prolist2 = None
+    prolist2 = "找不到符合條件的資料。"
   return prolist2
 #------------------新增預購進貨資訊、狀態更新------------------------
 def newtopur_inf(purchase_pid,purchase_num,purchase_cost,purchase_unit,purchase_time,give_money,money_time):

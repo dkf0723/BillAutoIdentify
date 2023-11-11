@@ -8,10 +8,16 @@ def Manufacturer_list_and_new_chosen_screen():
             "type": "bubble",
             "hero": {
                 "type": "image",
-                "url": "https://i.imgur.com/VpkoVwC.jpg",
-                "size": "full",
                 "aspectRatio": "20:13",
-                "aspectMode": "cover"
+                "url": "https://i.imgur.com/LRgQNkf.jpg",
+                "align": "center",
+                "margin": "none",
+                "animated": True,
+                "aspectMode": "fit",
+                "size": "full",
+                "offsetTop": "lg",
+                "offsetBottom": "none",
+                "offsetStart": "sm"
             },
             "body": {
                 "type": "box",
@@ -25,24 +31,41 @@ def Manufacturer_list_and_new_chosen_screen():
                     "align": "center"
                 },
                 {
-                    "type": "text",
-                    "text": "※廠商資料列表",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
-                },
-                {
-                    "type": "text",
-                    "text": "※廠商資料修改",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "sm",
-                    "weight": "bold"
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※廠商資料列表",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※廠商資料修改",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    }
+                    ]
                 }
                 ]
             },
@@ -53,28 +76,35 @@ def Manufacturer_list_and_new_chosen_screen():
                 "contents": [
                 {
                     "type": "button",
-                    "height": "sm",
+                    "style": "primary",
                     "action": {
                     "type": "message",
-                    "label": "廠商列表",
-                    "text": "【管理廠商】廠商列表"
+                    "text": "【管理廠商】廠商列表  ",
+                    "label": "廠商列表"
                     },
-                    "color": "#5f5f5f",
-                    "style": "primary"
+                    "height": "sm",
+                    "color": "#5f5f5f"
                 }
                 ],
-                "flex": 0
+                "flex": 0,
+                "margin": "sm"
             }
             }
     manufacturer_list_and_new_chosen_screen.append(info1)
-    info2 = {
+    info2 ={
             "type": "bubble",
             "hero": {
                 "type": "image",
-                "url": "https://i.imgur.com/CePlNvY.jpg",
-                "size": "full",
                 "aspectRatio": "20:13",
-                "aspectMode": "cover"
+                "url": "https://i.imgur.com/sfH8ZVW.jpg",
+                "align": "center",
+                "margin": "none",
+                "aspectMode": "fit",
+                "size": "full",
+                "offsetTop": "lg",
+                "offsetStart": "none",
+                "offsetBottom": "none",
+                "offsetEnd": "xxl"
             },
             "body": {
                 "type": "box",
@@ -88,14 +118,27 @@ def Manufacturer_list_and_new_chosen_screen():
                     "align": "center"
                 },
                 {
-                    "type": "text",
-                    "text": "※建立新廠商資料",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※建立廠商資料",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    }
+                    ]
                 }
                 ]
             },
@@ -106,17 +149,19 @@ def Manufacturer_list_and_new_chosen_screen():
                 "contents": [
                 {
                     "type": "button",
-                    "height": "sm",
+                    "style": "primary",
                     "action": {
                     "type": "message",
-                    "label": "新增廠商",
-                    "text": "【管理廠商】建立廠商"
+                    "text": "【管理廠商】建立廠商 ",
+                    "label": "新增廠商"
                     },
+                    "height": "sm",
                     "color": "#C9B0A8",
-                    "style": "primary"
+                    "offsetEnd": "none"
                 }
                 ],
-                "flex": 0
+                "flex": 0,
+                "margin": "sm"
             }
             }
     manufacturer_list_and_new_chosen_screen.append(info2)
@@ -1077,7 +1122,7 @@ def wishes_list():
                                     "color": "#ffffff"
                                 }
                                 ],
-                                "backgroundColor": "#C9B0A8",
+                                "backgroundColor": "#84C4B4",
                                 "cornerRadius": "xxl"
                             },
                             {

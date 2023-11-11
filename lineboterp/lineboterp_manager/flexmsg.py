@@ -2,7 +2,7 @@ from linebot.models import FlexSendMessage,TextSendMessage,ButtonComponent,Messa
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent
 import manager
 from database import(db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,
-                     db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro)
+                     db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro,nopur_inf,product_ing)
 #---------------------庫存管理一開始的畫面-------
 def Inventory_management():
     Inventory_management = []
@@ -2472,5 +2472,162 @@ def Order_preorder_selectionscreen(): #管理者-預購/未取
                                 } 
                             )
     return screen
+
+def preorderli_list():
+    db_preorder = nopur_inf()
+    if db_preorder == "找不到符合條件的資料。":
+        preorder_show = TextSendMessage(text=db_preorder)
+    else:
+        preorder_show = []
+        preorder_handlelist = []
+    
+        while len(db_preorder) > 0:
+            ooo_elements = db_preorder[:10]  # 取得10個元素
+            preorder_handlelist.append(ooo_elements)  # 將10個元素作為一個子陣列加入結果陣列
+            db_preorder = db_preorder[10:]
+
+        for totalooolist in preorder_handlelist:
+            buttons = []  # #模塊中10筆資料
+            for i in range(len(totalooolist)):
+                '''totalooolist[i][0]#pid
+                totalooolist[i][1]#pname
+                totalooolist[i][2]#unit
+                totalooolist[i][3]#manuname
+                totalooolist[i][4]#payment'''
+                button = {
+                    "type": "button",
+                    "action": {
+                        "type": "message",
+                        "label": f"{totalooolist[i][1]}",
+                        "text": f"預購商品ID:{totalooolist[i][0]}~{totalooolist[i][2]}!{totalooolist[i][3]}/{totalooolist[i][4]}"
+                    }
+                    }
+                buttons.append(button)
+            preorder_show.append({
+                    "type": "bubble",
+                    "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                            "contents": [
+                                {
+                                "type": "text",
+                                "text": "高逸嚴選",
+                                "weight": "bold",
+                                "color": "#A44528",
+                                "size": "sm"
+                                },
+                                {
+                                "type": "text",
+                                "text": "預購商品查詢",
+                                "weight": "bold",
+                                "size": "xl",
+                                "align": "center",
+                                "margin": "md"
+                                },
+                                {
+                                "type": "separator",
+                                "margin": "xxl"
+                                },
+                                {
+                                "type": "box",
+                                "layout": "vertical",
+                                "margin": "md",
+                                "contents": buttons
+                                }
+                            ]
+                            },
+                            "styles": {
+                            "footer": {
+                                "separator": True
+                            }
+                            }
+                        })
+        preorder_show = FlexSendMessage(
+                alt_text="現購商品查詢",
+                contents={
+                "type": "carousel",
+                "contents": preorder_show      
+                } 
+            )
+    return preorder_show
+
+def noworderli_list():
+    dbdb_preorder = product_ing()
+    if dbdb_preorder == "找不到符合條件的資料。":
+        preorderr_show = TextSendMessage(text=dbdb_preorder)
+    else:
+        preorderr_show = []
+        preorderr_handlelist = []
+    
+        while len(dbdb_preorder) > 0:
+            oooo_elements = dbdb_preorder[:10]  # 取得10個元素
+            preorderr_handlelist.append(oooo_elements)  # 將10個元素作為一個子陣列加入結果陣列
+            dbdb_preorder = dbdb_preorder[10:]
+            
+        for totaloooolist in preorderr_handlelist:
+            buttons = []  # #模塊中10筆資料
+            for i in range(len(totaloooolist)):
+                '''totalooolist[i][0]#pid
+                totalooolist[i][1]#pname
+                totalooolist[i][2]#unit
+                totalooolist[i][3]#manuname
+                totalooolist[i][4]#payment'''
+                button = {
+                    "type": "button",
+                    "action": {
+                        "type": "message",
+                        "label": f"{totaloooolist[i][1]}",
+                        "text": f"現購商品ID:{totaloooolist[i][0]}~{totaloooolist[i][2]}!{totaloooolist[i][3]}/{totaloooolist[i][4]}"
+                    }
+                    }
+                buttons.append(button)
+            preorderr_show.append({
+                    "type": "bubble",
+                    "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                            "contents": [
+                                {
+                                "type": "text",
+                                "text": "高逸嚴選",
+                                "weight": "bold",
+                                "color": "#A44528",
+                                "size": "sm"
+                                },
+                                {
+                                "type": "text",
+                                "text": "現購商品查詢",
+                                "weight": "bold",
+                                "size": "xl",
+                                "align": "center",
+                                "margin": "md"
+                                },
+                                {
+                                "type": "separator",
+                                "margin": "xxl"
+                                },
+                                {
+                                "type": "box",
+                                "layout": "vertical",
+                                "margin": "md",
+                                "contents": buttons
+                                }
+                            ]
+                            },
+                            "styles": {
+                            "footer": {
+                                "separator": True
+                            }
+                            }
+                        })
+        preorderr_show = FlexSendMessage(
+                alt_text="現購商品查詢",
+                contents={
+                "type": "carousel",
+                "contents": preorderr_show      
+                } 
+            )
+    return preorderr_show
+
 
 
