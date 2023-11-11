@@ -3,21 +3,23 @@ from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from linebot.models import TextSendMessage
-#======這裡是呼叫的檔案內容-蓉=====
-# from FM import * #因為蓉的程式碼很多所以多建一個FM
-# from test_check import * #蓉所需
-from FM import (manager_products_manufacturers_list,manager_manufacturers_list,manager_categoryate_list,Product_management,
-                Now_Product_Modification_FM, Pre_Product_Modification_FM)
+#======這裡是呼叫的檔案內容-蓉===
+from FM import (manager_products_manufacturers_list,manager_manufacturers_list,
+                manager_categoryate_list,Product_management,Now_Product_Modification_FM,
+                Pre_Product_Modification_FM)
 selected_category = None
+#======這裡是呼叫的檔案內容-顧客取貨/報表管理
+from DFM import  Customer_pickup,Report_management
 #======這裡是呼叫的檔案內容=====
 from flexmsg import (quick_purchase_manufacturers_list,quickmanu_pro_list,nopur_inf_flex_msg,product_ing_flex_msg,
                      quick_catepro_list,stock_manufacturers_name_list,stock_manuinf_list,stock_categoryinf_list,
-                     pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management)
+                     pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management,preorderli_list,noworderli_list)
 from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import purchase_check,gettime
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_list_and_new_chosen_screen,wishes_list
-from vendor_management import Manufacturer_list,Manufacturer_edit 
+from vendor_management import Manufacturer_list,Manufacturer_edit
+from FMtestpur import Purchase_fillin_and_check_screen
 from DidnotPickedup import *
 from Preorder import *
 from Inventoryinquiry import *
@@ -107,22 +109,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, check_text)
     else:
         if '顧客取貨' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-                alt_text='取貨選擇',
-                template=ConfirmTemplate(
-                    text='請選擇取貨方式：\n【手機後三碼】或是【訂單編號】',
-                    actions=[
-                        MessageAction(
-                            label='【後三碼】',
-                            text='【取貨】手機後三碼',
-                        ),
-                        MessageAction(
-                            label='【訂單編號】',
-                            text='【取貨】訂單編號'
-                        )
-                    ]
-                )
-            ))
+            line_bot_api.reply_message(event.reply_token, Customer_pickup())
         elif '【取貨】' in msg:
             if msg[4:] == '手機後三碼':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
@@ -413,19 +400,12 @@ def handle_message(event):
                                 )
                             ))
         elif msg.startswith('【新增】預購'):
-            result = nopur_inf()
-            if result is None:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='無可顯示的預購商品'))
-            else:
-                flex_message = nopur_inf_flex_msg(result)
-                line_bot_api.reply_message(event.reply_token, flex_message)
+            show = preorderli_list()
+            line_bot_api.reply_message(event.reply_token, show)
         elif msg.startswith('【新增】現購'):
-            result = product_ing()
-            if result is None:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='無可顯示的現購商品'))
-            else:
-                flex_message = product_ing_flex_msg(result)
-                line_bot_api.reply_message(event.reply_token, flex_message)
+            show = noworderli_list()
+            line_bot_api.reply_message(event.reply_token, show)
+        ########
         elif msg.startswith('預購商品ID:'):
             parts = msg.split("~")
             pid = parts[0].split(":")[1]
@@ -437,21 +417,24 @@ def handle_message(event):
             storage[user_id + 'purchase_unit'] = unit
             storage[user_id + 'manu_manuname'] = manuname
             storage[user_id + 'manu_payment'] = payment
+            storage[user_id + 'manu_stapro'] = ''
             storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}\n廠商名：{manuname}\n付款方式：{payment}"
-            check_text = f"{storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
-            user_state1[user_id] = 'num'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
+            user_state1[user_id] = 'Purchase_num'
+            storage[user_id+'Purchase_edit_step'] = 0
+            line_bot_api.reply_message(event.reply_token, Purchase_fillin_and_check_screen(''))
         elif msg.startswith('現購商品ID:'):
             pid = msg[7:-1]
             unit = msg[-1:]
-            user_state[user_id] = 'purchasing_ck'
+            user_state[user_id] = 'pre_purchase_ck'
             storage[user_id + 'purchase_pid'] = pid
             storage[user_id + 'purchase_unit'] = unit
+            storage[user_id + 'manu_stapro'] = ''
             storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
-            check_text = f"{storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
-            user_state1[user_id] = 'num'
+            user_state1[user_id] = 'Purchase_num'
+            storage[user_id+'Purchase_edit_step'] = 0
             #getmanuinf()#取得現預購類別及廠商付款方式
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
+            line_bot_api.reply_message(event.reply_token, Purchase_fillin_and_check_screen(''))
+        ############
         elif '【快速進貨】' in msg:
             if msg[6:] == '類別':
                 message = TextSendMessage(text='請點選查詢類別',
@@ -535,6 +518,24 @@ def handle_message(event):
                     "contents": showb      
                     } 
                 ))
+        elif msg.startswith('快速進貨-'): 
+            parts = msg.split('~')
+            if len(parts) >= 2:
+                sta_pro = parts[0].split('-')[1][:2]
+                pid = parts[1].split('!')[0]
+                unit = parts[1].split('!')[1].split('@')[0]
+                payment = parts[1].split('!')[1].split('@')[1]
+                storage[user_id + 'purchase_pid'] = pid
+                storage[user_id + 'purchase_unit'] = unit
+                storage[user_id + 'manu_payment'] = payment
+                storage[user_id + 'manu_stapro'] = sta_pro[:2]#預購/現購
+                user_state[user_id] = 'pre_purchase_ck'
+                storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}\n付款方式：{payment}"
+                user_state1[user_id] = 'Purchase_num'
+                storage[user_id+'Purchase_edit_step'] = 0
+                line_bot_api.reply_message(event.reply_token, Purchase_fillin_and_check_screen(''))
+            else:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='錯誤'))
         elif msg in ['frozen1', 'dailyuse1', 'dessert1', 'local1', 'staplefood1', 'generally1', 'beauty1', 'snack1', 'healthy1', 'drinks1', 'test1']:
             selectedr_category = msg.rstrip("1")
             duplicate_save[user_id+" selectedr_category"] = selectedr_category
@@ -571,26 +572,6 @@ def handle_message(event):
                     "contents":  showi      
                     } 
                 ))
-        elif msg.startswith('快速進貨-'): 
-            parts = msg.split('~')
-            if len(parts) >= 2:
-                sta_pro = parts[0].split('-')[1][:2]
-                pid = parts[1].split('!')[0]
-                unit = parts[1].split('!')[1].split('@')[0]
-                payment = parts[1].split('!')[1].split('@')[1]
-                storage[user_id + 'purchase_pid'] = pid
-                storage[user_id + 'purchase_unit'] = unit
-                storage[user_id + 'manu_payment'] = payment
-                if sta_pro[:2] == '預購':
-                    user_state[user_id] = 'repurchase_ck'
-                else:
-                    user_state[user_id] = 'rerepurchase_ck'
-                storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}\n付款方式：{payment}"
-                check_text = f"{storage[user_id+'purchase_all']}\n=>請接著輸入「進貨數量」"
-                user_state1[user_id] = 'num'
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=check_text))
-            else:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='錯誤'))
             #--------------------------查詢商品庫存----------------------------------
         elif '查詢商品庫存' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -971,22 +952,7 @@ def handle_message(event):
                     } 
                 ))
         elif msg.startswith('報表管理'):
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-                alt_text='報表管理及許願清單選擇',
-                template=ButtonsTemplate(
-                    text='請選擇報表管理或許願清單：',
-                    actions=[
-                        MessageAction(
-                            label='報表管理',
-                            text='【報表管理】報表管理',
-                        ),
-                        MessageAction(
-                            label='許願清單',
-                            text='【報表管理】許願清單'
-                        )
-                    ]
-                )
-            ))
+             line_bot_api.reply_message(event.reply_token, Report_management())
         #海碧
         elif '【報表管理】報表管理' in msg:
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text='報表管理'))
@@ -1048,13 +1014,13 @@ def handle_postback(event):
         #轉換格式2023-10-18T21:00 -> 2023-10-18 21:00:00
         date_time_obj = datetime.strptime(tdelete_datetime , '%Y-%m-%d %H:%M')
         restock_datetime = date_time_obj.strftime('%Y-%m-%d %H:%M')
-        if postback_data in ['新增進貨預購商品匯款時間','快速進貨商品匯款時間']:
+        if postback_data == '新增進貨預購商品匯款時間':
             storage[user_id + 'money_time'] = str(restock_datetime)
-            storage[user_id+'purchase_all'] += f'\n您輸入的匯款時間： {str(restock_datetime)}'
-           
+            storage[user_id +'Purchase_edit_step'] = 3
+            response = Purchase_fillin_and_check_screen('')
         elif postback_data == '修改商品資訊-預購截止時間':
             msg = str(restock_datetime)
-        response = purchase_check()
+            response = purchase_check()
         line_bot_api.reply_message(event.reply_token, response)
         
 

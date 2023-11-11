@@ -41,14 +41,15 @@ def manager_order_list():
                             "type": "text",
                             "text": "高逸嚴選",
                             "weight": "bold",
-                            "color": "#1DB446",
+                            "color": "#A44528",
                             "size": "sm"
                             },
                             {
                             "type": "text",
                             "text": "未取訂單查詢",
                             "weight": "bold",
-                            "size": "xxl",
+                            "size": "xl",
+                            "align": "center",
                             "margin": "md"
                             },
                             {

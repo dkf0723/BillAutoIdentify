@@ -3,7 +3,7 @@ from datetime import datetime
 import manager
 import pytz
 from database import newtopur_inf,newingtopur_inf,manufacturer,Manufacturer_infochange,MP_information_modify,gettime,db_infotmation
-
+from FMtestpur import Purchase_fillin_and_check_screen,Purchase_establishment_screen
 ###廠商管理---
 from relevant_information import bank,Citytalk#廠商建立用，未來拔掉
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_establishment_screen,Manufacturer_edit_screen #廠商建立用，未來拔掉
@@ -18,15 +18,7 @@ def purchase_check():
     id = manager.user_id
     state = manager.user_state
     if state[id] == 'pre_purchase_ck':
-        check_texts = purchase_info()
-        # nepurchase_info()
-    elif state[id] == 'purchasing_ck':
-        check_texts = purchase_info()
-        # ingnepurchase_info()
-    elif state[id] == 'repurchase_ck': 
-        check_texts = renepurchase_info()
-    elif state[id] == 'rerepurchase_ck':
-        check_texts = quick_now_purchase()
+        check_texts = newing_purchaseinf()
     elif 'Product_Modification' in state[id]:#商品修改-蓉
         check_texts = product_modification()
     
@@ -39,9 +31,11 @@ def purchase_check():
         check_texts = Manufacturereditall_check()
     elif 'manufacturer_edit_' in state[id]:
         check_texts = manufacturer_editinfo()
+    #-----1111測試----------------------------
+    elif 'purchase_newinfo_' in state[id]:
+        check_texts = newing_purchaseinf()
     #-----------------------------------------
     return check_texts
-
 
 def purchase_info(is_ingnepurchase=False):
     id = manager.user_id
@@ -1081,3 +1075,169 @@ def get_product_modification_flex_message(product_status, product_id):
         return Pre_Product_Modification_FM(product_id)
     elif product_status == '查無':
         return TextSendMessage(text='商品有誤！')
+
+
+
+
+#-------------------測試1111輸入進貨資訊-------------------
+#-------------------廠商管理-新增廠商----------------------
+def newing_purchaseinf():
+    id = manager.user_id
+    state = manager.user_state
+    state1 = manager.user_state1
+    message = manager.msg
+    message_storage = manager.storage
+    if message in ['取消','重新填寫']:
+        message_storage[id + 'purchase_pid']= 'NAN'
+        message_storage[id + 'purchase_num']= 'NAN'
+        message_storage[id + 'purchase_cost']= 'NAN'
+        message_storage[id + 'purchase_unit']= 'NAN'
+        message_storage[id + 'purchase_time']= 'NAN'
+        message_storage[id + 'give_money']= 'NAN'
+        message_storage[id + 'money_time']= 'NAN'
+        if message == '取消':
+            state[id] = 'normal'
+            check_text = TextSendMessage(text="取消輸入進貨資訊流程囉！")
+        else:
+            state1[id] = 'Purchase_num'#進貨數量
+            message_storage[id+'Purchase_edit_step'] = 0
+            check_text = Purchase_fillin_and_check_screen('')
+    elif state1[id] == 'Purchase_num':
+        textmsg,check_step = check_Purchase_num()#進貨數量檢查
+        state1[id] = 'Purchase_cost' #進貨單價
+        if check_step == 'ok':
+            state1[id] = 'Purchase_cost' #進貨單價
+            message_storage[id+'Purchase_edit_step'] = 1
+            check_text = Purchase_fillin_and_check_screen('')
+        else:
+            check_text = Purchase_fillin_and_check_screen(textmsg)
+    elif state1[id] == 'Purchase_cost':
+        textmsg,check_step = check_Purchase_cost()#進貨單價檢查
+        if check_step == 'ok':
+            state1[id] = 'Purchase_end' #匯款金額0*1
+            if message_storage[id + 'manu_payment'] != '現金':
+                message_storage[id+'Purchase_edit_step'] = 2
+                template_message = FlexSendMessage(
+                                    alt_text='匯款時間選擇',
+                                    contents={
+                                        "type": "carousel",
+                                        "contents": [{
+                                        "type": "bubble",
+                                        "body": {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "選擇日期時間",
+                                                "weight": "bold",
+                                                "size": "xl"
+                                            },
+                                            {
+                                                "type": "text",
+                                                "text": f"{message_storage[id+'purchase_all']}\n=>請接著輸入「匯款時間」",
+                                                "wrap": True,
+                                                "color": "#3b5a5f",
+                                                "weight": "bold"
+                                            }
+                                            ]
+                                        },
+                                        "footer": {
+                                            "type": "box",
+                                            "layout": "vertical",
+                                            "spacing": "sm",
+                                            "contents": [
+                                            {
+                                                "type": "button",
+                                                "style": "link",
+                                                "height": "sm",
+                                                "action": {
+                                                "type": "datetimepicker",
+                                                "label": "點擊選擇日期與時間",
+                                                "data": "新增進貨預購商品匯款時間",
+                                                "mode": "datetime"
+                                                }
+                                            }
+                                            ],
+                                            "flex": 0
+                                        }
+                                        }]   
+                                        } 
+                                    )
+                check_text = [Purchase_fillin_and_check_screen(''),template_message]
+            else:
+                message_storage[id+'Purchase_edit_step'] = 3
+                message_storage[id+'money_time'] = 'NAN'
+                check_text = Purchase_fillin_and_check_screen('')
+        else:
+            check_text = Purchase_fillin_and_check_screen(textmsg)
+    elif state1[id] == 'Purchase_end':
+        if message.isdigit():##
+            if message in ['1','2']:
+                if message == '1':
+                    check = newingtopur_inf (message_storage[id+'purchase_pid'],
+                                    message_storage[id+'purchase_num'],
+                                    message_storage[id+'purchase_cost'],
+                                    message_storage[id+'purchase_unit'],
+                                    message_storage[id+'purchase_time'],
+                                    message_storage[id+'give_money'],
+                                    message_storage[id+'money_time'])
+                    if check == 'ok':
+                        check_text = Purchase_establishment_screen(message_storage[id+'purchase_pid'],
+                                                                    message_storage[id+'purchase_num'],
+                                                                    message_storage[id+'purchase_cost'],
+                                                                    message_storage[id+'purchase_unit'],
+                                                                    message_storage[id+'money_time'],
+                                                                    message_storage[id+'give_money'],
+                                                                    message_storage[id+'purchase_time'])
+                    else:
+                        check_text = TextSendMessage(text=f"進貨資訊流程失敗！")
+                elif message == '2':
+                    check_text = TextSendMessage(text="取消輸入進貨資訊流程囉！")
+                state[id] = 'normal'
+                message_storage[id + 'purchase_pid']= 'NAN'
+                message_storage[id + 'purchase_num']= 'NAN'
+                message_storage[id + 'purchase_cost']= 'NAN'
+                message_storage[id + 'purchase_unit']= 'NAN'
+                message_storage[id + 'purchase_time']= 'NAN'
+                message_storage[id + 'give_money']= 'NAN'
+                message_storage[id + 'money_time']= 'NAN'
+            else:
+                message_storage[id+'Purchase_edit_step'] = 5
+                check_text = Purchase_fillin_and_check_screen(f"「{message}」不是此流程的內容喔！")
+        else:
+            message_storage[id+'Purchase_edit_step'] = 5
+            check_text = Purchase_fillin_and_check_screen(f"「{message}」不是此流程的內容喔！")
+    return check_text
+
+
+
+
+
+#--------------檢查格式區--------------------------
+###-------------------進貨數量檢查----------------------
+def check_Purchase_num():
+    id = manager.user_id
+    message = manager.msg
+    message_storage = manager.storage
+    if message.isdigit() is not True or int(message) <= 0:
+        check_step = ''
+        check_text = f"輸入的「{message}」不是正確的格式或不是大於0的正整數！"
+    else:
+        message_storage[id+'purchase_num'] = int(message) #進貨數量暫存
+        check_step = 'ok'
+        check_text = ''
+    return check_text,check_step
+def check_Purchase_cost():
+    id = manager.user_id
+    message = manager.msg
+    message_storage = manager.storage
+    if message.isdigit() is not True or int(message) <= 0:
+        check_step = ''
+        check_text = f"輸入的「{message}」不是正確的格式或不是大於0的正整數！"
+    else:
+        message_storage[id+'purchase_cost'] = int(message) #進貨單價暫存
+        check_step = 'ok'
+        check_text = ''
+    return check_text,check_step
+
