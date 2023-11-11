@@ -688,9 +688,26 @@ def db_products_manufacturers(manufacturer_id,choose):
   return result
 #-------------分類下所有商品列表------------
 def db_categoryate(selected_category):
-  query = f"""SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價,現預購商品 
-              FROM Product_information NATURAL JOIN Purchase_Information 
-              WHERE 商品ID LIKE '{selected_category}%' and 現預購商品 <> '現購停售'and 現預購商品 <> '預購截止';"""
+  query = f"""WITH LatestPurchase AS (
+                SELECT
+                  pi.商品ID,
+                  MAX(pi.進貨時間) AS 最新進貨時間
+                FROM
+                  Purchase_Information pi
+                GROUP BY
+                  pi.商品ID
+              )
+              SELECT
+                p.商品ID,p.商品名稱,p.商品圖片,p.庫存數量,p.商品單位,
+                pi.進貨單價,p.售出單價,p.現預購商品
+              FROM
+                Product_information p
+              INNER JOIN
+                Purchase_Information pi ON p.商品ID = pi.商品ID
+              INNER JOIN
+                LatestPurchase lp ON pi.商品ID = lp.商品ID AND pi.進貨時間 = lp.最新進貨時間
+              where p.商品ID LIKE '{selected_category}%' and p.現預購商品 <> '現購停售'and p.現預購商品 <> '預購截止'
+              order by pi.進貨時間 desc;"""
   category = 'select' #重試類別 select/notselect
   result = retry(category,query)
   return result
