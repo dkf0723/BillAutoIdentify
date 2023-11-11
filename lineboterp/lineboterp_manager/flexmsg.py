@@ -1,9 +1,272 @@
 from linebot.models import FlexSendMessage,TextSendMessage,ButtonComponent,MessageAction
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent
 import manager
-from database import db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro
-
-#--------------------未有進貨資訊的預購商品列表---------------------------
+from database import(db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,
+                     db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro)
+#---------------------庫存管理一開始的畫面-------
+def Inventory_management():
+    Inventory_management = []
+    info1 = {
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "fit",
+                "url": "https://i.imgur.com/vHe8Ee2.jpg"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "新增進貨 / 二次進貨",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※新增現預購商品",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※商品二次進貨",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    }
+                    ]
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "none",
+                "contents": [
+                {
+                    "type": "button",
+                    "style": "primary",
+                    "action": {
+                    "type": "message",
+                    "text": "新增及快速進貨商品",
+                    "label": "新增進貨 / 二次進貨"
+                    },
+                    "height": "sm",
+                    "color": "#9E93D9"
+                }
+                ],
+                "flex": 0,
+                "margin": "none"
+            }
+            }
+    Inventory_management.append(info1)
+    info2 ={
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "url": "https://i.imgur.com/3DjZhrd.jpg",
+                "align": "center",
+                "margin": "none",
+                "aspectMode": "cover",
+                "offsetBottom": "none",
+                "offsetStart": "none",
+                "offsetTop": "xxl"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "查詢商品庫存 ",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※庫存警示",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※所有商品庫存",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    }
+                    ]
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "none",
+                "contents": [
+                {
+                    "type": "button",
+                    "style": "primary",
+                    "action": {
+                    "type": "message",
+                    "text": "查詢商品庫存 ",
+                    "label": "查詢商品庫存 "
+                    },
+                    "height": "sm",
+                    "color": "#9E93D9"
+                }
+                ],
+                "flex": 0,
+                "margin": "none"
+            }
+            }
+    Inventory_management.append(info2)
+    info3 ={
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "aspectRatio": "20:13",
+                "url": "https://i.imgur.com/bRj2IM8.jpg",
+                "align": "center",
+                "margin": "none",
+                "animated": True,
+                "aspectMode": "cover",
+                "size": "full",
+                "offsetTop": "xxl"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "查詢商品狀態 ",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※商品進貨中列表(點貨用)",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※商品已到貨列表",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    }
+                    ]
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "none",
+                "contents": [
+                {
+                    "type": "button",
+                    "style": "primary",
+                    "action": {
+                    "type": "message",
+                    "text": "進貨商品狀態查詢 ",
+                    "label": "查詢商品狀態 "
+                    },
+                    "height": "sm",
+                    "color": "#9E93D9"
+                }
+                ],
+                "flex": 0,
+                "margin": "none"
+            }
+            }
+    Inventory_management.append(info3)
+    screen =FlexSendMessage(
+                            alt_text='庫存管理服務選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": Inventory_management  
+                                } 
+                            )
+    return screen
+#--------------------未有進貨資訊的預購商品列表--
 def nopur_inf_flex_msg(result):
     if result:
         bubble = BubbleContainer(
@@ -81,6 +344,7 @@ def quick_purchase_manufacturers_list():
                 "type": "text",
                 "text": "【快速進貨】依廠商",
                 "weight": "bold",
+                "align": "center",
                 "size": "xl"
             },
             {
@@ -245,6 +509,7 @@ def quickmanu_pro_list(manufacturerR_id):
                 "type": "text",
                 "text": "【廠商】快速進貨商品",
                 "weight": "bold",
+                "align": "center",
                 "size": "xl"
             },
             {
@@ -457,6 +722,7 @@ def quick_catepro_list(selectedr_category):
                 "type": "text",
                 "text": "【類別】快速進貨商品",
                 "weight": "bold",
+                "align": "center",
                 "size": "xl"
             },
             {
@@ -655,6 +921,7 @@ def stock_manufacturers_name_list():
                 "type": "text",
                 "text": "【庫存查詢】依廠商",
                 "weight": "bold",
+                "align": "center",
                 "size": "xl"
             },
             {
@@ -816,6 +1083,7 @@ def stock_manuinf_list(manufacturerZ_id):
                 "type": "text",
                 "text": "【廠商】庫存查詢商品",
                 "weight": "bold",
+                "align": "center",
                 "size": "xl"
             },
             {
@@ -1037,6 +1305,7 @@ def stock_categoryinf_list(selectedD_category):
                 "type": "text",
                 "text": "【類別】庫存查詢商品",
                 "weight": "bold",
+                "align": "center",
                 "size": "xl"
             },
             {
@@ -1255,7 +1524,7 @@ def puring_pro_list():
         six = pro_puring_list[6]
         stat_pro.append(six)
       for i in range(len(pid)):
-        pro_puring_show.append({
+         pro_puring_show.append({
         "type": "bubble",
         "body": {
             "type": "box",
@@ -1265,13 +1534,14 @@ def puring_pro_list():
                 "type": "text",
                 "text": "【進貨中】查詢商品",
                 "weight": "bold",
-                "size": "xl"
+                "size": "xl",
+                "align": "center"
             },
             {
                 "type": "box",
                 "layout": "vertical",
                 "margin": "lg",
-                "spacing": "sm",
+                "spacing": "xs",
                 "contents": [
                 {
                     "type": "box",
@@ -1280,17 +1550,20 @@ def puring_pro_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品ID：",
+                        "text": "※商品ID：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text": f" {pid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold",
+                        "text": f" {pid[i]}"
                     }
                     ]
                 },
@@ -1301,101 +1574,112 @@ def puring_pro_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品名稱：",
+                        "text": "※商品名稱：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text": f" {pname[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold",
+                        "text":  f" {pname[i]}"
                     }
                     ]
                 },
                 {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "進貨數量：",
+                        "text": "※進貨數量：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":  f" {pur_num[i]}",
+                        "text": f" {pur_num[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
                 {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "進貨狀態：",
+                        "text": "※進貨狀態：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":  f" {pur_sta[i]}",
+                        "text": f" {pur_sta[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
                 {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "進貨時間：",
+                        "text": "※進貨時間：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":  f" {pur_time[i]}",
+                        "text": f" {pur_time[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
                 {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "付款方式：",
+                        "text": "※付款方式：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
                         "text":  f" {payment[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 }
@@ -1406,21 +1690,185 @@ def puring_pro_list():
         "footer": {
             "type": "box",
             "layout": "vertical",
-            "spacing": "sm",
             "contents": [
             {
                 "type": "button",
                 "action": {
                 "type": "message",
                 "label": "商品已到貨",
-                "text": f"商品已到貨~{pid[i]}~{payment[i]}~{stat_pro[i]}",
+                "text":f"商品已到貨~{pid[i]}~{payment[i]}~{stat_pro[i]}"
                 },
-                "style": "primary"
+                "style": "primary",
+                "color": "#7b97cd"
             }
-            ],
-            "flex": 0
+            ]
         }
         })
+        # "type": "bubble",
+        # "body": {
+        #     "type": "box",
+        #     "layout": "vertical",
+        #     "contents": [
+        #     {
+        #         "type": "text",
+        #         "text": "【進貨中】查詢商品",
+        #         "weight": "bold",
+        #         "size": "xl"
+        #     },
+        #     {
+        #         "type": "box",
+        #         "layout": "vertical",
+        #         "margin": "lg",
+        #         "spacing": "sm",
+        #         "contents": [
+        #         {
+        #             "type": "box",
+        #             "layout": "vertical",
+        #             "spacing": "sm",
+        #             "contents": [
+        #             {
+        #                 "type": "text",
+        #                 "text": "商品ID：",
+        #                 "size": "sm",
+        #                 "flex": 1
+        #             },
+        #             {
+        #                 "type": "text",
+        #                 "text": f" {pid[i]}",
+        #                 "wrap": True,
+        #                 "color": "#666666",
+        #                 "size": "sm",
+        #                 "flex": 5
+        #             }
+        #             ]
+        #         },
+        #         {
+        #             "type": "box",
+        #             "layout": "vertical",
+        #             "spacing": "sm",
+        #             "contents": [
+        #             {
+        #                 "type": "text",
+        #                 "text": "商品名稱：",
+        #                 "size": "sm",
+        #                 "flex": 1
+        #             },
+        #             {
+        #                 "type": "text",
+        #                 "text": f" {pname[i]}",
+        #                 "wrap": True,
+        #                 "color": "#666666",
+        #                 "size": "sm",
+        #                 "flex": 5
+        #             }
+        #             ]
+        #         },
+        #         {
+        #             "type": "box",
+        #             "layout": "vertical",
+        #             "spacing": "sm",
+        #             "contents": [
+        #             {
+        #                 "type": "text",
+        #                 "text": "進貨數量：",
+        #                 "size": "sm",
+        #                 "flex": 1
+        #             },
+        #             {
+        #                 "type": "text",
+        #                 "text":  f" {pur_num[i]}",
+        #                 "wrap": True,
+        #                 "color": "#666666",
+        #                 "size": "sm",
+        #                 "flex": 5
+        #             }
+        #             ]
+        #         },
+        #         {
+        #             "type": "box",
+        #             "layout": "vertical",
+        #             "spacing": "sm",
+        #             "contents": [
+        #             {
+        #                 "type": "text",
+        #                 "text": "進貨狀態：",
+        #                 "size": "sm",
+        #                 "flex": 1
+        #             },
+        #             {
+        #                 "type": "text",
+        #                 "text":  f" {pur_sta[i]}",
+        #                 "wrap": True,
+        #                 "color": "#666666",
+        #                 "size": "sm",
+        #                 "flex": 5
+        #             }
+        #             ]
+        #         },
+        #         {
+        #             "type": "box",
+        #             "layout": "vertical",
+        #             "spacing": "sm",
+        #             "contents": [
+        #             {
+        #                 "type": "text",
+        #                 "text": "進貨時間：",
+        #                 "size": "sm",
+        #                 "flex": 1
+        #             },
+        #             {
+        #                 "type": "text",
+        #                 "text":  f" {pur_time[i]}",
+        #                 "wrap": True,
+        #                 "color": "#666666",
+        #                 "size": "sm",
+        #                 "flex": 5
+        #             }
+        #             ]
+        #         },
+        #         {
+        #             "type": "box",
+        #             "layout": "vertical",
+        #             "spacing": "sm",
+        #             "contents": [
+        #             {
+        #                 "type": "text",
+        #                 "text": "付款方式：",
+        #                 "size": "sm",
+        #                 "flex": 1
+        #             },
+        #             {
+        #                 "type": "text",
+        #                 "text":  f" {payment[i]}",
+        #                 "wrap": True,
+        #                 "color": "#666666",
+        #                 "size": "sm",
+        #                 "flex": 5
+        #             }
+        #             ]
+        #         }
+        #         ]
+        #     }
+        #     ]
+        # },
+        # "footer": {
+        #     "type": "box",
+        #     "layout": "vertical",
+        #     "spacing": "sm",
+        #     "contents": [
+        #     {
+        #         "type": "button",
+        #         "action": {
+        #         "type": "message",
+        #         "label": "商品已到貨",
+        #         "text": f"商品已到貨~{pid[i]}~{payment[i]}~{stat_pro[i]}",
+        #         },
+        #         "style": "primary"
+        #     }
+        #     ],
+        #     "flex": 0
+        # }
+        # })
       if len(pro_puring_show) >= 9:
         pro_puring_show.append({
           "type": "bubble",
@@ -1494,7 +1942,7 @@ def pured_pro_list():
         four = pro_pured_list[4]
         pur_time.append(four)
       for i in range(len(pid)):
-        pro_pured_show.append({
+         pro_pured_show.append({
         "type": "bubble",
         "body": {
             "type": "box",
@@ -1504,13 +1952,15 @@ def pured_pro_list():
                 "type": "text",
                 "text": "【已到貨】查詢商品",
                 "weight": "bold",
-                "size": "xl"
+                "size": "xl",
+                "align": "center",
+                "gravity": "center"
             },
             {
                 "type": "box",
                 "layout": "vertical",
                 "margin": "lg",
-                "spacing": "sm",
+                "spacing": "xs",
                 "contents": [
                 {
                     "type": "box",
@@ -1519,17 +1969,20 @@ def pured_pro_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品ID：",
+                        "text": "※商品ID：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text": f" {pid[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold",
+                        "text":  f" {pid[i]}",
                     }
                     ]
                 },
@@ -1540,95 +1993,231 @@ def pured_pro_list():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "商品名稱：",
+                        "text": "※商品名稱：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text": f" {pname[i]}",
-                        "wrap": True,
+                        "wrap":True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold",
+                        "text":  f" {pname[i]}"
                     }
                     ]
                 },
                 {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "進貨數量：",
+                        "text": "※進貨數量：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":  f" {pur_num[i]}",
-                        "wrap": True,
+                        "text": f" {pur_num[i]}",
+                        "wrap":True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
                 {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "進貨狀態：",
+                        "text": "※進貨狀態：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":  f" {pur_sta[i]}",
+                        "text":f" {pur_sta[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
                     ]
                 },
                 {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "進貨時間：",
+                        "text": "※進貨時間：",
                         "size": "sm",
-                        "flex": 1
+                        "flex": 1,
+                        "color": "#3b5a5f",
+                        "weight": "bold"
                     },
                     {
                         "type": "text",
-                        "text":  f" {pur_time[i]}",
+                        "text": f" {pur_time[i]}",
                         "wrap": True,
                         "color": "#666666",
-                        "size": "sm",
-                        "flex": 5
-                      }
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
+                    }
+                    ]
+                }
+                ]
+            }
             ]
-          }
-        ]
-      }
-    ]
-  },
-        "footer": {
-            "type": "box",
-            "layout": "vertical",
-            "spacing": "sm",
-            "contents": [],
-            "flex": 0
         }
         })
+#         "type": "bubble",
+#         "body": {
+#             "type": "box",
+#             "layout": "vertical",
+#             "contents": [
+#             {
+#                 "type": "text",
+#                 "text": "【已到貨】查詢商品",
+#                 "weight": "bold",
+#                 "size": "xl"
+#             },
+#             {
+#                 "type": "box",
+#                 "layout": "vertical",
+#                 "margin": "lg",
+#                 "spacing": "sm",
+#                 "contents": [
+#                 {
+#                     "type": "box",
+#                     "layout": "vertical",
+#                     "spacing": "sm",
+#                     "contents": [
+#                     {
+#                         "type": "text",
+#                         "text": "商品ID：",
+#                         "size": "sm",
+#                         "flex": 1
+#                     },
+#                     {
+#                         "type": "text",
+#                         "text": f" {pid[i]}",
+#                         "wrap": True,
+#                         "color": "#666666",
+#                         "size": "sm",
+#                         "flex": 5
+#                     }
+#                     ]
+#                 },
+#                 {
+#                     "type": "box",
+#                     "layout": "vertical",
+#                     "spacing": "sm",
+#                     "contents": [
+#                     {
+#                         "type": "text",
+#                         "text": "商品名稱：",
+#                         "size": "sm",
+#                         "flex": 1
+#                     },
+#                     {
+#                         "type": "text",
+#                         "text": f" {pname[i]}",
+#                         "wrap": True,
+#                         "color": "#666666",
+#                         "size": "sm",
+#                         "flex": 5
+#                     }
+#                     ]
+#                 },
+#                 {
+#                     "type": "box",
+#                     "layout": "vertical",
+#                     "spacing": "sm",
+#                     "contents": [
+#                     {
+#                         "type": "text",
+#                         "text": "進貨數量：",
+#                         "size": "sm",
+#                         "flex": 1
+#                     },
+#                     {
+#                         "type": "text",
+#                         "text":  f" {pur_num[i]}",
+#                         "wrap": True,
+#                         "color": "#666666",
+#                         "size": "sm",
+#                         "flex": 5
+#                     }
+#                     ]
+#                 },
+#                 {
+#                     "type": "box",
+#                     "layout": "vertical",
+#                     "spacing": "sm",
+#                     "contents": [
+#                     {
+#                         "type": "text",
+#                         "text": "進貨狀態：",
+#                         "size": "sm",
+#                         "flex": 1
+#                     },
+#                     {
+#                         "type": "text",
+#                         "text":  f" {pur_sta[i]}",
+#                         "wrap": True,
+#                         "color": "#666666",
+#                         "size": "sm",
+#                         "flex": 5
+#                     }
+#                     ]
+#                 },
+#                 {
+#                     "type": "box",
+#                     "layout": "vertical",
+#                     "spacing": "sm",
+#                     "contents": [
+#                     {
+#                         "type": "text",
+#                         "text": "進貨時間：",
+#                         "size": "sm",
+#                         "flex": 1
+#                     },
+#                     {
+#                         "type": "text",
+#                         "text":  f" {pur_time[i]}",
+#                         "wrap": True,
+#                         "color": "#666666",
+#                         "size": "sm",
+#                         "flex": 5
+#                       }
+#             ]
+#           }
+#         ]
+#       }
+#     ]
+#   },
+#         "footer": {
+#             "type": "box",
+#             "layout": "vertical",
+#             "spacing": "sm",
+#             "contents": [],
+#             "flex": 0
+#         }
+#         })
       if len(pro_pured_show) >= 9:
         pro_pured_show.append({
           "type": "bubble",
@@ -1679,10 +2268,14 @@ def Order_preorder_selectionscreen(): #管理者-預購/未取
             "type": "bubble",
             "hero": {
                 "type": "image",
-                "url": "https://i.imgur.com/vLCC99Q.jpg",
-                "size": "full",
                 "aspectRatio": "20:13",
-                "aspectMode": "cover"
+                "url": "https://i.imgur.com/NLcNzHJ.jpg",
+                "align": "center",
+                "margin": "none",
+                "animated": True,
+                "aspectMode": "fit",
+                "size": "full",
+                "offsetTop": "lg"
             },
             "body": {
                 "type": "box",
@@ -1696,34 +2289,55 @@ def Order_preorder_selectionscreen(): #管理者-預購/未取
                     "align": "center"
                 },
                 {
-                    "type": "text",
-                    "text": "※最近100筆預購訂單",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
-                },
-                {
-                    "type": "text",
-                    "text": "預購訂單成立由近到遠排序",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "sm",
-                    "weight": "bold"
-                },
-                {
-                    "type": "text",
-                    "text": "可顯示預購訂單詳細內容",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "sm",
-                    "weight": "bold"
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※最近100筆預購訂單",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※預購訂單成立由近到遠排序",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※可顯示預購訂單詳細內容",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    }
+                    ]
                 }
                 ]
             },
@@ -1734,92 +2348,121 @@ def Order_preorder_selectionscreen(): #管理者-預購/未取
                 "contents": [
                 {
                     "type": "button",
-                    "height": "sm",
+                    "style": "primary",
                     "action": {
                     "type": "message",
-                    "label": "預購名單列表",
-                    "text": "【預購名單】列表"
+                    "text": "【預購名單】列表  ",
+                    "label": "預購名單列表"
                     },
-                    "color": "#1a9879",
-                    "style": "primary"
+                    "height": "sm",
+                    "color": "#E76700"
                 }
                 ],
-                "flex": 0
+                "flex": 0,
+                "margin": "sm"
             }
             }
+            
     Order_preorder_screen.append(Order)
     preorder = {
-                "type": "bubble",
-                "hero": {
-                    "type": "image",
-                    "url": "https://i.imgur.com/5ksWY7Y.jpg",
-                    "size": "full",
-                    "aspectRatio": "20:13",
-                    "aspectMode": "cover"
-                },
-                "body": {
+  "type": "bubble",
+  "hero": {
+            "type": "image",
+            "aspectRatio": "20:13",
+            "url": "https://i.imgur.com/sjgqpvS.jpg",
+            "align": "center",
+            "margin": "none",
+            "animated": True,
+            "aspectMode": "fit",
+            "size": "full",
+            "offsetTop": "lg"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "未取名單",
+                "weight": "bold",
+                "size": "xl",
+                "align": "center"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "lg",
+                "spacing": "sm",
+                "contents": [
+                {
                     "type": "box",
-                    "layout": "vertical",
+                    "layout": "baseline",
+                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": "未取名單",
-                        "weight": "bold",
-                        "size": "xl",
-                        "align": "center"
-                    },
-                    {
-                        "type": "text",
-                        "text": "※最近100筆未取訂單",
-                        "wrap": True,
+                        "text": "※最近100筆預購訂單",
                         "color": "#3b5a5f",
                         "size": "md",
                         "flex": 5,
-                        "margin": "md",
-                        "weight": "bold"
-                    },
-                    {
-                        "type": "text",
-                        "text": "※未取訂單成立由近到遠排序",
-                        "wrap": True,
-                        "color": "#3b5a5f",
-                        "size": "md",
-                        "flex": 5,
-                        "margin": "sm",
-                        "weight": "bold"
-                    },
-                    {
-                        "type": "text",
-                        "text": "※可顯示未取訂單詳細內容",
-                        "wrap": True,
-                        "color": "#3b5a5f",
-                        "size": "md",
-                        "flex": 5,
-                        "margin": "sm",
                         "weight": "bold"
                     }
                     ]
                 },
-                "footer": {
+                {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
                     "contents": [
                     {
-                        "type": "button",
-                        "height": "sm",
-                        "action": {
-                        "type": "message",
-                        "label": "未取名單列表",
-                        "text": "【未取名單】列表"
-                        },
-                        "color": "#c42149",
-                        "style": "primary"
+                        "type": "text",
+                        "text": "※未取訂單成立由近到遠排序",
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
                     }
-                    ],
-                    "flex": 0
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "※可顯示預購訂單詳細內容",
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "weight": "bold"
+                    }
+                    ]
                 }
-                }
+                ]
+            }
+            ]
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "spacing": "md",
+            "contents": [
+            {
+                "type": "button",
+                "style": "primary",
+                "action": {
+                "type": "message",
+                "text": "【未取名單】列表  ",
+                "label": "未取名單列表"
+                },
+                "height": "sm",
+                "color": "#E76700"
+            }
+            ],
+            "flex": 0,
+            "margin": "sm"
+        }
+        }
+               
     Order_preorder_screen.append(preorder)
     screen =FlexSendMessage(
                             alt_text='預購/未取名單列表',

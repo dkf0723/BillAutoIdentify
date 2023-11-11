@@ -4,14 +4,15 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from linebot.models import TextSendMessage
 #======這裡是呼叫的檔案內容-蓉=====
-from FM import * #因為蓉的程式碼很多所以多建一個FM
-from FM import manager_products_manufacturers_list,manager_manufacturers_list,manager_categoryate_list
+# from FM import * #因為蓉的程式碼很多所以多建一個FM
 # from test_check import * #蓉所需
+from FM import (manager_products_manufacturers_list,manager_manufacturers_list,manager_categoryate_list,Product_management,
+                Now_Product_Modification_FM, Pre_Product_Modification_FM)
 selected_category = None
 #======這裡是呼叫的檔案內容=====
 from flexmsg import (quick_purchase_manufacturers_list,quickmanu_pro_list,nopur_inf_flex_msg,product_ing_flex_msg,
                      quick_catepro_list,stock_manufacturers_name_list,stock_manuinf_list,stock_categoryinf_list,
-                     pured_pro_list,puring_pro_list,Order_preorder_selectionscreen)
+                     pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management)
 from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import purchase_check,gettime
@@ -129,26 +130,7 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
         #--------商品管理【查詢/修改/下架】或【停售及截止商品列表 】或【新增上架】蓉----------------#           
         elif '商品管理' in msg:
-            line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-                alt_text='查詢選擇',
-                template=ButtonsTemplate(
-                    text='請選擇商品服務：\n【查詢/修改/下架】或【停售及截止商品列表 】或【新增上架】',
-                    actions=[
-                        MessageAction(
-                            label='【查詢/修改/下架】',
-                            text='【查詢/修改/下架】',
-                        ),
-                        MessageAction(
-                            label='【停售及截止商品列表 】',
-                            text='【停售及截止商品列表 】'
-                        ),
-                         MessageAction(
-                            label='【新增上架】',
-                            text='【新增上架】'
-                        )
-                    ]
-                )
-            ))
+            line_bot_api.reply_message(event.reply_token, Product_management())
         elif '【查詢/修改/下架】' in msg:
             line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                 alt_text='查詢選擇',
@@ -188,8 +170,8 @@ def handle_message(event):
             send_category_selection(event, line_bot_api)
         elif msg in ['test','frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
             duplicate_save[user_id+"selected_category"] = msg
-            list_page[user_id+'廠商數量min'] = 0
-            list_page[user_id+'廠商數量max'] = 9
+            list_page[user_id+'類別商品數量min'] = 0
+            list_page[user_id+'類別商品數量max'] = 9
             show3 = manager_categoryate_list(duplicate_save[user_id+"selected_category"])
             line_bot_api.reply_message(event.reply_token, FlexSendMessage(
                     alt_text='【商品查詢】列表',
@@ -208,14 +190,14 @@ def handle_message(event):
                 # 切割取得前後文字
                 min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
                 max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
-            list_page[user_id+'廠商數量min'] = min-1
-            list_page[user_id+'廠商數量max'] = max
+            list_page[user_id+'類別商品數量min'] = min-1
+            list_page[user_id+'類別商品數量max'] = max
             show3 = manager_categoryate_list(duplicate_save[user_id+"selected_category"])
             if 'TextSendMessage' in show3:
                 line_bot_api.reply_message(event.reply_token,show3)
             else:
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【商品】列表',
+                alt_text='【類別商品】列表',
                 contents={
                     "type": "carousel",
                     "contents": show3 
@@ -233,13 +215,13 @@ def handle_message(event):
                     "contents": show      
                     } 
                 ))
-        elif '【廠商列表下一頁】' in msg:
+        elif '【廠商列表下一頁1】' in msg:#莉蓉的
             original_string = msg
             # 找到"【廠商列表下一頁】"的位置
-            start_index = original_string.find("【廠商列表下一頁】")
+            start_index = original_string.find("【廠商列表下一頁1】")
             if start_index != -1:
                 # 從"【廠商列表下一頁】"後面開始切割字串
-                substr = original_string[start_index + len("【廠商列表下一頁】"):]
+                substr = original_string[start_index + len("【廠商列表下一頁1】"):]
                 # 切割取得前後文字
                 min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
                 max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元
@@ -263,8 +245,8 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此廠商，请重新输入。"))
             else:
                 product[user_id + 'Product_Modification_manufacturer_id'] = duplicate_save[user_id+"manufacturer_id"]
-                list_page[user_id+'廠商數量min'] = 0
-                list_page[user_id+'廠商數量max'] = 9
+                list_page[user_id+'數量min'] = 0
+                list_page[user_id+'數量max'] = 9
                 show2 = manager_products_manufacturers_list(duplicate_save[user_id+"manufacturer_id"],'no')
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(
                     alt_text='【商品查詢】列表',
@@ -369,13 +351,14 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))   
 ######################################庫存管理及功能選擇按鈕########################################################
         elif '庫存管理' in msg: 
-            message = TextSendMessage(text='請點選以下操作功能',
-                                quick_reply=QuickReply(items=[
-                                    QuickReplyButton(action=MessageAction(label="新增及快速進貨商品", text="新增及快速進貨商品")),
-                                    QuickReplyButton(action=MessageAction(label="查詢商品庫存", text="查詢商品庫存")),
-                                    QuickReplyButton(action=MessageAction(label="進貨商品狀態查詢", text="進貨商品狀態查詢")),
-                            ]))
-            line_bot_api.reply_message(event.reply_token, message)
+            line_bot_api.reply_message(event.reply_token, Inventory_management())
+            # message = TextSendMessage(text='請點選以下操作功能',
+            #                     quick_reply=QuickReply(items=[
+            #                         QuickReplyButton(action=MessageAction(label="新增及快速進貨商品", text="新增及快速進貨商品")),
+            #                         QuickReplyButton(action=MessageAction(label="查詢商品庫存", text="查詢商品庫存")),
+            #                         QuickReplyButton(action=MessageAction(label="進貨商品狀態查詢", text="進貨商品狀態查詢")),
+            #                 ]))
+            # line_bot_api.reply_message(event.reply_token, message)
             #--------------------------新增及修改進貨商品----------------------------------
         elif '新增及快速進貨商品' in msg:
                 line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
@@ -889,13 +872,13 @@ def handle_message(event):
                     "contents": Manufacturerlistpage      
                     } 
                 ))
-        elif '【廠商列表下一頁】' in msg:
+        elif '【廠商列表下一頁2】' in msg:
             original_string = msg
-            # 找到"【廠商列表下一頁】"的位置
-            start_index = original_string.find("【廠商列表下一頁】")
+            # 找到"【廠商列表下一頁2】"的位置
+            start_index = original_string.find("【廠商列表下一頁2】")
             if start_index != -1:
-                # 從"【廠商列表下一頁】"後面開始切割字串
-                substr = original_string[start_index + len("【廠商列表下一頁】"):]
+                # 從"【廠商列表下一頁2】"後面開始切割字串
+                substr = original_string[start_index + len("【廠商列表下一頁2】"):]
                 # 切割取得前後文字
                 min = int(substr.split("～")[0].strip()) # 取出～前面的字並去除空白字元
                 max = int(substr.split("～")[1].strip()) # 取出～後面的字並去除空白字元

@@ -404,7 +404,7 @@ def Manufacturer_list():
                             "action": {
                                 "type": "message",
                                 "label": "''點我''下一頁",
-                                "text": "【廠商列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
+                                "text": "【廠商列表下一頁2】"+ str(pagemax+1) +"～"+ str(pagemax+9)
                             }
                         }
                     ]

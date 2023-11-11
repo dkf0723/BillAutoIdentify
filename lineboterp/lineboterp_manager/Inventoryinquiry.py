@@ -33,7 +33,8 @@ def manager_inquiry_list():
             payment.append(db_inquiry_list[5])
             if db_inquiry_list[2]<10:
                 productStatus.append("庫存過低")
-                productStatusColor.append("#FF5151")
+                productStatusColor.append("#db4d4d")
+                # productStatusColor.append("#FF5151")
             else:
                 productStatus.append("庫存稍微不足")
                 productStatusColor.append("#FF8040")
@@ -65,7 +66,7 @@ def manager_inquiry_list():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "※商品名稱：",
+                            "text": "※商品ID：",
                             "size": "sm",
                             "flex": 1,
                             "color": "#3b5a5f",
@@ -73,7 +74,7 @@ def manager_inquiry_list():
                         },
                         {
                             "type": "text",
-                            "text": f"{product[i]}",
+                            "text": f"{productID[i]}",
                             "wrap": True,
                             "color": "#666666",
                             "size": "md",
@@ -89,7 +90,7 @@ def manager_inquiry_list():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "※商品ID：",
+                            "text": "※商品名稱：",
                             "size": "sm",
                             "flex": 1,
                             "color": "#3b5a5f",
@@ -97,7 +98,7 @@ def manager_inquiry_list():
                         },
                         {
                             "type": "text",
-                            "text": f"{productID[i]}",
+                            "text": f"{product[i]}",
                             "wrap": True,
                             "color": "#666666",
                             "size": "md",
@@ -146,8 +147,9 @@ def manager_inquiry_list():
                             "text": f"{amount[i]}",
                             "wrap": True,
                             "color": "#666666",
-                            "size": "sm",
-                            "flex": 5
+                             "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
                         }
                         ]
                     }
