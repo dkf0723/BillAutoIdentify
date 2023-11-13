@@ -1142,9 +1142,11 @@ def create_preorder(id):
                             )
   return screen
 
-def showOrder(orderDetails):
+def showOrder():
     Notpickedup_preordered_history_screen = []
-    for i in orderDetails :        
+    id = manager.user_id
+    global_Storage= manager.global_Storage
+    for i in global_Storage[id+'orders'][global_Storage[id+'base']:global_Storage[id+'base'] + 10 ] :        
         orderDetail = {
                         "type": "bubble",
                         "body": {
@@ -1224,7 +1226,7 @@ def showOrder(orderDetails):
                         }
         count = 5
         for j in i :
-                sum=int(j[2])*int(j[3])
+                sum = int(j[2])*int(j[3])
                 a={
                       "type": "text",
                       "text":f'{j[1]}',
@@ -1239,6 +1241,27 @@ def showOrder(orderDetails):
                 orderDetail['body']['contents'].insert(count+1,b)
                 count += 2
         Notpickedup_preordered_history_screen.append(orderDetail)
+    if len(global_Storage[id+'orders'])>global_Storage[id+'base']+10:
+          Notpickedup_preordered_history_screen.append({
+          "type": "bubble",
+          "body": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": [
+                  {
+                    "type": "button",
+                    "flex": 1,
+                    "gravity": "center",
+                    "action": {
+                      "type": "message",
+                      "label": "''點我''下一頁",
+                      "text": "下一頁"
+                      }
+                    }
+                ]
+            }
+        })
     screen =FlexSendMessage(
                             alt_text='未取/預購/歷史訂單選擇',
                             contents={
@@ -1247,3 +1270,52 @@ def showOrder(orderDetails):
                                 } 
                             )
     return screen
+
+def template_message(check_text,datetime):
+  template_message = FlexSendMessage(
+                            alt_text='預購截止時間選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": [{
+                                "type": "bubble",
+                                "body": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "選擇日期時間",
+                                        "weight": "bold",
+                                        "size": "xl"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"{check_text}",
+                                        "wrap": True,
+                                    }
+                                    ]
+                                },
+                                "footer": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "spacing": "sm",
+                                    "contents": [
+                                    {
+                                        "type": "button",
+                                        "style": "link",
+                                        "height": "sm",
+                                        "action": {
+                                        "type": "datetimepicker",
+                                        "label": "點擊選擇日期與時間",
+                                        "data": "預購截止時間",
+                                        "mode": "datetime",
+                                        "min": f"{datetime}"
+                                        }
+                                    }
+                                    ],
+                                    "flex": 0
+                                }
+                                }]   
+                                } 
+                            )
+  return template_message

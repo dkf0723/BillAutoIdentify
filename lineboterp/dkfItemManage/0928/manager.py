@@ -261,11 +261,11 @@ def handle_message(event):
         elif '新增現購商品'in msg:
             user_state[user_id] = 'createNowProduct'
             user_state1[user_id] = 'first'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱(低於50字)'))
         elif '新增預購商品'in msg:
             user_state[user_id] = 'createPreOrder'
             user_state1[user_id] = 'first'
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱(低於50字)'))
         elif '未取名單' in msg:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='未取名單'))
         elif '報表管理' in msg:
@@ -406,3 +406,21 @@ if __name__ == "__main__":
 #             line_bot_api.reply_message(event.reply_token, [TextSendMessage(text='目前動作狀態無需發送照片呦～'),wishesin[1]])
 #         else:
 #             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='目前動作狀態無需發送照片呦～'))
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    global msg
+    postback_data = event.postback.data
+    if 'datetime' in event.postback.params:
+        # 獲取使用者選擇的日期和時間
+        selected_datetime = event.postback.params['datetime']
+        tdelete_datetime = selected_datetime.replace('T', ' ')
+        #轉換格式2023-10-18T21:00 -> 2023-10-18 21:00:00
+        if postback_data == '預購截止時間':
+            date_time_obj = datetime.strptime(tdelete_datetime , '%Y-%m-%d %H:%M')
+            restock_datetime = date_time_obj.strftime('%Y-%m-%d %H:%M')
+            msg = str(restock_datetime)
+            response = inventory_check()
+        elif postback_data == '預購截止時間321':
+            msg = str(restock_datetime)
+            response = inventory_check()
+        line_bot_api.reply_message(event.reply_token, response)
