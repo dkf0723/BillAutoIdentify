@@ -853,7 +853,7 @@ def createProduct(id):
     returnProduct= storage[id+'returnProduct'][6:]
     manufacturerId = storage[id+'manufacturerId']
     num = count(category)
-    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2,廠商編號) VALUES ('{category+num}',{pname},'現購','{picture}','{introduction}','{unit}','{unitPrice}',now(),'{returnProduct}', '{unitPrice2}','{manufacturerId}');"
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}',now(),'{returnProduct}', '{unitPrice2}','{manufacturerId}');"
   else :
     pname = storage[id+'pname'][3:]
     category= storage[id+'category'][5:]
@@ -866,7 +866,7 @@ def createProduct(id):
     multiple = storage[id+'multiple'][7:]
     manufacturerId = storage[id+'manufacturerId']
     num = count(category)
-    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,售出單價2,預購數量限制_倍數,預購截止時間,廠商編號) VALUES ('{category+num}',{pname},'現購','{picture}','{introduction}','{unit}','{unitPrice}',now(), '{unitPrice2}','{multiple}','{deadline}','{manufacturerId}');"
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,售出單價2,預購數量限制_倍數,預購截止時間,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}',now(), '{unitPrice2}','{multiple}','{deadline}','{manufacturerId}');"
   result = retry('notselect', query)
   return result
 

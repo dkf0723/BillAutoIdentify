@@ -113,10 +113,9 @@ def handle_message(event):
         if '顧客取貨' in msg:
             line_bot_api.reply_message(event.reply_token, Customer_pickup())
         elif '【取貨】' in msg:
-            if msg[4:] == '手機後三碼':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
-            elif msg[4:] == '訂單編號':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
+                user_state[user_id] = 'searchingOrderByPhoneNumber'
+                user_state1[user_id] = 'first'
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入手機後三碼'))
         #--------商品管理【查詢/修改/下架】或【停售及截止商品列表 】或【新增上架】蓉----------------#           
         elif '商品管理' in msg:
             line_bot_api.reply_message(event.reply_token, Product_management())
