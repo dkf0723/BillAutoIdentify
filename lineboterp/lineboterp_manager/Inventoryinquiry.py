@@ -169,7 +169,7 @@ def manager_inquiry_list():
                     "action": {
                     "type": "message",
                     "label": "下訂",
-                    "text": f"快速進貨-{stapro[i][:2]}~{productID[i]}!{unit[i]}@{payment[i]}"
+                    "text": f"二次進貨-{stapro[i][:2]}~{productID[i]}!{unit[i]}@{payment[i]}"
                     },
                     "color": "#db4d4d"
                 }
