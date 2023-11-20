@@ -16,13 +16,14 @@ from flexmsg import (quick_purchase_manufacturers_list,quickmanu_pro_list,nopur_
                      pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management,preorderli_list,noworderli_list)
 from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay
 from relevant_information import linebotinfo,dbinfo
-from nepurinf import purchase_check,gettime
+from nepurinf import purchase_check,gettime,new_manufacturer
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_list_and_new_chosen_screen,wishes_list
 from vendor_management import Manufacturer_list,Manufacturer_edit
 from FMtestpur import Purchase_fillin_and_check_screen
 from DidnotPickedup import *
 from Preorder import *
 from Inventoryinquiry import *
+import database
 #======python的函式庫==========
 from mysql.connector import pooling
 import os
@@ -72,7 +73,8 @@ global storage
 storage = {}
 global orderall
 orderall = {}
-
+global global_Storage
+global_Storage = {}
 #資料庫pool設定數量4個
 dbdata = dbinfo()
 db_pool = pooling.MySQLConnectionPool(
@@ -152,7 +154,34 @@ def handle_message(event):
                     ]
                 )
             ))
+        elif '【舊廠商】' in msg:
+            storage[user_id+'oldManufactureType'] = 'newProduct'
+            list_page[user_id+'廠商數量min'] = 0
+            list_page[user_id+'廠商數量max'] = 9
+            show = manager_manufacturers_list() #這個show是變數隨便取
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【廠商查詢】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
+        elif msg.startswith('選我選我') and storage[user_id+'oldManufactureType'] == 'newProduct':
+            global_Storage[user_id+'manufacturerId'] = msg[5:]  # 提取廠商編號
+            user_state[user_id] = 'preAndNowSelect'#下一步的狀態
+            selectMessage = TextSendMessage(text='請點選新增類別',quick_reply=QuickReply(items=[
+                QuickReplyButton(action=MessageAction(label="現購", text="現購")),
+                QuickReplyButton(action=MessageAction(label="預購", text="預購")),
+            ]))
+            line_bot_api.reply_message(event.reply_token,selectMessage)
+            global_Storage[user_id+'oldManufactureType'] = ''
+        elif '【新廠商】' in msg:
+            user_state[user_id] = 'other_manufacturer_add'
+            storage[user_id+'addtype'] = 'single'
+            show = new_manufacturer()
+            line_bot_api.reply_message(event.reply_token, show)
          #-------------【依類別】查詢-蓉------------------
+
         elif '【依類別】查詢' in msg:
             send_category_selection(event, line_bot_api)
         elif msg in ['test','frozen', 'dailyuse', 'dessert', 'local', 'staplefood', 'generally', 'beauty', 'snack', 'healthy', 'drinks']:
@@ -882,6 +911,7 @@ def handle_message(event):
                 ))
         elif '【管理廠商】建立廠商' in msg:
             user_state[user_id] = 'manufacturer_name'
+            storage[user_id+'addtype'] = 'single'
             storage[user_id+'Manufacturer_edit_step'] = 0
             show = Manufacturer_fillin_and_check_screen('')
             line_bot_api.reply_message(event.reply_token,show)
@@ -1007,6 +1037,7 @@ def handle_postback(event):
     global msg
     storage = manager.storage
     postback_data = event.postback.data
+    state1 = manager.user_state1
     if 'datetime' in event.postback.params:
         # 獲取使用者選擇的日期和時間
         selected_datetime = event.postback.params['datetime']
@@ -1021,6 +1052,14 @@ def handle_postback(event):
         elif postback_data == '修改商品資訊-預購截止時間':
             msg = str(restock_datetime)
             response = purchase_check()
+        elif postback_data == '預購截止時間':
+            msg = str(restock_datetime)
+            if state1[user_id] == 'changeDeadline':
+                state1[user_id] = 'ShowFM'
+            else:
+                state1[user_id] = 'seven'
+            response = purchase_check()
+
         line_bot_api.reply_message(event.reply_token, response)
         
 
