@@ -347,19 +347,19 @@ def handle_message(event):
             #                 ]))
             # line_bot_api.reply_message(event.reply_token, message)
             #--------------------------新增及修改進貨商品----------------------------------
-        elif '新增及快速進貨商品' in msg:
+        elif '新增及二次進貨商品' in msg:
                 line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
-                alt_text='商品新增及快速進貨選擇',
+                alt_text='商品新增及二次進貨選擇',
                 template= ButtonsTemplate(
-                    text='請選擇新增或快速進貨商品：',
+                    text='請選擇新增或二次進貨商品：',
                     actions=[
                         MessageAction(
                             label='【新增】',
                             text='【進貨商品】新增',
                         ),
                         MessageAction(
-                            label='【快速進貨】',
-                            text='【進貨商品】快速進貨'
+                            label='【二次進貨】',
+                            text='【進貨商品】二次進貨'
                         )
                     ]
                 )
@@ -382,7 +382,7 @@ def handle_message(event):
                     ]
                 )
             ))
-            elif msg[6:] == '快速進貨':
+            elif msg[6:] == '二次進貨':
                 line_bot_api.reply_message(event.reply_token, TemplateSendMessage(
                                 alt_text='商品查詢選擇',
                                 template=ButtonsTemplate(
@@ -390,11 +390,11 @@ def handle_message(event):
                                     actions=[
                                         MessageAction(
                                             label='【依類別】',
-                                            text='【快速進貨】類別',
+                                            text='【二次進貨】類別',
                                         ),
                                         MessageAction(
                                             label='【依廠商】',
-                                            text='【快速進貨】廠商'
+                                            text='【二次進貨】廠商'
                                         )
                                     ]
                                 )
@@ -435,7 +435,7 @@ def handle_message(event):
             #getmanuinf()#取得現預購類別及廠商付款方式
             line_bot_api.reply_message(event.reply_token, Purchase_fillin_and_check_screen(''))
         ############
-        elif '【快速進貨】' in msg:
+        elif '【二次進貨】' in msg:
             if msg[6:] == '類別':
                 message = TextSendMessage(text='請點選查詢類別',
                         quick_reply=QuickReply(items=[
@@ -483,7 +483,7 @@ def handle_message(event):
                     "contents": showa      
                     } 
                 ))
-        elif msg.startswith('快速進貨-選擇廠商'):
+        elif msg.startswith('二次進貨-選擇廠商'):
             duplicate_save[user_id+"manufacturerR_id"] = msg[9:]
             if duplicate_save[user_id+"manufacturerR_id"] == '':
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text="查無此廠商，请重新输入。"))
@@ -498,11 +498,11 @@ def handle_message(event):
                     "contents": showb      
                     } 
                     ))
-        elif '【快速進貨商品列表下一頁】' in msg:
+        elif '【二次進貨商品列表下一頁】' in msg:
             original_string = msg
-            start_index = original_string.find("【快速進貨商品列表下一頁】")
+            start_index = original_string.find("【二次進貨商品列表下一頁】")
             if start_index != -1:
-                substr = original_string[start_index + len("【快速進貨商品列表下一頁】"):]
+                substr = original_string[start_index + len("【二次進貨商品列表下一頁】"):]
                 min = int(substr.split("～")[0].strip()) 
                 max = int(substr.split("～")[1].strip()) 
             list_page[user_id+'廠商數量min'] = min-1
@@ -518,7 +518,7 @@ def handle_message(event):
                     "contents": showb      
                     } 
                 ))
-        elif msg.startswith('快速進貨-'): 
+        elif msg.startswith('二次進貨-'): 
             parts = msg.split('~')
             if len(parts) >= 2:
                 sta_pro = parts[0].split('-')[1][:2]
@@ -546,17 +546,17 @@ def handle_message(event):
                 list_page[user_id+'廠商數量max'] = 9
                 showi = quick_catepro_list(selectedr_category)
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                    alt_text='【快速進貨商品查詢】列表',
+                    alt_text='【二次進貨商品查詢】列表',
                     contents={
                     "type": "carousel",
                     "contents":  showi      
                     } 
                     ))
-        elif '【類別快速進貨商品列表下一頁】' in msg:
+        elif '【類別二次進貨商品列表下一頁】' in msg:
             original_string = msg
-            start_index = original_string.find("【類別快速進貨商品列表下一頁】")
+            start_index = original_string.find("【類別二次進貨商品列表下一頁】")
             if start_index != -1:
-                substr = original_string[start_index + len("【類別快速進貨商品列表下一頁】"):]
+                substr = original_string[start_index + len("【類別二次進貨商品列表下一頁】"):]
                 min = int(substr.split("～")[0].strip()) 
                 max = int(substr.split("～")[1].strip()) 
             list_page[user_id+'廠商數量min'] = min-1
@@ -566,7 +566,7 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, showi)
             else:
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(
-                alt_text='【快速進貨商品查詢】列表',
+                alt_text='【二次進貨商品查詢】列表',
                 contents={
                     "type": "carousel",
                     "contents":  showi      

@@ -75,7 +75,7 @@ def Inventory_management():
                     "style": "primary",
                     "action": {
                     "type": "message",
-                    "text": "新增及快速進貨商品",
+                    "text": "新增及二次進貨商品",
                     "label": "新增進貨 / 二次進貨"
                     },
                     "height": "sm",
@@ -342,7 +342,7 @@ def quick_purchase_manufacturers_list():
             "contents": [
             {
                 "type": "text",
-                "text": "【快速進貨】依廠商",
+                "text": "【二次進貨】依廠商",
                 "weight": "bold",
                 "align": "center",
                 "size": "xl"
@@ -417,7 +417,7 @@ def quick_purchase_manufacturers_list():
                 "action": {
                 "type": "message",
                 "label": "選擇此廠商",
-                "text": f"快速進貨-選擇廠商{mid[i]}"
+                "text": f"二次進貨-選擇廠商{mid[i]}"
                 },
                 "color": "#cfa091"
             }
@@ -461,7 +461,7 @@ def quick_purchase_manufacturers_list():
                     "action": {
                       "type": "message",
                       "label":"到底囉！點我回'選擇商品查詢方式'",
-                      "text": "【進貨商品】快速進貨",
+                      "text": "【進貨商品】二次進貨",
                     }
                   }
               ]
@@ -507,7 +507,7 @@ def quickmanu_pro_list(manufacturerR_id):
             "contents": [
             {
                 "type": "text",
-                "text": "【廠商】快速進貨商品",
+                "text": "【廠商】二次進貨商品",
                 "weight": "bold",
                 "align": "center",
                 "size": "xl"
@@ -628,7 +628,7 @@ def quickmanu_pro_list(manufacturerR_id):
                 "action": {
                 "type": "message",
                 "label": "選擇此商品",
-                "text": f"快速進貨-{statepro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
+                "text": f"二次進貨-{statepro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
                 },
                 "color": "#C9B0A8"
             }
@@ -651,7 +651,7 @@ def quickmanu_pro_list(manufacturerR_id):
                     "action": {
                       "type": "message",
                       "label": "''點我''下一頁",
-                      "text": "【快速進貨商品列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
+                      "text": "【二次進貨商品列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
                         }
                     }
                 ]
@@ -672,7 +672,7 @@ def quickmanu_pro_list(manufacturerR_id):
                   "action": {
                     "type": "message",
                     "label":"到底囉！點我回到'所有廠商列表'",
-                    "text": "【快速進貨】廠商",
+                    "text": "【二次進貨】廠商",
                     }
                 }
             ]
@@ -720,7 +720,7 @@ def quick_catepro_list(selectedr_category):
             "contents": [
             {
                 "type": "text",
-                "text": "【類別】快速進貨商品",
+                "text": "【類別】二次進貨商品",
                 "weight": "bold",
                 "align": "center",
                 "size": "xl"
@@ -841,7 +841,7 @@ def quick_catepro_list(selectedr_category):
                 "action": {
                 "type": "message",
                 "label": "選擇此商品",
-                "text": f"快速進貨-{stat_pro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
+                "text": f"二次進貨-{stat_pro[i]}~{pid[i]}!{unit[i]}@{payment[i]}"
                 },
                  "color":"#5f5f5f"
             }
@@ -864,7 +864,7 @@ def quick_catepro_list(selectedr_category):
                     "action": {
                       "type": "message",
                       "label": "''點我''下一頁",
-                      "text": "【類別快速進貨商品列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
+                      "text": "【類別二次進貨商品列表下一頁】"+ str(pagemax+1) +"～"+ str(pagemax+9)
                       }
                     }
                 ]
@@ -884,8 +884,8 @@ def quick_catepro_list(selectedr_category):
                     "gravity": "center",
                     "action": {
                       "type": "message",
-                      "label":"到底囉!點我回到'快速進貨類別選項'",
-                      "text": "【快速進貨】類別",
+                      "label":"到底囉!點我回到'二次進貨類別選項'",
+                      "text": "【二次進貨】類別",
                     }
                   }
               ]
