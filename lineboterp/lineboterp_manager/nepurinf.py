@@ -973,7 +973,7 @@ def product_modification():
                                         "action": {
                                         "type": "datetimepicker",
                                         "label": "點擊選擇日期與時間",
-                                        "data": "預購截止時間",
+                                        "data": "修改商品資訊-預購截止時間",
                                         "mode": "datetime",
                                         "min": f"{datetime}"
                                         }
@@ -1790,6 +1790,13 @@ def preAndNowSelect():
     user_state1 = manager.user_state1
     user_id = manager.user_id
     msg = manager.msg
+    option = ['現購','預購']
+    if msg not in option:
+        selectMessage = TextSendMessage(text='輸入錯誤，請選擇現購或預購',quick_reply=QuickReply(items=[
+                        QuickReplyButton(action=MessageAction(label="現購", text="現購")),
+                        QuickReplyButton(action=MessageAction(label="預購", text="預購")),
+                    ]))
+        return selectMessage
     if msg == '現購':
         user_state[user_id] = 'createNowProduct'
         user_state1[user_id] = 'first'

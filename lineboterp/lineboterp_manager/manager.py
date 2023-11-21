@@ -220,6 +220,7 @@ def handle_message(event):
                 ))
         #-------------【依廠商】查詢-蓉------------------
         elif '【依廠商】查詢'in msg:
+            storage[user_id+'oldManufactureType'] = ''
             list_page[user_id+'廠商數量min'] = 0
             list_page[user_id+'廠商數量max'] = 9
             show = manager_manufacturers_list() #這個show是變數隨便取
@@ -1048,8 +1049,9 @@ def handle_postback(event):
             storage[user_id + 'money_time'] = str(restock_datetime)
             storage[user_id +'Purchase_edit_step'] = 3
             response = Purchase_fillin_and_check_screen('')
+            #line_bot_api.reply_message(event.reply_token, response)
         elif postback_data == '修改商品資訊-預購截止時間':
-            msg = str(restock_datetime)
+            msg = str(date_time_obj)
             response = purchase_check()
         elif postback_data == '預購截止時間':
             msg = str(restock_datetime)
@@ -1058,7 +1060,9 @@ def handle_postback(event):
             else:
                 state1[user_id] = 'seven'
             response = purchase_check()
-
+        else:
+            response = '都沒有'
+        #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f"{msg}\n{user_state[user_id]}\n{response}"))
         line_bot_api.reply_message(event.reply_token, response)
         
 
