@@ -173,7 +173,7 @@ def retry(category,query):#select/notselect
           result2 = 'no'#購物車新增用
           if count == 2 and step == 1:
             stepout = 1
-          time.sleep(1)
+          time.sleep(0.5)
       if stepout == 1:#成功取得資料後退出或兩輪都失敗退出迴圈
         cursor.close()#關閉第一輪游標的
         block = 1
@@ -488,7 +488,7 @@ def order_detail(serial_number):
       if sort != '預購':
         if int(orderall[1])<= int(inventory):#庫存檢查
           if int(orderall[1]) >= 2:
-            if price2 is not None:
+            if (price2 is not None) and (price2 != 0) and (str(price2) != ''):
               order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價2 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
             else:
               order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
@@ -506,7 +506,7 @@ def order_detail(serial_number):
           establishment_message = f"商品id：{orderall[0]},現購數量：{str(orderall[1])},庫存剩餘數量不足！"
       else:
         if int(orderall[1]) >= 2:
-          if price2 is not None:
+          if (price2 is not None) and (price2 != 0) and (str(price2) != ''):
             order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價2 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
           else:
             order_details += f"('order{order_dateget}{serial_number}','{orderall[0]}','{str(orderall[1])}', (select 售出單價 from Product_information where 商品ID = '{orderall[0]}')*{orderall[1]})"
@@ -614,7 +614,7 @@ def quickcalculation(pid,pnum):
   if price_result != []:
     for row in price_result:
       price1 = row[0]
-      if row[1] is not None:
+      if (row[1] is not None) and (row[1] != 0) and (str(row[1]) != ''):
         price2 = row[1]
         discount00 = '(優惠價)'
       else:
@@ -632,7 +632,7 @@ def quickcalculation(pid,pnum):
   else:
     subtotal_result = '計算小計時發生錯誤！'
 
-  if discount00 == discount01:
+  if discount00 == '(優惠價)' and discount01 =='(優惠價)':
     discount = '(優惠價)'
   else:
     discount = ''
@@ -646,7 +646,7 @@ def onlyprice(pid):
   if price_result != []:
     for row in price_result:
       price1 = row[0]
-      if row[1] is not None:
+      if (row[1] is not None) and (row[1] != 0) and (str(row[1]) != ''):
         discount = '(優惠價)'
       else:
         discount = ''
@@ -800,7 +800,7 @@ def cartadd(id,product_id,num):
   inventory_result,result2 = retry(category,query)
 
   if inventory_result != []:
-    if inventory_result[0][2] is not None:
+    if (inventory_result[0][2] is not None) and (inventory_result[0][2] != 0) and (str(inventory_result[0][2]) != ''):
       if num >= 2 :
         query1 =f"""
                 INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
@@ -841,7 +841,7 @@ def revise(id,product_id,num):
   inventory_result,result2 = retry(category,query)
 
   if inventory_result != []:
-    if inventory_result[0][2] is not None:
+    if (inventory_result[0][2] is not None) and (inventory_result[0][2] != 0) and (str(inventory_result[0][2]) != ''):
       if num >= 2 :
         query1 = f"""
             UPDATE order_details
