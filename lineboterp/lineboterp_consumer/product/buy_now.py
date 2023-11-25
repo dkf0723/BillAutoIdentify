@@ -49,7 +49,7 @@ def product_buynow_list():
 
 
         for i in range(len(product_id)):
-            if product_price2[i] is None:
+            if (product_price2[i] is None) or (product_price2[i] == '') or (product_price2[i] == 0):
                 price2 = '暫無其他優惠'
             else:
                 price2 = f"2{product_unit[i]}起每{product_unit[i]}{str(product_price2[i])}元"
@@ -77,7 +77,8 @@ def product_buynow_list():
                     "type": "text",
                     "text": product_name[i],
                     "weight": "bold",
-                    "size": "lg"
+                    "size": "lg",
+                    "wrap": True
                     },
                     {
                     "type": "box",
