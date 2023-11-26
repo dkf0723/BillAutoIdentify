@@ -1594,7 +1594,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{pname[:100]}",
+                      "label": f"{pname[:30]}",
                       "text": '修改品名'
                     },
                     "style": "secondary",
@@ -1604,7 +1604,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{category[:100]}",
+                      "label": f"{category[:30]}",
                       "text": f"修改商品類別"
                     },
                     "style": "secondary",
@@ -1614,7 +1614,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{unit[:100]}",
+                      "label": f"{unit[:30]}",
                       "text": f"修改商品單位"
                     },
                     "style": "secondary",
@@ -1624,7 +1624,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{introduction[:100]}",
+                      "label": f"{introduction[:30]}",
                       "text": f"修改商品簡介"
                     },
                     "style": "secondary",
@@ -1634,7 +1634,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{unitPrice[:100]}",
+                      "label": f"{unitPrice[:30]}",
                       "text": f"修改商品售出單價"
                     },
                     "style": "secondary",
@@ -1644,7 +1644,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{unitPrice2[:100]}",
+                      "label": f"{unitPrice2[:30]}",
                       "text": f"修改商品售出單價2"
                     },
                     "style": "secondary",
@@ -1654,7 +1654,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{picture[:100]}",
+                      "label": f"{picture[:30]}",
                       "text": f"修改商品圖片"
                     },
                     "style": "secondary",
@@ -1664,7 +1664,7 @@ def create_now_purchase_product(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{returnProduct[:100]}",
+                      "label": f"{returnProduct[:30]}",
                       "text": f"修改可否退換貨"
                     },
                     "style": "secondary",
@@ -1737,7 +1737,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{pname[:100]}",
+                      "label": f"{pname[:30]}",
                       "text": '修改品名'
                     },
                     "style": "secondary",
@@ -1747,7 +1747,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{category[:100]}",
+                      "label": f"{category[:30]}",
                       "text": f"修改商品類別"
                     },
                     "style": "secondary",
@@ -1757,7 +1757,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{unit[:100]}",
+                      "label": f"{unit[:30]}",
                       "text": f"修改商品單位"
                     },
                     "style": "secondary",
@@ -1767,7 +1767,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{introduction[:100]}",
+                      "label": f"{introduction[:30]}",
                       "text": f"修改商品簡介"
                     },
                     "style": "secondary",
@@ -1777,7 +1777,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{unitPrice[:100]}",
+                      "label": f"{unitPrice[:30]}",
                       "text": f"修改商品售出單價"
                     },
                     "style": "secondary",
@@ -1787,7 +1787,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{unitPrice2[:100]}",
+                      "label": f"{unitPrice2[:30]}",
                       "text": f"修改商品售出單價2"
                     },
                     "style": "secondary",
@@ -1797,7 +1797,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{picture[:100]}",
+                      "label": f"{picture[:30]}",
                       "text": f"修改商品圖片"
                     },
                     "style": "secondary",
@@ -1807,7 +1807,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{multiple[:100]}",
+                      "label": f"{multiple[:30]}",
                       "text": f"修改商品預購倍數"
                     },
                     "style": "secondary",
@@ -1817,7 +1817,7 @@ def create_preorder(id):
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": f"{deadline[:100]}",
+                      "label": f"{deadline[:30]}",
                       "text": f"修改商品預購截止時間"
                     },
                     "style": "secondary",

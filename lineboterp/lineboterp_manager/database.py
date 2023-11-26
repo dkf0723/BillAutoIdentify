@@ -832,10 +832,10 @@ def getTotalByOrder(order):
 def updateOrder(id):
   storage = manager.global_Storage
   if storage[id+'order'][:1] == '0':
-    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = now() WHERE 電話 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取' ;"
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = '{datetime.now() + timedelta(hours=8)}'  WHERE 電話 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取' ;"
     result = retry('notselect', query)
   else : 
-    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = now()  WHERE 訂單編號 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取';"
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = '{datetime.now() + timedelta(hours=8)}'   WHERE 訂單編號 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取';"
     # query = f"UPDATE Order_information SET 訂單狀態未取已取 = ''  WHERE 訂單編號 = '{storage[id+'order']} and 訂單狀態未取已取 like '%未取'';"
     result = retry('notselect', query)
   return result
@@ -853,7 +853,7 @@ def createProduct(id):
     returnProduct= storage[id+'returnProduct'][6:]
     manufacturerId = storage[id+'manufacturerId']
     num = count(category)
-    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}',now(),'{returnProduct}', '{unitPrice2}','{manufacturerId}');"
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}','{datetime.now() + timedelta(hours=8)}' ,'{returnProduct}', '{unitPrice2}','{manufacturerId}');"
   else :
     pname = storage[id+'pname'][3:]
     category= storage[id+'category'][5:]
@@ -866,7 +866,7 @@ def createProduct(id):
     multiple = storage[id+'multiple'][7:]
     manufacturerId = storage[id+'manufacturerId']
     num = count(category)
-    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,售出單價2,預購數量限制_倍數,預購截止時間,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}',now(), '{unitPrice2}','{multiple}','{deadline}','{manufacturerId}');"
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,售出單價2,預購數量限制_倍數,預購截止時間,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}','{datetime.now() + timedelta(hours=8)}', '{unitPrice2}','{multiple}','{deadline}','{manufacturerId}');"
   result = retry('notselect', query)
   return result
 
