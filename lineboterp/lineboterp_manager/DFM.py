@@ -39,7 +39,7 @@ def Customer_pickup():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "※",
+                            "text": "※一次全部取貨",
                             "color": "#3b5a5f",
                             "size": "md",
                             "flex": 5,
@@ -53,7 +53,7 @@ def Customer_pickup():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "※",
+                            "text": "※分開取貨",
                             "color": "#3b5a5f",
                             "size": "md",
                             "flex": 5,

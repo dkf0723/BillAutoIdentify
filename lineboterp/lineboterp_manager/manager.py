@@ -41,7 +41,7 @@ line_bot_api = LineBotApi(linebotdata['LineBotApidata'])
 # Channel Secret
 handler = WebhookHandler(linebotdata['WebhookHandlerdata'])
 
-
+##有嘉興版本
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -1013,6 +1013,8 @@ def handle_message(event):
         elif '測試' in msg:
             datasearch = '暫時'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
+        else :
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text = f'你輸入的【{msg}】不再功能內\n請重新輸入'))
 
 def send_category_selection(event, line_bot_api):
     message = TextSendMessage(text='請點選查詢類別',
