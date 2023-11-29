@@ -1,6 +1,7 @@
-from linebot.models import FlexSendMessage,TextSendMessage,ButtonComponent,MessageAction
+from linebot.models import FlexSendMessage,TextSendMessage,ButtonComponent,MessageAction, QuickReply,QuickReplyButton
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent
 import manager
+from datetime import datetime, timedelta
 from database import(db_quick_purchase_manufacturers,db_quickmanu_pro,db_stock_manufacturers_name,
                      db_stock_manuinf,db_stock_categoryinf,db_puring_pro,db_pured_pro,db_quick_catepro,nopur_inf,product_ing)
 #---------------------庫存管理一開始的畫面-------
@@ -2628,6 +2629,514 @@ def noworderli_list():
                 } 
             )
     return preorderr_show
+def report_list_selectionscreen(): # 報表管理
+    report_list_screen = []
+    cost = {
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "url": "https://i.imgur.com/vLCC99Q.jpg",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "成本統計",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "text",
+                    "text": "※月統計",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "※年統計",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                {
+                    "type": "button",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": "成本統計列表",
+                    "text": "【成本統計】列表"
+                    },
+                    "color": "#1a9879",
+                    "style": "primary"
+                }
+                ],
+                "flex": 0
+            }
+            }
+    report_list_screen.append(cost)
+    profit = {
+                "type": "bubble",
+                "hero": {
+                    "type": "image",
+                    "url": "https://i.imgur.com/5ksWY7Y.jpg",
+                    "size": "full",
+                    "aspectRatio": "20:13",
+                    "aspectMode": "cover"
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "利潤統計",
+                        "weight": "bold",
+                        "size": "xl",
+                        "align": "center"
+                    },
+                {
+                    "type": "text",
+                    "text": "※月統計",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "※年統計",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "利潤統計列表",
+                        "text": "【利潤統計】列表"
+                        },
+                        "color": "#c42149",
+                        "style": "primary"
+                    }
+                    ],
+                    "flex": 0
+                }
+                }
+    report_list_screen.append(profit)
+    popular_products = {
+                "type": "bubble",
+                "hero": {
+                    "type": "image",
+                    "url": "https://i.imgur.com/5ksWY7Y.jpg",
+                    "size": "full",
+                    "aspectRatio": "20:13",
+                    "aspectMode": "cover"
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "熱門商品統計",
+                        "weight": "bold",
+                        "size": "xl",
+                        "align": "center"
+                    },
+                {
+                    "type": "text",
+                    "text": "※月統計",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "熱門商品統計列表",
+                        "text": "【熱門商品統計】列表"
+                        },
+                        "color": "#c42149",
+                        "style": "primary"
+                    }
+                    ],
+                    "flex": 0
+                }
+                }
+    report_list_screen.append(popular_products)
+    screen =FlexSendMessage(
+                            alt_text='報表管理',
+                            contents={
+                                "type": "carousel",
+                                "contents": report_list_screen   
+                                } 
+                            )
+    return screen
+def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
+    Report_statistics_screen = []
+    if queryObject == '熱門商品':
+        popular_products_monthly = {
+                "type": "bubble",
+                "hero": {
+                    "type": "image",
+                    "url": "https://i.imgur.com/vLCC99Q.jpg",
+                    "size": "full",
+                    "aspectRatio": "20:13",
+                    "aspectMode": "cover"
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "熱門商品月統計",
+                        "weight": "bold",
+                        "size": "xl",
+                        "align": "center"
+                    },
+                    {
+                        "type": "text",
+                        "text": "※各廠商熱賣商品",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "md",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "可自行選擇月份",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "sm",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "十年範圍",
+                        "wrap": True,
+                        "color": "#3b5a5f",
+                        "size": "md",
+                        "flex": 5,
+                        "margin": "sm",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "md",
+                    "contents": [
+                    {
+                        "type": "button",
+                        "height": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "熱門商品月統計",
+                        "text": "【熱門商品月統計】列表"
+                        },
+                        "color": "#1a9879",
+                        "style": "primary"
+                    }
+                    ],
+                    "flex": 0
+                }
+                }
+        Report_statistics_screen.append(popular_products_monthly)
+    else:
+        monthly = {
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "url": "https://i.imgur.com/vLCC99Q.jpg",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": f"{queryObject}月統計",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
+                },
+                {
+                    "type": "text",
+                    "text": f"※該月{queryObject}統計",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "md",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "可自行選擇月份",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "sm",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "十年範圍",
+                    "wrap": True,
+                    "color": "#3b5a5f",
+                    "size": "md",
+                    "flex": 5,
+                    "margin": "sm",
+                    "weight": "bold"
+                }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                {
+                    "type": "button",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": f"{queryObject}月統計",
+                    "text": f"【{queryObject}月統計】"
+                    },
+                    "color": "#1a9879",
+                    "style": "primary"
+                }
+                ],
+                "flex": 0
+            }
+            }
+        Report_statistics_screen.append(monthly)
+        yearly = {
+                    "type": "bubble",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://i.imgur.com/5ksWY7Y.jpg",
+                        "size": "full",
+                        "aspectRatio": "20:13",
+                        "aspectMode": "cover"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": f"{queryObject}年統計",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"※該年{queryObject}統計",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "margin": "md",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": "可自行選擇年份",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "margin": "sm",
+                            "weight": "bold"
+                        },
+                        {
+                            "type": "text",
+                            "text": "十年範圍",
+                            "wrap": True,
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "margin": "sm",
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "md",
+                        "contents": [
+                        {
+                            "type": "button",
+                            "height": "sm",
+                            "action": {
+                            "type": "message",
+                            "label": f"{queryObject}年統計",
+                            "text": f"【{queryObject}年統計】"
+                            },
+                            "color": "#c42149",
+                            "style": "primary"
+                        }
+                        ],
+                        "flex": 0
+                    }
+                    }
+        Report_statistics_screen.append(yearly)    
+    screen =FlexSendMessage(
+                            alt_text='成本/利潤報表統計',
+                            contents={
+                                "type": "carousel",
+                                "contents": Report_statistics_screen   
+                                } 
+                            )
+    return screen
+def manager_time_choise(now_time): 
 
+    current_datetime = datetime.now()# 取得當前的日期和時間
+    modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
+    order_date = modified_datetime.strftime('%Y')#格式化日期，清除-
+    now_time = int(order_date)
 
+    report_year = []
+    year_list = [] #近10年的年份
+    for i in range(10):
+        year_list.append(now_time-i)
+    for i in range(len(year_list)):
+      report_year.append({
+      "type": "bubble",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": f"{year_list[i]}", #前面須加關鍵字才能呼叫選擇月份
+              "text": f"【選擇月份】{year_list[i]}"
+            }
+          }
+        ]
+      }
+    })
+    show = FlexSendMessage(
+            alt_text='【未取訂單】列表',
+            contents= {
+                      "type": "carousel",
+                      "contents": report_year
+                      }
+            )
 
+    return show
+#-----------------選擇報表年分------------------------------------------------------------------------------
+def manager_year_choise(event, line_bot_api, report_type):
+    current_datetime = datetime.now()# 取得當前的日期和時間
+    modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
+    order_date = modified_datetime.strftime('%Y')#格式化日期，清除-
+    now_time = int(order_date)
+    if '年' in report_type: 
+        message = TextSendMessage(text='請點選年份',
+                quick_reply=QuickReply(items=[
+                    QuickReplyButton(action=MessageAction(label=f"{now_time}", text=f"【顯示報表】{now_time}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-1}", text=f"【顯示報表】{now_time-1}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-2}", text=f"【顯示報表】{now_time-2}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-3}", text=f"【顯示報表】{now_time-3}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-4}", text=f"【顯示報表】{now_time-4}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-5}", text=f"【顯示報表】{now_time-5}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-6}", text=f"【顯示報表】{now_time-6}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-7}", text=f"【顯示報表】{now_time-7}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-8}", text=f"【顯示報表】{now_time-8}-99{report_type}")),
+                    QuickReplyButton(action=MessageAction(label=f"{now_time-9}", text=f"【顯示報表】{now_time-9}-99{report_type}"))
+                ]))
+    else:
+        message = TextSendMessage(text='請點選年份',
+        quick_reply=QuickReply(items=[
+            QuickReplyButton(action=MessageAction(label=f"{now_time}", text=f"【選擇月份】{now_time}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-1}", text=f"【選擇月份】{now_time-1}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-2}", text=f"【選擇月份】{now_time-2}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-3}", text=f"【選擇月份】{now_time-3}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-4}", text=f"【選擇月份】{now_time-4}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-5}", text=f"【選擇月份】{now_time-5}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-6}", text=f"【選擇月份】{now_time-6}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-7}", text=f"【選擇月份】{now_time-7}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-8}", text=f"【選擇月份】{now_time-8}{report_type}")),
+            QuickReplyButton(action=MessageAction(label=f"{now_time-9}", text=f"【選擇月份】{now_time-9}{report_type}"))
+        ]))
+    line_bot_api.reply_message(event.reply_token, message) 
+#-----------------選擇報表月份------------------------------------------------------------------------------
+def manager_month_choise(event, line_bot_api,year_query,report_type): 
+    message = TextSendMessage(text='請點選月份',
+            quick_reply=QuickReply(items=[
+                QuickReplyButton(action=MessageAction(label=f"一月", text=f"【顯示報表】{year_query}-01{report_type}")),
+                QuickReplyButton(action=MessageAction(label="二月", text=f"【顯示報表】{year_query}-02{report_type}")),
+                QuickReplyButton(action=MessageAction(label="三月", text=f"【顯示報表】{year_query}-03{report_type}")),
+                QuickReplyButton(action=MessageAction(label="四月", text=f"【顯示報表】{year_query}-04{report_type}")),
+                QuickReplyButton(action=MessageAction(label="五月", text=f"【顯示報表】{year_query}-05{report_type}")),
+                QuickReplyButton(action=MessageAction(label="六月", text=f"【顯示報表】{year_query}-06{report_type}")),
+                QuickReplyButton(action=MessageAction(label="七月", text=f"【顯示報表】{year_query}-07{report_type}")),
+                QuickReplyButton(action=MessageAction(label="八月", text=f"【顯示報表】{year_query}-08{report_type}")),
+                QuickReplyButton(action=MessageAction(label="九月", text=f"【顯示報表】{year_query}-09{report_type}")),
+                QuickReplyButton(action=MessageAction(label="十月", text=f"【顯示報表】{year_query}-10{report_type}")),
+                QuickReplyButton(action=MessageAction(label="十一月", text=f"【顯示報表】{year_query}-11{report_type}")),
+                QuickReplyButton(action=MessageAction(label="十二月", text=f"【顯示報表】{year_query}-12{report_type}"))
+            ]))
+    line_bot_api.reply_message(event.reply_token, message)
