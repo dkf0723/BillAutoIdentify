@@ -879,3 +879,20 @@ def count(category):
       number = int(result[0][0][-6:])+1
     result_string_formatted = '{:06}'.format(number)
     return result_string_formatted
+#--------------------取出報表---------------------------------
+def report_query_list(report_type, time_query):
+  query = f"""
+    SELECT {report_type}
+    FROM Statistical_Product
+    WHERE 年月 like '{time_query}%';
+    """#成本月報表
+  result = retry('select', query)
+  if result != []:
+    img_link = result[0][0]
+    image_msg = ImageSendMessage(
+                    original_content_url=img_link,  # 圖片原圖
+                    preview_image_url=img_link  # 圖片縮圖
+                )
+  else:
+    image_msg = TextSendMessage(text="找不到符合條件的資料。")
+  return image_msg
