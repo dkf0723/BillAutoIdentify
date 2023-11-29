@@ -1449,7 +1449,7 @@ def showOrder():
                             },
                             {
                                 "type": "text",
-                                "text": "購物車訂單確認",
+                                "text": "顧客訂單確認",
                                 "weight": "bold",
                                 "size": "xl",
                                 "margin": "md",
