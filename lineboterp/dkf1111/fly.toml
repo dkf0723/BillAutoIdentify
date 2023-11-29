@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for three on 2023-09-21T17:17:48+08:00
+# fly.toml app configuration file generated for dkkfffdfdf on 2023-10-15T23:31:36+08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "three"
+app = "dkkfffdfdf"
 primary_region = "nrt"
 kill_signal = "SIGINT"
 kill_timeout = 5

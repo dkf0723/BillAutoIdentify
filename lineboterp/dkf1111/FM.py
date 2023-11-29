@@ -1,6 +1,7 @@
 from linebot.models import TextSendMessage,FlexSendMessage
 import manager
 from database import Now_Product,Per_Product, db_manufacturers,db_products_manufacturers,db_categoryate
+import database
 #-------------商品管理一開始的畫面-------
 def Product_management():
     Product_management = []
@@ -1428,3 +1429,475 @@ def Pre_Product_Modification_FM(id):
     else:
         flex_message = TextSendMessage(text="找不到符合條件的廠商商品。")
     return flex_message
+def showOrder():
+    Notpickedup_preordered_history_screen = []
+    id = manager.user_id
+    global_Storage= manager.global_Storage
+    for i in global_Storage[id+'orders'][global_Storage[id+'base']:global_Storage[id+'base'] + 10 ] :        
+        orderDetail = {
+                        "type": "bubble",
+                        "body": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "高逸嚴選",
+                                "weight": "bold",
+                                "color": "#1DB446",
+                                "size": "sm"
+                            },
+                            {
+                                "type": "text",
+                                "text": "購物車訂單確認",
+                                "weight": "bold",
+                                "size": "xl",
+                                "margin": "md",
+                                "align": "center"
+                            },
+                            {
+                                "type": "separator",
+                                "margin": "xxl"
+                            },
+                            {
+                                "type": "text",
+                                "text": "訂單內容",
+                                "size": "sm",
+                                "margin": "lg",
+                                "wrap": True
+                            },
+                           
+                            {
+                                "type": "separator",
+                                "margin": "xxl"
+                            },
+                            {
+                                "type": "text",
+                                "text": f"總額：NT${database.getTotalByOrder(i[0][0])}",
+                                "size": "md",
+                                "margin": "lg",
+                                "align": "center",
+                                "weight": "bold"
+                            }
+                            ]
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                "type": "message",
+                                "label": "【1.確認】",
+                                "text": "【確認】"
+                                }
+                            },
+                            {
+                                "type": "button",
+                                "action": {
+                                "type": "message",
+                                "label": "【2.取消】",
+                                "text": "【取消】"
+                                }
+                            }
+                            ],
+                            "spacing": "none",
+                            "paddingAll": "sm"
+                        },
+                        "styles": {
+                            "footer": {
+                            "separator": True
+                            }
+                        }
+                        }
+        count = 5
+        for j in i :
+                sum = int(j[2])*int(j[3])
+                a={
+                      "type": "text",
+                      "text":f'{j[1]}',
+                      "margin": "10px"
+                  }
+                b={
+                    "type": "text",
+                    "text": f"{ j[2]}*{j[3]}={sum}$",
+                    "align": "end"
+                }
+                orderDetail['body']['contents'].insert(count,a)
+                orderDetail['body']['contents'].insert(count+1,b)
+                count += 2
+        Notpickedup_preordered_history_screen.append(orderDetail)
+    if len(global_Storage[id+'orders'])>global_Storage[id+'base']+10:
+          Notpickedup_preordered_history_screen.append({
+          "type": "bubble",
+          "body": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "sm",
+              "contents": [
+                  {
+                    "type": "button",
+                    "flex": 1,
+                    "gravity": "center",
+                    "action": {
+                      "type": "message",
+                      "label": "''點我''下一頁",
+                      "text": "下一頁"
+                      }
+                    }
+                ]
+            }
+        })
+    screen =FlexSendMessage(
+                            alt_text='未取/預購/歷史訂單選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": Notpickedup_preordered_history_screen   
+                                } 
+                            )
+    return screen
+
+def create_now_purchase_product(id):
+  storage = manager.global_Storage
+  pname = storage[id+'pname']
+  category= storage[id+'category']
+  unit= storage[id+'unit']
+  introduction= storage[id+'introduction']
+  unitPrice= storage[id+'unitPrice']
+  unitPrice2= storage[id+'unitPrice2']
+  picture= storage[id+'picture']
+  returnProduct= storage[id+'returnProduct']
+  bubble = {
+              "type": "bubble",
+              "hero": {
+                "type": "image",
+                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_2_restaurant.png",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                }
+              },
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                },
+                "contents": [
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{pname[:100]}",
+                      "text": '修改品名'
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{category[:100]}",
+                      "text": f"修改商品類別"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unit[:100]}",
+                      "text": f"修改商品單位"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{introduction[:100]}",
+                      "text": f"修改商品簡介"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice[:100]}",
+                      "text": f"修改商品售出單價"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice2[:100]}",
+                      "text": f"修改商品售出單價2"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{picture[:100]}",
+                      "text": f"修改商品圖片"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{returnProduct[:100]}",
+                      "text": f"修改可否退換貨"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "button",
+                    "style": "secondary",
+                    "color": "#EAD880",
+                    "margin": "xs",
+                    "action": {
+                      "type": "message",
+                      "label": "建立商品",
+                      "text": "建立商品"
+                    },
+                    "height": "md"
+                  }
+                ],
+                "spacing": "md",
+                "margin": "md"
+              }
+            }
+  screen =FlexSendMessage(
+                            alt_text='未取/預購/歷史訂單選擇',
+                            contents = bubble
+                            )
+  return screen
+
+
+def create_preorder(id):
+  storage = manager.global_Storage
+  pname = storage[id+'pname']
+  category= storage[id+'category']
+  unit= storage[id+'unit']
+  introduction= storage[id+'introduction']
+  unitPrice= storage[id+'unitPrice']
+  unitPrice2= storage[id+'unitPrice2']
+  picture= storage[id+'picture']
+  multiple= storage[id+'multiple']
+  deadline= storage[id+'deadline']
+  bubble = {
+              "type": "bubble",
+              "hero": {
+                "type": "image",
+                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_2_restaurant.png",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                }
+              },
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "action": {
+                  "type": "uri",
+                  "uri": "https://linecorp.com"
+                },
+                "contents": [
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{pname[:100]}",
+                      "text": '修改品名'
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{category[:100]}",
+                      "text": f"修改商品類別"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unit[:100]}",
+                      "text": f"修改商品單位"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{introduction[:100]}",
+                      "text": f"修改商品簡介"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice[:100]}",
+                      "text": f"修改商品售出單價"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{unitPrice2[:100]}",
+                      "text": f"修改商品售出單價2"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{picture[:100]}",
+                      "text": f"修改商品圖片"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{multiple[:100]}",
+                      "text": f"修改商品預購倍數"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": f"{deadline[:100]}",
+                      "text": f"修改商品預購截止時間"
+                    },
+                    "style": "secondary",
+                    "color": "#B1D3C5"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "button",
+                    "style": "secondary",
+                    "color": "#EAD880",
+                    "margin": "xs",
+                    "action": {
+                      "type": "message",
+                      "label": "建立商品",
+                      "text": "建立商品"
+                    },
+                    "height": "md"
+                  }
+                ],
+                "spacing": "md",
+                "margin": "md"
+              }
+            }
+
+  screen =FlexSendMessage(
+                            alt_text='未取/預購/歷史訂單選擇',
+                            contents = bubble
+                            )
+  return screen
+
+def template_message(check_text,datetime):
+  template_message = FlexSendMessage(
+                            alt_text='預購截止時間選擇',
+                            contents={
+                                "type": "carousel",
+                                "contents": [{
+                                "type": "bubble",
+                                "body": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "選擇日期時間",
+                                        "weight": "bold",
+                                        "size": "xl"
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"{check_text}",
+                                        "wrap": True,
+                                    }
+                                    ]
+                                },
+                                "footer": {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "spacing": "sm",
+                                    "contents": [
+                                    {
+                                        "type": "button",
+                                        "style": "link",
+                                        "height": "sm",
+                                        "action": {
+                                        "type": "datetimepicker",
+                                        "label": "點擊選擇日期與時間",
+                                        "data": "預購截止時間",
+                                        "mode": "datetime",
+                                        "min": f"{datetime}"
+                                        }
+                                    }
+                                    ],
+                                    "flex": 0
+                                }
+                                }]   
+                                } 
+                            )
+  return template_message

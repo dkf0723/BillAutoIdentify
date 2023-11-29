@@ -18,6 +18,7 @@ def gettime():
   formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
   order_date = modified_datetime.strftime('%Y%m%d')#格式化日期，清除-
   formatted_datetime2 = modified_datetime.strftime('%Y-%m-%dT%H:%M')# 給日期選擇器的-蓉
+
   return {'formatted_datetime':formatted_datetime,'formatted_date':formatted_date,'order_date':order_date,'formatted_millisecond':formatted_millisecond,'formatted_datetime2':formatted_datetime2}
 #-------------------資料庫連線----------------------
 #連線
@@ -781,3 +782,102 @@ def wisheslistdb():
   return info
 #---------------蓉的資料庫語法--------------------------#
 
+def getPhoneNumberByPhoneNumberLastThreeYard(phoneNumber):
+    query = f"SELECT distinct 電話 FROM Order_information WHERE 電話 LIKE '%{phoneNumber}' and 訂單狀態未取已取 like '%未取';"
+    result = retry('select',query)
+    send = []
+    if result is not None:
+        for row in result:
+            send.append(row[0])       
+    # 關閉游標與連線
+    return send
+def getOrderByPhoneNumber(phoneNumber):
+    query = f"SELECT 訂單編號 FROM Order_information WHERE 電話 = '{phoneNumber}' and 訂單狀態未取已取 like '%未取';"
+    # cursor.execute(query)
+    result = retry('select',query)
+    # result = cursor.fetchall() 
+    send = []
+    if result is not None:
+        for row in result:
+            send.append(row[0])       
+    # 關閉游標與連線
+    return send
+
+def getOrderDetailByPhoneNumber(phoneNumber):
+    query = f"SELECT o.訂單編號,p.商品名稱 ,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 in( select 訂單編號 from Order_information where 電話 = '{phoneNumber}' and 訂單狀態未取已取 like '%未取' );"
+    result = retry('select', query)
+    test =''
+    send = []
+    a=[]
+    for i in result:
+        if i[0] == test:
+          a.append(i)
+        else :
+          test = i[0]  
+          send.append(a)
+          a =[]
+          a.append(i)
+    send.append(a)
+    send.pop(0)
+    return send
+def getOrderDetailByOrder(order):
+    query = f"SELECT o.訂單編號,p.商品名稱,o.訂購數量,o.商品小計 FROM Product_information as p inner join order_details as o on o.商品ID =p.商品ID  WHERE o.訂單編號 = '{order}';"
+    result = retry('select', query)
+    send=[]    
+    send.append(result)
+    # 關閉游標與連線
+    return send
+def getTotalByOrder(order):
+    query = f"SELECT 總額 FROM Order_information WHERE 訂單編號 = '{order}';"
+    result = retry('select', query)
+    return result[0][0]
+def updateOrder(id):
+  storage = manager.global_Storage
+  if storage[id+'order'][:1] == '0':
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = now() WHERE 電話 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取' ;"
+    result = retry('notselect', query)
+  else : 
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = now()  WHERE 訂單編號 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取';"
+    # query = f"UPDATE Order_information SET 訂單狀態未取已取 = ''  WHERE 訂單編號 = '{storage[id+'order']} and 訂單狀態未取已取 like '%未取'';"
+    result = retry('notselect', query)
+  return result
+
+def createProduct(id):
+  storage = manager.global_Storage
+  if storage[id+'createType'] == 'now':
+    pname = storage[id+'pname'][3:]
+    category= storage[id+'category'][5:]
+    unit= storage[id+'unit'][5:]
+    introduction= storage[id+'introduction'][5:]
+    unitPrice= storage[id+'unitPrice'][7:]
+    unitPrice2= storage[id+'unitPrice2'][8:]
+    picture= storage[id+'picture'][5:]
+    returnProduct= storage[id+'returnProduct'][6:]
+    manufacturerId = storage[id+'manufacturerId']
+    num = count(category)
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2,廠商編號) VALUES ('{category+num}',{pname},'現購','{picture}','{introduction}','{unit}','{unitPrice}',now(),'{returnProduct}', '{unitPrice2}','{manufacturerId}');"
+  else :
+    pname = storage[id+'pname'][3:]
+    category= storage[id+'category'][5:]
+    unit= storage[id+'unit'][5:]
+    introduction= storage[id+'introduction'][5:]
+    unitPrice= storage[id+'unitPrice'][7:]
+    unitPrice2= storage[id+'unitPrice2'][8:]
+    picture= storage[id+'picture'][5:]
+    deadline = storage[id+'deadline'][9:]
+    multiple = storage[id+'multiple'][7:]
+    manufacturerId = storage[id+'manufacturerId']
+    num = count(category)
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,售出單價2,預購數量限制_倍數,預購截止時間,廠商編號) VALUES ('{category+num}',{pname},'現購','{picture}','{introduction}','{unit}','{unitPrice}',now(), '{unitPrice2}','{multiple}','{deadline}','{manufacturerId}');"
+  result = retry('notselect', query)
+  return result
+
+def count(category):
+    query = f"SELECT  商品ID  FROM Product_information   where 商品ID like '{category}%'  order by  商品ID DESC  limit 1;"
+    result = retry('select', query)
+    if result == None:
+      number = 0
+    else:
+      number = int(result[0][0][-6:])+1
+    result_string_formatted = '{:06}'.format(number)
+    return result_string_formatted

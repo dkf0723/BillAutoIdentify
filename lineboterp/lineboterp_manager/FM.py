@@ -1521,7 +1521,7 @@ def showOrder():
                   }
                 b={
                     "type": "text",
-                    "text": f"{ j[2]}*{j[3]}={sum}$",
+                    "text": f"{ j[2]}*{int(int(j[3])/int(j[2]))}$={j[3]}$",
                     "align": "end"
                 }
                 orderDetail['body']['contents'].insert(count,a)

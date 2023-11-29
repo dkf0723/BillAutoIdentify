@@ -347,7 +347,7 @@ def createNowProduct():
             check_text=TextSendMessage(text=check_text, quick_reply=QuickReply(items=actions))
             return check_text
         if(message == '建立商品'):
-            # database.createProduct(id)
+            database.createProduct(id)
             check_text = TextSendMessage(text='商品建立成功')
             state[id]= 'normal'
         elif(state1[id] == 'ShowFM'):
@@ -569,13 +569,14 @@ def createPreOrder():
             state1[id] = 'changeMultiple'
             check_text = TextSendMessage(text=check_text)
         if(message == '建立商品'):
-            # database.createProduct(id)
+            database.createProduct(id)
             check_text = TextSendMessage(text='商品建立成功')
             state[id]= 'normal'
         elif(state1[id] == 'ShowFM'):
             check_text = FM.create_preorder(id)
 
     return check_text
+
 def searchingOrderByPhoneNumber():
      # 若使用者已經在等待回覆狀態，則根據回覆進行處理
     id = manager.user_id

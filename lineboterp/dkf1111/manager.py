@@ -16,7 +16,7 @@ from flexmsg import (quick_purchase_manufacturers_list,quickmanu_pro_list,nopur_
                      pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management,preorderli_list,noworderli_list)
 from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay
 from relevant_information import linebotinfo,dbinfo
-from nepurinf import purchase_check,gettime
+from nepurinf import purchase_check,gettime,new_manufacturer
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_list_and_new_chosen_screen,wishes_list
 from vendor_management import Manufacturer_list,Manufacturer_edit
 from FMtestpur import Purchase_fillin_and_check_screen
@@ -31,6 +31,7 @@ import schedule #排程
 import threading #排程執行緒
 from apscheduler.schedulers.background import BackgroundScheduler#另一種排程
 import time
+import database
 #======python的函數庫==========
 app = Flask(__name__)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
@@ -72,6 +73,8 @@ global storage
 storage = {}
 global orderall
 orderall = {}
+global global_Storage
+global_Storage = {}
 
 #資料庫pool設定數量4個
 dbdata = dbinfo()
@@ -112,9 +115,9 @@ def handle_message(event):
             line_bot_api.reply_message(event.reply_token, Customer_pickup())
         elif '【取貨】' in msg:
             if msg[4:] == '手機後三碼':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
-            elif msg[4:] == '訂單編號':
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='顯示顧客購買商品選單'))
+                user_state[user_id] = 'searchingOrderByPhoneNumber'
+                user_state1[user_id] = 'first'
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入手機後三碼'))
         #--------商品管理【查詢/修改/下架】或【停售及截止商品列表 】或【新增上架】蓉----------------#           
         elif '商品管理' in msg:
             line_bot_api.reply_message(event.reply_token, Product_management())
@@ -152,6 +155,32 @@ def handle_message(event):
                     ]
                 )
             ))
+        elif '【舊廠商】' in msg:
+            storage[user_id+'oldManufactureType'] = 'newProduct'
+            list_page[user_id+'廠商數量min'] = 0
+            list_page[user_id+'廠商數量max'] = 9
+            show = manager_manufacturers_list() #這個show是變數隨便取
+            line_bot_api.reply_message(event.reply_token, FlexSendMessage(
+                alt_text='【廠商查詢】列表',
+                contents={
+                    "type": "carousel",
+                    "contents": show      
+                    } 
+                ))
+        elif msg.startswith('選我選我') and storage[user_id+'oldManufactureType'] == 'newProduct':
+            global_Storage[user_id+'manufacturerId'] = msg[5:]  # 提取廠商編號
+            user_state[user_id] = 'preAndNowSelect'#下一步的狀態
+            selectMessage = TextSendMessage(text='請點選新增類別',quick_reply=QuickReply(items=[
+                QuickReplyButton(action=MessageAction(label="現購", text="現購")),
+                QuickReplyButton(action=MessageAction(label="預購", text="預購")),
+            ]))
+            line_bot_api.reply_message(event.reply_token,selectMessage)
+            global_Storage[user_id+'oldManufactureType'] = ''
+        elif '【新廠商】' in msg:
+            user_state[user_id] = 'other_manufacturer_add'
+            storage[user_id+'addtype'] = 'single'
+            show = new_manufacturer()
+            line_bot_api.reply_message(event.reply_token, show)
          #-------------【依類別】查詢-蓉------------------
         elif '【依類別】查詢' in msg:
             send_category_selection(event, line_bot_api)
@@ -191,6 +220,7 @@ def handle_message(event):
                     } 
                 ))
         #-------------【依廠商】查詢-蓉------------------
+
         elif '【依廠商】查詢'in msg:
             list_page[user_id+'廠商數量min'] = 0
             list_page[user_id+'廠商數量max'] = 9
@@ -975,6 +1005,15 @@ def handle_message(event):
             list_page[user_id+'許願min'] = min-1
             list_page[user_id+'許願max'] = max
             line_bot_api.reply_message(event.reply_token,wishes_list())
+        # 先放在這 ，之後改
+        elif '新增現購商品'in msg:
+            user_state[user_id] = 'createNowProduct'
+            user_state1[user_id] = 'first'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱(低於50字)'))
+        elif '新增預購商品'in msg:
+            user_state[user_id] = 'createPreOrder'
+            user_state1[user_id] = 'first'
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱(低於50字)'))
         #-------------------資料庫測試----------------------
         elif '資料庫' in msg:
             databasetest_msg = f"資料庫連線1：\n{db['databasetest_msg']}\n{db['conn']}\n更新時間：\n{db['databaseup']}\n下次更新時間：\n{db['databasenext']}\n\n"
@@ -983,7 +1022,6 @@ def handle_message(event):
         elif '測試' in msg:
             datasearch = '暫時'
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='【資料庫測試】提取資料測試：\n%s' %(datasearch)))
-
 def send_category_selection(event, line_bot_api):
     message = TextSendMessage(text='請點選查詢類別',
             quick_reply=QuickReply(items=[
@@ -1007,6 +1045,8 @@ def handle_postback(event):
     global msg
     storage = manager.storage
     postback_data = event.postback.data
+    state1 = manager.user_state1
+  
     if 'datetime' in event.postback.params:
         # 獲取使用者選擇的日期和時間
         selected_datetime = event.postback.params['datetime']
@@ -1021,6 +1061,13 @@ def handle_postback(event):
         elif postback_data == '修改商品資訊-預購截止時間':
             msg = str(restock_datetime)
             response = purchase_check()
+        elif postback_data == '預購截止時間':
+            msg = str(restock_datetime)
+            response = purchase_check()
+            if state1 == 'changeDeadline':
+                state1='ShowFM'
+            else:
+                state1 = 'seven'
         line_bot_api.reply_message(event.reply_token, response)
         
 

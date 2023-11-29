@@ -1,7 +1,7 @@
 def linebotinfo():
     linebotdata = {
-        'LineBotApidata':'J7jADxRSi/3p4vlG5H9lqvFqZgKcdU5aceIQMGAuNF8oemiPxX1JgpBYi1Js8KXci2NfFnT2DuXzyHFFPS5/3OQaWZYVbxFMqjDTBDc4dAieb4Q3bvvLQn3B45bCYZfSEm/2ozasOtrDTcsV5hrcDAdB04t89/1O/w1cDnyilFU=',
-        'WebhookHandlerdata':'7bba6e253457f394cb56d7e4b7adfc39'
+        'LineBotApidata':'KuaXaQ9Xkb3HUPhlYh+NkB1mtGHzvL6pt2aSFDOkM/ZDdQBKEus7vqSfw0K5t8aN4FK9O7eqJWIOhLAzf6l2WL/fyxwlW4DtH3RRv8C4aJx9gRd8wRBBCYZlp++4x/TBFmrksxOE+91yuI0W0d7HDwdB04t89/1O/w1cDnyilFU=',
+        'WebhookHandlerdata':'df6388631fc768cb828aa09192f2b4b7'
     }
     return linebotdata
 
@@ -19,6 +19,7 @@ def imgurinfo():
         'CLIENT_ID_data':'ebcfa98f6d190dc'
     }
     return imgurdata
+
 
 def bank():
     bankdata = [

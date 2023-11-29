@@ -455,9 +455,10 @@ def createProduct(id):
   unitPrice2= storage[id+'unitPrice2']
   picture= storage[id+'picture']
   returnProduct= storage[id+'returnProduct']
-  # query = f"SELECT 總額 FROM Order_information WHERE 訂單編號 = '{order}';"
-  # result = retry('notselect', query)
-  # return result
+  query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2) VALUES ('hihi123','123','123','123','123','213','1231',now(),'123', '123');"
+  result = retry('notselect', query)
+  return result
+
 def updateOrder(id):
   storage = manager.global_Storage
   if storage[id+'order'][:1] == '0':
