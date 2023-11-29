@@ -13,8 +13,8 @@ from DFM import  Customer_pickup,Report_management
 #======這裡是呼叫的檔案內容=====
 from flexmsg import (quick_purchase_manufacturers_list,quickmanu_pro_list,nopur_inf_flex_msg,product_ing_flex_msg,
                      quick_catepro_list,stock_manufacturers_name_list,stock_manuinf_list,stock_categoryinf_list,
-                     pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management,preorderli_list,noworderli_list)
-from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay
+                     pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management,preorderli_list,noworderli_list,report_list_selectionscreen,manager_month_choise,manager_year_choise,Report_statistics_selectionscreen)
+from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay, report_query_list
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import purchase_check,gettime,new_manufacturer
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_list_and_new_chosen_screen,wishes_list
@@ -985,7 +985,41 @@ def handle_message(event):
              line_bot_api.reply_message(event.reply_token, Report_management())
         #海碧
         elif '【報表管理】報表管理' in msg:
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='報表管理'))
+            line_bot_api.reply_message(event.reply_token, report_list_selectionscreen())
+            #-------------------報表管理----------------------
+        elif '【成本統計】列表' in msg:
+            queryObject = '成本'
+            line_bot_api.reply_message(event.reply_token, Report_statistics_selectionscreen(queryObject))    
+        elif '【利潤統計】列表' in msg:
+            queryObject = '利潤'
+            line_bot_api.reply_message(event.reply_token, Report_statistics_selectionscreen(queryObject)) 
+        elif '【熱門商品統計】列表' in msg:
+            queryObject = '熱門商品'
+            line_bot_api.reply_message(event.reply_token, Report_statistics_selectionscreen(queryObject))
+        elif '【成本月統計】' in msg:
+            report_type = '月成本_圖'
+            manager_year_choise(event, line_bot_api,report_type)
+        elif '【利潤月統計】' in msg:
+            report_type = '月利潤_圖'
+            manager_year_choise(event, line_bot_api,report_type)
+        elif '【熱門商品月統計】' in msg:
+            report_type = '月熱門商品_圖'
+            manager_year_choise(event, line_bot_api,report_type)
+        elif '【成本年統計】' in msg:
+            report_type = '年成本_圖'
+            manager_year_choise(event, line_bot_api,report_type) 
+        elif '【利潤年統計】' in msg:
+            report_type = '年利潤_圖'
+            manager_year_choise(event, line_bot_api,report_type)
+        elif '【選擇月份】' in msg:           
+            year_query = msg[6:10] #去掉msg的選擇年份
+            report_type = msg[10:]
+            manager_month_choise(event, line_bot_api, year_query, report_type)
+        elif '【顯示報表】' in msg:           
+            time_query = msg[6:13] #去掉msg的選擇月份
+            report_type = msg[13:]
+            img_send = report_query_list(report_type, time_query)
+            line_bot_api.reply_message(event.reply_token, img_send)
         #-------------------許願清單----------------------
         elif '【報表管理】許願清單' in msg:
             list_page[user_id+'許願min'] = 0
