@@ -368,7 +368,11 @@ def order_create():
           ORDER BY 訂單成立時間 DESC , 訂單編號 DESC;""" #訂單資料檢查
   category ='select' #重試類別select/notselect
   order_result,result2 = retry(category,query2)
-  
+
+  formatted_datetime_obj = datetime.strptime(formatted_datetimeget, '%Y-%m-%d %H:%M:%S')#這段後可加減/比較
+  modified_datetime = formatted_datetime_obj + timedelta(days=1)  # 增加1天
+  deadline = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 格式化日期和時間，不包含毫秒部分(可取消訂單時間)
+
   if order_result == []:
     serial_number = '00001'
     order_details,establishmentget,sort = order_detail(serial_number)
@@ -378,14 +382,18 @@ def order_create():
     else:
       if sort == '現購':
         sorttype = '現購未取'
+        addup = f"""
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取,可取消訂單時間)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}','{deadline}');
+            """
       elif sort == '預購':
         sorttype = '預購'
-      query3_1 = f"""
-            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
+        addup = f"""
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取,可取消訂單時間)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}',Null);
             """
       category ='notselect' #重試類別select/notselect
-      result,result2 = retry(category,query3_1)
+      result,result2 = retry(category,addup)
 
       query3_2 = f"""
             INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
@@ -430,14 +438,18 @@ def order_create():
     else:
       if sort == '現購':
         sorttype = '現購未取'
+        addup = f"""
+              INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取,可取消訂單時間)
+              VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}','{deadline}');
+              """
       elif sort == '預購':
         sorttype = '預購'
-      addorder = f"""
-            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}');
+        addup = f"""
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取,可取消訂單時間)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','{sorttype}',NULL);
             """
       category ='notselect' #重試類別select/notselect
-      result,result2 = retry(category,addorder)
+      result,result2 = retry(category,addup)
 
       addorderdetails = f"""
             INSERT INTO order_details (訂單編號,商品ID,訂購數量,商品小計)
@@ -657,7 +669,10 @@ def ordertoplist():
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
-    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 ='預購未取' or 訂單狀態未取已取 like '現購%') and 訂單狀態未取已取 <> '現購已取'
+    where 會員_LINE_ID = '{userid}' and 
+      (訂單狀態未取已取 = '預購未取' or 訂單狀態未取已取 like '現購%') and 
+      訂單狀態未取已取 <> '現購已取' and 
+      訂單狀態未取已取 <> '現購取消'
     order by 訂單成立時間 desc
     limit 100 offset 0;
     """#下一頁加100改offset(目前暫無考慮)
@@ -673,7 +688,10 @@ def orderpreorderlist():
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
-    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 like '預購%') and 訂單狀態未取已取 <> '預購已取'
+    where 會員_LINE_ID = '{userid}' and 
+      (訂單狀態未取已取 like '預購%') and 
+      訂單狀態未取已取 <> '預購已取' and 
+      訂單狀態未取已取 <> '預購取消'
     order by 訂單成立時間 desc
     limit 100 offset 0;
     """#下一頁加100改offset(目前暫無考慮)
@@ -709,6 +727,8 @@ def ordertopalllist():
 def orderdt():
   userid = lineboterp.user_id
   ordersearch = lineboterp.orderall[userid+'dt']
+  current_datetime = gettime()['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(current_datetime, '%Y-%m-%d %H:%M:%S')
   query = f"""
           SELECT
             Order_information.訂單編號,
@@ -721,7 +741,8 @@ def orderdt():
             order_details.商品小計,
             Order_information.總額,
             Order_information.訂單成立時間,
-            Order_information.取貨完成時間
+            Order_information.取貨完成時間,
+            Order_information.可取消訂單時間
           FROM
             Order_information
           JOIN
@@ -735,7 +756,7 @@ def orderdt():
 
   if orderdetails_result == []:
     orderdetails_result = '找不到符合條件的資料。'
-  return orderdetails_result
+  return orderdetails_result,formatted_datetime_obj,current_datetime
 #-------------------購物車資料查詢----------------------
 def cartsearch():
   userid = lineboterp.user_id
@@ -936,11 +957,16 @@ def cartordergo(phonenum):
     category ='select' #重試類別select/notselect
     order_result,result2 = retry(category,query2)
 
+    current_datetime = gettime()['formatted_datetime']  # 取得当前的日期和时间
+    formatted_datetime_obj = datetime.strptime(current_datetime, '%Y-%m-%d %H:%M:%S')#這段後可加減/比較
+    modified_datetime = formatted_datetime_obj + timedelta(days=1)  # 增加1天
+    deadline = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 格式化日期和時間，不包含毫秒部分
+
     if order_result == []:
       serial_number = '00001'
       query3_1 = f"""
-            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','現購未取');
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取,可取消訂單時間)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','現購未取','{deadline}');
             """
       category ='notselect' #重試類別select/notselect
       result,result2 = retry(category,query3_1)
@@ -986,8 +1012,8 @@ def cartordergo(phonenum):
       else:
         serial_number = '00001'
       addorder = f"""
-            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取)
-            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','現購未取');
+            INSERT INTO Order_information (訂單編號,會員_LINE_ID,電話,訂單成立時間,訂單狀態未取已取,可取消訂單時間)
+            VALUES ('order{order_dateget}{serial_number}','{userid}','{phonenum}', '{formatted_datetimeget}','現購未取','{deadline}');
             """
       category ='notselect' #重試類別select/notselect
       result,result2 = retry(category,addorder)
@@ -1080,6 +1106,58 @@ def wisheslistdb():
   else:
     info = result
   return info
+
+#-------------------取消訂單----------------------
+def cancel_order(orderid):
+  db_orderdt,formatted_datetime_obj,current_datetime = orderdt()
+  '''訂單編號,電話,訂單狀態未取已取,商品ID,商品名稱,商品單位,訂購數量,商品小計,總額,訂單成立時間,取貨完成時間,可取消訂單時間'''
+  if db_orderdt == []:
+    info = TextSendMessage(text=f"訂單編號：{orderid}\n取得時發生錯誤！稍後再試~")
+  else:
+    #info = TextSendMessage(text=f"訂單編號：{orderid}\n值\n{db_orderdt}")
+    if db_orderdt[0][2] == '現購未取':
+      if formatted_datetime_obj < db_orderdt[0][11]:
+        for change in db_orderdt:
+          query = f"select 訂單剩餘 from Product_information where 商品ID = '{change[3]}'"
+          inventory_result,result2 = retry('select',query)
+          if inventory_result != []:
+            query1 =f"""
+                  UPDATE Product_information
+                  SET 訂單剩餘 = '{str(int(inventory_result[0][0])+int(change[6]))}'
+                  WHERE 商品ID = '{change[3]}'
+                  """
+            result1,result2 = retry('notselect',query1)
+            if result1 != 'ok':
+              errid = f"{change[3]}"
+              break
+        if result1 == 'ok':
+          query =f"""
+              UPDATE Order_information
+              SET 訂單狀態未取已取 = '現購取消', 取貨完成時間 = '{current_datetime}'
+              WHERE 訂單編號 = '{orderid}';
+                """
+          result2,result2 = retry('notselect',query)
+          if result2 == 'ok':
+            info = TextSendMessage(text=f"訂單編號：{orderid}\n已經成功取消訂單囉！")
+          else:
+            info = TextSendMessage(text=f"訂單編號：{orderid}\n取消訂單失敗2！請稍後再試！")
+        else:
+          info = TextSendMessage(text=f"訂單編號：{orderid}\n商品ID：{errid}\n修改錯誤1！請稍後再試！")
+    elif db_orderdt[0][2] == '預購':
+      query =f"""
+              UPDATE Order_information
+              SET 訂單狀態未取已取 = '預購取消', 取貨完成時間 = '{current_datetime}'
+              WHERE 訂單編號 = '{orderid}';
+                """
+      result3,result2 = retry('notselect',query)
+      if result3 == 'ok':
+        info = TextSendMessage(text=f"訂單編號：{orderid}\n已經成功取消訂單囉！")
+      else:
+        info = TextSendMessage(text=f"訂單編號：{orderid}\n取消訂單失敗！請稍後再試！")
+    else:
+      info = TextSendMessage(text=f"訂單編號：{orderid}\n不在可取消訂單資料中呦！")
+  return info
+
 #-------------------(單張)images資料夾中圖片轉連結、完成並刪除----------------------
 def single_imagetolink():
   id = lineboterp.user_id

@@ -12,7 +12,7 @@ from linebot.models import MessageEvent,TextSendMessage,ImageMessage,TextMessage
 from product.product_preorder import product_preorder_list,Order_preorder
 from product.buy_now import Order_buynow,product_buynow_list
 from product.check import product_check,business_information,recent_phone_call,Cart_order_screen
-from database import gettime, databasetest,member_profile,test_datasearch,imagesent#,Connection_timeout
+from database import gettime, databasetest,member_profile,test_datasearch,imagesent,cancel_order#,Connection_timeout
 from ask_wishes.ask import ask,qasearch_list,QAsearchinfoscreen,wishes_list#wishes_list未來刪除
 from ask_wishes.wishes import initial_fill_screen,wishes
 from relevant_information import linebotinfo,dbinfo
@@ -176,6 +176,10 @@ def handle_message(event):
             orderall[user_id+'dt'] = msg[-18:]
             searchresult = orderdtsearch()
             line_bot_api.reply_message(event.reply_token, searchresult)
+        elif '【取消訂單】' in msg:
+            orderall[user_id+'dt'] = msg[6:]
+            show = cancel_order(msg[6:])
+            line_bot_api.reply_message(event.reply_token, show)
         elif '【加入購物車】' in msg:
             errormsg = 'no'
             original_string = msg
