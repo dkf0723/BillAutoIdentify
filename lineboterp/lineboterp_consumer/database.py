@@ -657,7 +657,7 @@ def ordertoplist():
   query = f"""
     select 訂單編號,總額,訂單成立時間
     from `Order_information` 
-    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 ='預購未取' or 訂單狀態未取已取 like '現購%')
+    where 會員_LINE_ID = '{userid}' and (訂單狀態未取已取 ='預購未取' or 訂單狀態未取已取 like '現購%') and 訂單狀態未取已取 <> '現購已取'
     order by 訂單成立時間 desc
     limit 100 offset 0;
     """#下一頁加100改offset(目前暫無考慮)
