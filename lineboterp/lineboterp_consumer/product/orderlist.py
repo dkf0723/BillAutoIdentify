@@ -248,38 +248,49 @@ def orderhastaken_list():
 
 #-------------------訂單詳細資料----------------------
 def orderdtsearch():
-    db_orderdt = orderdt()
+    db_orderdt,formatted_datetime_obj,current_datetime = orderdt()
     if db_orderdt=='找不到符合條件的資料。':
         show = TextSendMessage(text=db_orderdt)
     else:
-        '''訂單編號,電話,訂單狀態未取已取,商品ID,商品名稱,商品單位,訂購數量,商品小計,總額,訂單成立時間,取貨完成時間'''
+        '''訂單編號,電話,訂單狀態未取已取,商品ID,商品名稱,商品單位,訂購數量,商品小計,總額,訂單成立時間,取貨完成時間,可取消訂單時間'''
         showdt = [] #訊息中的內容儲存
         if db_orderdt[0][10] is None:
             pickup = '無資料'
         else:
             pickup = str(db_orderdt[0][10])
 
-        add = None  
+        add = None
+        #db_orderdt[0][11]#可取消訂單時間(回來的不用改)
         if db_orderdt[0][2] in ['現購未取','預購','預購進貨','預購未取','預購截止']:
             ordertype = db_orderdt[0][2]
             if db_orderdt[0][2] == '現購未取':
                 ordertype = '未取'
                 take = '現購商品-未取'
                 text = '已經可以前往「店面取貨」囉～'
+                if db_orderdt[0][11] is not None:
+                    if formatted_datetime_obj < db_orderdt[0][11]:
+                        adbt = '可退'
+                    else:
+                        adbt = '不可退'
+                else:
+                    adbt = '不可退'
             
             elif db_orderdt[0][2] in  ['預購','預購進貨','預購截止','預購未取']:
                 ordertype = '預購'
                 if db_orderdt[0][2] == '預購':
                     take = '預購商品-等待預購截止'
                     text = '預購尚未截止！'
+                    adbt = '可退'
                 elif db_orderdt[0][2] in ['預購進貨','預購截止']:
                     take = '預購商品-進貨待到店'
                     text = '預購商品尚未到店！'
                     ordertype = '預購'
+                    adbt = '不可退'
                 elif db_orderdt[0][2] == '預購未取':
                     take = '預購商品-未取'
                     text = '預購商品已到店囉！\n已經可以前往「店面取貨」囉～'
                     ordertype = '預購'
+                    adbt = '不可退'
                     add = {
                                 "type": "button",
                                 "style": "primary",
@@ -303,6 +314,7 @@ def orderdtsearch():
                         "align": "center"
                     }
         else:
+            adbt = '不可退'
             ordertype = '歷史'
             take = db_orderdt[0][2]
             msg = {
@@ -334,7 +346,19 @@ def orderdtsearch():
                     "color": f"{color}"
                     }
         show0.append(button)
-
+        if adbt == '可退':
+            button_deadline = {
+                    "type": "button",
+                    "style": "primary",
+                    "height": "sm",
+                    "action": {
+                    "type": "message",
+                    "label": "取消訂單",
+                    "text": f"【取消訂單】{db_orderdt[0][0]}"#訂單編號
+                    },
+                    "color": "#B8BFB5"
+                    }
+            show0.append(button_deadline)
         items = len(db_orderdt)#項數
         pieces = 0
         for piecesadd in db_orderdt:
