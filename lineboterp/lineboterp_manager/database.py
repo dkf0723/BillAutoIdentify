@@ -195,7 +195,7 @@ def nopur_inf():
             WHERE PI.商品ID IS NULL AND P.現預購商品 = '預購';"""
   category ='select'
   result = retry(category,query)
-  if result is not None and len(result) > 0:
+  if result != [] and len(result) > 0:
     prolist = result
   else:
     prolist = "找不到符合條件的資料。"
@@ -208,7 +208,7 @@ def product_ing():
             WHERE PI.商品ID IS NULL AND P.現預購商品 = '現購';"""
   category ='select'
   result = retry(category,query)
-  if result is not None and len(result) > 0:
+  if result != [] and len(result) > 0:
     prolist2 = result
   else:
     prolist2 = "找不到符合條件的資料。"
