@@ -2473,9 +2473,10 @@ def Order_preorder_selectionscreen(): #管理者-預購/未取
                                 } 
                             )
     return screen
-
+#暫時無用
 def preorderli_list():
     db_preorder = nopur_inf()
+    #P.商品ID,P.商品名稱,P.商品單位,廠商名,付款方式
     if db_preorder == "找不到符合條件的資料。":
         preorder_show = TextSendMessage(text=db_preorder)
     else:
@@ -2544,7 +2545,7 @@ def preorderli_list():
                             }
                         })
         preorder_show = FlexSendMessage(
-                alt_text="現購商品查詢",
+                alt_text="預購商品查詢",
                 contents={
                 "type": "carousel",
                 "contents": preorder_show      
@@ -2552,8 +2553,13 @@ def preorderli_list():
             )
     return preorder_show
 
-def noworderli_list():
-    dbdb_preorder = product_ing()
+#新增進貨(現/預)
+def noworderli_list(tp):
+    if tp == '現':
+        dbdb_preorder = product_ing()
+    elif tp == '預':
+       dbdb_preorder = nopur_inf()
+    #P.商品ID,P.商品名稱,P.商品單位,廠商名,付款方式
     if dbdb_preorder == "找不到符合條件的資料。":
         preorderr_show = TextSendMessage(text=dbdb_preorder)
     else:
@@ -2573,12 +2579,16 @@ def noworderli_list():
                 totalooolist[i][2]#unit
                 totalooolist[i][3]#manuname
                 totalooolist[i][4]#payment'''
+                if len(totaloooolist[i][1])>40:
+                   lotot = totaloooolist[i][1][:40]
+                else:
+                   lotot = totaloooolist[i][1]
                 button = {
                     "type": "button",
                     "action": {
                         "type": "message",
-                        "label": f"{totaloooolist[i][1]}",
-                        "text": f"現購商品ID:{totaloooolist[i][0]}~{totaloooolist[i][2]}!{totaloooolist[i][3]}/{totaloooolist[i][4]}"
+                        "label": f"{lotot}",
+                        "text": f"{tp}購商品ID:{totaloooolist[i][0]}~{totaloooolist[i][2]}!{totaloooolist[i][3]}/{totaloooolist[i][4]}"
                     }
                     }
                 buttons.append(button)
@@ -2622,7 +2632,7 @@ def noworderli_list():
                             }
                         })
         preorderr_show = FlexSendMessage(
-                alt_text="現購商品查詢",
+                alt_text=f"{tp}購商品查詢",
                 contents={
                 "type": "carousel",
                 "contents": preorderr_show      

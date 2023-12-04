@@ -429,10 +429,10 @@ def handle_message(event):
                                 )
                             ))
         elif msg.startswith('【新增】預購'):
-            show = preorderli_list()
+            show = noworderli_list('預')
             line_bot_api.reply_message(event.reply_token, show)
         elif msg.startswith('【新增】現購'):
-            show = noworderli_list()
+            show = noworderli_list('現')
             line_bot_api.reply_message(event.reply_token, show)
         ########
         elif msg.startswith('預購商品ID:'):
@@ -452,18 +452,21 @@ def handle_message(event):
             storage[user_id+'Purchase_edit_step'] = 0
             line_bot_api.reply_message(event.reply_token, Purchase_fillin_and_check_screen(''))
         elif msg.startswith('現購商品ID:'):
-            pid = msg[7:-1]
-            unit = msg[-1:]
+            parts = msg.split("~")
+            pid = parts[0].split(":")[1]
+            unit = parts[1].split("!")[0]
+            manuname = parts[1].split("!")[1].split("/")[0]
+            payment = parts[1].split("!")[1].split("/")[1]
             user_state[user_id] = 'pre_purchase_ck'
             storage[user_id + 'purchase_pid'] = pid
             storage[user_id + 'purchase_unit'] = unit
+            storage[user_id + 'manu_manuname'] = manuname
+            storage[user_id + 'manu_payment'] = payment
             storage[user_id + 'manu_stapro'] = ''
-            storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}"
+            storage[user_id+'purchase_all'] = f"商品ID： {pid}\n商品單位：{unit}\n廠商名：{manuname}\n付款方式：{payment}"
             user_state1[user_id] = 'Purchase_num'
             storage[user_id+'Purchase_edit_step'] = 0
-            #getmanuinf()#取得現預購類別及廠商付款方式
             line_bot_api.reply_message(event.reply_token, Purchase_fillin_and_check_screen(''))
-        ############
         elif '【二次進貨】' in msg:
             if msg[6:] == '類別':
                 message = TextSendMessage(text='請點選查詢類別',

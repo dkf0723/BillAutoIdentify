@@ -1102,7 +1102,7 @@ def newing_purchaseinf():
             check_text = Purchase_fillin_and_check_screen('')
     elif state1[id] == 'Purchase_num':
         textmsg,check_step = check_Purchase_num()#進貨數量檢查
-        state1[id] = 'Purchase_cost' #進貨單價
+        #state1[id] = 'Purchase_cost' #進貨單價
         if check_step == 'ok':
             state1[id] = 'Purchase_cost' #進貨單價
             message_storage[id+'Purchase_edit_step'] = 1
