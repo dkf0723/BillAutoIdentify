@@ -19,8 +19,8 @@ def purchase_check():
     id = manager.user_id
     state = manager.user_state
     if state[id] == 'pre_purchase_ck':
-        check_texts = newing_purchaseinf()
-    elif 'Product_Modification' in state[id]:#商品修改-蓉
+        check_texts = newing_purchaseinf()  
+    elif 'Product_Modification' in state[id]: #商品修改-蓉
         check_texts = product_modification()
     elif 'createNowProduct' in state[id]:
         check_texts = createNowProduct()
@@ -44,7 +44,6 @@ def purchase_check():
         check_texts = newing_purchaseinf()
     #-----------------------------------------
     return check_texts
-
 def purchase_info(is_ingnepurchase=False):
     id = manager.user_id
     state = manager.user_state

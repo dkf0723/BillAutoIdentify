@@ -2607,7 +2607,7 @@ def noworderli_list(tp):
                                 },
                                 {
                                 "type": "text",
-                                "text": "現購商品查詢",
+                                "text": f"{tp}購商品查詢",
                                 "weight": "bold",
                                 "size": "xl",
                                 "align": "center",
@@ -2645,10 +2645,10 @@ def report_list_selectionscreen(): # 報表管理
             "type": "bubble",
             "hero": {
                 "type": "image",
-                "url": "https://i.imgur.com/vLCC99Q.jpg",
                 "size": "full",
                 "aspectRatio": "20:13",
-                "aspectMode": "cover"
+                "aspectMode": "fit",
+                "url": "https://i.imgur.com/5di1yQ6.jpg"
             },
             "body": {
                 "type": "box",
@@ -2662,163 +2662,215 @@ def report_list_selectionscreen(): # 報表管理
                     "align": "center"
                 },
                 {
-                    "type": "text",
-                    "text": "※月統計",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
-                },
-                {
-                    "type": "text",
-                    "text": "※年統計",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※月統計",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※年統計",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
+                    }
+                    ]
                 }
                 ]
             },
             "footer": {
                 "type": "box",
                 "layout": "vertical",
-                "spacing": "md",
+                "spacing": "xs",
                 "contents": [
                 {
                     "type": "button",
-                    "height": "sm",
+                    "style": "primary",
                     "action": {
                     "type": "message",
-                    "label": "成本統計列表",
-                    "text": "【成本統計】列表"
+                    "text": "【成本統計】列表",
+                    "label": "成本統計列表"
                     },
-                    "color": "#1a9879",
-                    "style": "primary"
+                    "height": "sm",
+                    "color": "#5bb09b"
                 }
                 ],
-                "flex": 0
+                "flex": 0,
+                "margin": "xs"
             }
             }
     report_list_screen.append(cost)
     profit = {
-                "type": "bubble",
-                "hero": {
-                    "type": "image",
-                    "url": "https://i.imgur.com/5ksWY7Y.jpg",
-                    "size": "full",
-                    "aspectRatio": "20:13",
-                    "aspectMode": "cover"
+            "type": "bubble",
+            "hero": {
+                "type": "image",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "fit",
+                "url": "https://i.imgur.com/TjtIVXm.jpg"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "利潤統計",
+                    "weight": "bold",
+                    "size": "xl",
+                    "align": "center"
                 },
-                "body": {
+                {
                     "type": "box",
                     "layout": "vertical",
+                    "margin": "lg",
+                    "spacing": "sm",
                     "contents": [
                     {
-                        "type": "text",
-                        "text": "利潤統計",
-                        "weight": "bold",
-                        "size": "xl",
-                        "align": "center"
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※月統計",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
                     },
-                {
-                    "type": "text",
-                    "text": "※月統計",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
-                },
-                {
-                    "type": "text",
-                    "text": "※年統計",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
-                }
-                    ]
-                },
-                "footer": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "md",
-                    "contents": [
                     {
-                        "type": "button",
-                        "height": "sm",
-                        "action": {
-                        "type": "message",
-                        "label": "利潤統計列表",
-                        "text": "【利潤統計】列表"
-                        },
-                        "color": "#c42149",
-                        "style": "primary"
+                        "type": "box",
+                        "layout": "baseline",
+                        "spacing": "sm",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "※年統計",
+                            "color": "#3b5a5f",
+                            "size": "md",
+                            "flex": 5,
+                            "weight": "bold"
+                        }
+                        ]
                     }
-                    ],
-                    "flex": 0
+                    ]
                 }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "xs",
+                "contents": [
+                {
+                    "type": "button",
+                    "style": "primary",
+                    "action": {
+                    "type": "message",
+                    "text": "【利潤統計】列表",
+                    "label": "利潤統計列表"
+                    },
+                    "height": "sm",
+                    "color": "#5bb09b"
                 }
+                ],
+                "flex": 0,
+                "margin": "xs"
+            }
+            }
     report_list_screen.append(profit)
     popular_products = {
-                "type": "bubble",
-                "hero": {
-                    "type": "image",
-                    "url": "https://i.imgur.com/5ksWY7Y.jpg",
-                    "size": "full",
-                    "aspectRatio": "20:13",
-                    "aspectMode": "cover"
-                },
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "熱門商品統計",
-                        "weight": "bold",
-                        "size": "xl",
-                        "align": "center"
+                    "type": "bubble",
+                    "hero": {
+                        "type": "image",
+                        "size": "full",
+                        "aspectRatio": "20:13",
+                        "aspectMode": "cover",
+                        "url": "https://i.imgur.com/mGn0B5q.jpg"
                     },
-                {
-                    "type": "text",
-                    "text": "※月統計",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "md",
-                    "weight": "bold"
-                }
-                    ]
-                },
-                "footer": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "md",
-                    "contents": [
-                    {
-                        "type": "button",
-                        "height": "sm",
-                        "action": {
-                        "type": "message",
-                        "label": "熱門商品統計列表",
-                        "text": "【熱門商品統計】列表"
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "熱門商品統計",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center"
                         },
-                        "color": "#c42149",
-                        "style": "primary"
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "sm",
+                            "contents": [
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "※月統計",
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "weight": "bold"
+                                }
+                                ]
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "xs",
+                        "contents": [
+                        {
+                            "type": "button",
+                            "style": "primary",
+                            "action": {
+                            "type": "message",
+                            "text": "【熱門商品統計】列表",
+                            "label": "熱門商品統計列表"
+                            },
+                            "height": "sm",
+                            "color": "#5bb09b"
+                        }
+                        ],
+                        "flex": 0,
+                        "margin": "xs"
                     }
-                    ],
-                    "flex": 0
-                }
-                }
+                    }
     report_list_screen.append(popular_products)
     screen =FlexSendMessage(
                             alt_text='報表管理',
@@ -2832,87 +2884,98 @@ def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
     Report_statistics_screen = []
     if queryObject == '熱門商品':
         popular_products_monthly = {
-                "type": "bubble",
-                "hero": {
-                    "type": "image",
-                    "url": "https://i.imgur.com/vLCC99Q.jpg",
-                    "size": "full",
-                    "aspectRatio": "20:13",
-                    "aspectMode": "cover"
-                },
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "熱門商品月統計",
-                        "weight": "bold",
-                        "size": "xl",
-                        "align": "center"
+                    "type": "bubble",
+                    "hero": {
+                        "type": "image",
+                        "size": "full",
+                        "aspectRatio": "20:13",
+                        "aspectMode": "fit",
+                        "url": "https://i.imgur.com/vHe8Ee2.jpg"
                     },
-                    {
-                        "type": "text",
-                        "text": "※各廠商熱賣商品",
-                        "wrap": True,
-                        "color": "#3b5a5f",
-                        "size": "md",
-                        "flex": 5,
-                        "margin": "md",
-                        "weight": "bold"
-                    },
-                    {
-                        "type": "text",
-                        "text": "可自行選擇月份",
-                        "wrap": True,
-                        "color": "#3b5a5f",
-                        "size": "md",
-                        "flex": 5,
-                        "margin": "sm",
-                        "weight": "bold"
-                    },
-                    {
-                        "type": "text",
-                        "text": "十年範圍",
-                        "wrap": True,
-                        "color": "#3b5a5f",
-                        "size": "md",
-                        "flex": 5,
-                        "margin": "sm",
-                        "weight": "bold"
-                    }
-                    ]
-                },
-                "footer": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "md",
-                    "contents": [
-                    {
-                        "type": "button",
-                        "height": "sm",
-                        "action": {
-                        "type": "message",
-                        "label": "熱門商品月統計",
-                        "text": "【熱門商品月統計】列表"
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "熱門商品月統計",
+                            "weight": "bold",
+                            "size": "xl",
+                            "align": "center"
                         },
-                        "color": "#1a9879",
-                        "style": "primary"
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "sm",
+                            "contents": [
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "※各廠商熱賣商品",
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "weight": "bold",
+                                    "wrap": True
+                                }
+                                ]
+                            },
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "※可自行選擇月份,十年範圍",
+                                    "color": "#3b5a5f",
+                                    "size": "md",
+                                    "flex": 5,
+                                    "weight": "bold",
+                                    "wrap": True
+                                }
+                                ]
+                            }
+                            ]
+                        }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "xs",
+                        "contents": [
+                        {
+                            "type": "button",
+                            "style": "primary",
+                            "action": {
+                            "type": "message",
+                            "text": "【熱門商品月統計】列表",
+                            "label": "熱門商品月統計"
+                            },
+                            "height": "sm",
+                            "color": "#1a9879"
+                        }
+                        ],
+                        "flex": 0,
+                        "margin": "xs"
                     }
-                    ],
-                    "flex": 0
-                }
-                }
+                    }
         Report_statistics_screen.append(popular_products_monthly)
     else:
         monthly = {
             "type": "bubble",
             "hero": {
                 "type": "image",
-                "url": "https://i.imgur.com/vLCC99Q.jpg",
+                "url": "https://i.imgur.com/xkAEoti.jpg",
                 "size": "full",
                 "aspectRatio": "20:13",
-                "aspectMode": "cover"
+                "aspectMode": "fit"
             },
             "body": {
                 "type": "box",
@@ -2937,7 +3000,7 @@ def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
                 },
                 {
                     "type": "text",
-                    "text": "可自行選擇月份",
+                    "text":"※可自行選擇月份,十年範圍",
                     "wrap": True,
                     "color": "#3b5a5f",
                     "size": "md",
@@ -2945,16 +3008,6 @@ def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
                     "margin": "sm",
                     "weight": "bold"
                 },
-                {
-                    "type": "text",
-                    "text": "十年範圍",
-                    "wrap": True,
-                    "color": "#3b5a5f",
-                    "size": "md",
-                    "flex": 5,
-                    "margin": "sm",
-                    "weight": "bold"
-                }
                 ]
             },
             "footer": {
@@ -2982,10 +3035,10 @@ def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
                     "type": "bubble",
                     "hero": {
                         "type": "image",
-                        "url": "https://i.imgur.com/5ksWY7Y.jpg",
+                        "url": "https://i.imgur.com/AkabFg0.jpg",
                         "size": "full",
                         "aspectRatio": "20:13",
-                        "aspectMode": "cover"
+                        "aspectMode": "fit"
                     },
                     "body": {
                         "type": "box",
@@ -3010,7 +3063,7 @@ def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
                         },
                         {
                             "type": "text",
-                            "text": "可自行選擇年份",
+                            "text":"※可自行選擇月份,十年範圍",
                             "wrap": True,
                             "color": "#3b5a5f",
                             "size": "md",
@@ -3018,16 +3071,6 @@ def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
                             "margin": "sm",
                             "weight": "bold"
                         },
-                        {
-                            "type": "text",
-                            "text": "十年範圍",
-                            "wrap": True,
-                            "color": "#3b5a5f",
-                            "size": "md",
-                            "flex": 5,
-                            "margin": "sm",
-                            "weight": "bold"
-                        }
                         ]
                     },
                     "footer": {
@@ -3043,7 +3086,7 @@ def Report_statistics_selectionscreen(queryObject): # 報表管理各項統計
                             "label": f"{queryObject}年統計",
                             "text": f"【{queryObject}年統計】"
                             },
-                            "color": "#c42149",
+                            "color": "#1a9879",
                             "style": "primary"
                         }
                         ],
