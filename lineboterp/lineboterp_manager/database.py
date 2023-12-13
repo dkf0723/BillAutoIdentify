@@ -896,3 +896,73 @@ def report_query_list(report_type, time_query):
   else:
     image_msg = TextSendMessage(text="找不到符合條件的資料。")
   return image_msg
+#--------------------繪製月報表----------------------------------
+def month_report_list():
+  modified_year = formatted_datetime_obj.year # 取年份
+  modified_month = formatted_datetime_obj.month #取月份
+  int_modified_month = int(modified_month)-1
+  query = f"""
+    SELECT
+            Product_information.商品名稱,
+            order_details.訂購數量,
+            Purchase_Information.進貨單價,
+            order_details.商品小計
+          FROM
+            Order_information
+          JOIN
+            order_details ON Order_information.訂單編號 = order_details.訂單編號
+          JOIN
+            Product_information ON order_details.商品ID = Product_information.商品ID
+		  JOIN
+			Purchase_Information ON order_details.商品ID = Purchase_Information.商品ID
+          WHERE (訂單狀態未取已取='現購已取' OR 訂單狀態未取已取='預購已取') AND 取貨完成時間 like {modified_year}-{int_modified_month}%';;
+    """
+  result = retry('select', query)
+  if result == []:
+    report_data = '找不到符合條件的資料。'
+  else:
+    report_data = result
+  return report_data
+#--------------------繪製年報表----------------------------------
+def year_report_list():
+  modified_year = formatted_datetime_obj.year # 取年份
+  int_modified_year = int(modified_year)-1
+  query = f"""
+    SELECT 年月,月成本_值, 月利潤_值
+    FROM Statistical_Product
+    WHERE 年月 like '{int_modified_year}%' AND 年月 != '{int_modified_year}-99';
+    """
+  result = retry('select', query)
+  if result == []:
+    report_data = '找不到符合條件的資料。'
+  else:
+    report_data = result
+  return report_data
+#--------------------上傳月報表_圖-------------------------------
+def upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_figure_chart_database_link,month_total_cost,month_total_profit):
+  modified_year = formatted_datetime_obj.year # 取年份
+  modified_month = formatted_datetime_obj.month # 取月份
+  year_month = modified_year+modified_month
+  query = f"""
+    INSERT INTO Statistical_Product (年月,月成本_圖,月利潤_圖,月熱門商品_圖,月成本_值,月利潤_值)
+    VALUES ( '{year_month}','{cost_pie_database_link}','{profit_pie_database_link}','{saled_figure_chart_database_link}','{month_total_cost}','{month_total_profit}');
+    """
+  result = retry('notselect', query)
+  if result == []:
+    report_data = '找不到符合條件的資料。'
+  else:
+    report_data = result
+  return report_data
+#--------------------上傳年報表_圖-------------------------------
+def upload_year_report(cost_line_database_link,profit_line_database_link):
+  modified_year = formatted_datetime_obj.year # 取年份
+  query = f"""
+    INSERT INTO Statistical_Product (年月,年成本_圖,年利潤_圖)
+    VALUES ( '{modified_year}-99','{cost_line_database_link}','{profit_line_database_link}');
+    """
+    result = retry('notselect', query)
+  if result == []:
+    report_data = '找不到符合條件的資料。'
+  else:
+    report_data = result
+  return report_data
