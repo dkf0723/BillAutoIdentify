@@ -9,3 +9,4 @@ pyimgur
 schedule
 apscheduler
 pytz
+matplotlib
