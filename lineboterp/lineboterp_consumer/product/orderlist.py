@@ -269,28 +269,28 @@ def orderdtsearch():
                 text = '已經可以前往「店面取貨」囉～'
                 if db_orderdt[0][11] is not None:
                     if formatted_datetime_obj < db_orderdt[0][11]:
-                        adbt = '可退'
+                        adbt = '可'
                     else:
-                        adbt = '不可退'
+                        adbt = '不可'
                 else:
-                    adbt = '不可退'
+                    adbt = '不可'
             
             elif db_orderdt[0][2] in  ['預購','預購進貨','預購截止','預購未取']:
                 ordertype = '預購'
                 if db_orderdt[0][2] == '預購':
                     take = '預購商品-等待預購截止'
                     text = '預購尚未截止！'
-                    adbt = '可退'
+                    adbt = '可'
                 elif db_orderdt[0][2] in ['預購進貨','預購截止']:
                     take = '預購商品-進貨待到店'
                     text = '預購商品尚未到店！'
                     ordertype = '預購'
-                    adbt = '不可退'
+                    adbt = '不可'
                 elif db_orderdt[0][2] == '預購未取':
                     take = '預購商品-未取'
                     text = '預購商品已到店囉！\n已經可以前往「店面取貨」囉～'
                     ordertype = '預購'
-                    adbt = '不可退'
+                    adbt = '不可'
                     add = {
                                 "type": "button",
                                 "style": "primary",
@@ -314,7 +314,7 @@ def orderdtsearch():
                         "align": "center"
                     }
         else:
-            adbt = '不可退'
+            adbt = '不可'
             ordertype = '歷史'
             take = db_orderdt[0][2]
             msg = {
