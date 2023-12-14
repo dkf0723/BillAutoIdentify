@@ -1,0 +1,17 @@
+！！請「依序」安裝以下功能套件！！
+(vs code terminal 安裝不需要前面的「!」)
+=>!pip install requests==2.28.2
+=>!pip install line-bot-sdk
+=>!pip install gunicorn
+=>!pip install flask
+=>!pip install python-telegram-bot
+
+這些是 Python 的套件，用於特定的功能和任務：
+◆requests 是一個常用的 HTTP 請求套件，用於發送和接收 HTTP 請求。
+◆line-bot-sdk 是用於開發 LINE Bot 的官方套件，提供了與 LINE Messaging API 進行互動的功能。
+◆gunicorn 是一個 WSGI（Web Server Gateway Interface）HTTP 伺服器，用於部署 Python 網路應用程式。
+◆flask 是一個輕量級的 Python Web 應用程式框架，用於開發 Web 應用程式和 API。
+◆python-telegram-bot 是用於開發 Telegram Bot 的官方套件，提供了與 Telegram Bot API 進行互動的功能。
+
+
+
