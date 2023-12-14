@@ -346,7 +346,7 @@ def orderdtsearch():
                     "color": f"{color}"
                     }
         show0.append(button)
-        if adbt == '可退':
+        if adbt == '可':
             button_deadline = {
                     "type": "button",
                     "style": "primary",
