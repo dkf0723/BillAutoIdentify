@@ -1,0 +1,10 @@
+<windows 安裝 flyctl>iwr https://fly.io/install.ps1 -useb | iex
+
+<註冊跳轉>flyctl auth signup
+
+<登入跳轉>flyctl auth login
+
+<新增伺服器檔案>flyctl launch
+(名稱、伺服主機國家、是否設置database)
+
+<上傳檔案>flyctl deploy
