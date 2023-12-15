@@ -11,8 +11,8 @@ import time
 
 #-------------------取得現在時間----------------------
 def gettime():
-  current_datetime = datetime.now()# 取得當前的日期和時間
-  modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
+  modified_datetime = datetime.now()# 取得當前的日期和時間
+  # modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
   formatted_millisecond = modified_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
   formatted_datetime = modified_datetime.strftime('%Y-%m-%d %H:%M:%S')# 格式化日期和時間，不包含毫秒部分
   formatted_date = modified_datetime.strftime('%Y-%m-%d')#格式化日期
@@ -676,16 +676,36 @@ def db_manufacturers():
 #--------------此廠商所有商品----------------
 def db_products_manufacturers(manufacturer_id,choose):
   if choose != 'stop':
-    test1 = f"廠商編號 = '{manufacturer_id}' and 現預購商品 <> '現購停售'and 現預購商品 <> '預購截止'"
-  else:
-    test1 = f"現預購商品 = '現購停售' or 現預購商品 = '預購截止'"
-  query = f"""SELECT 商品ID,商品名稱,商品圖片,庫存數量,商品單位,進貨單價,售出單價,現預購商品 
+    query = f"""SELECT 商品ID, 
+              MAX(商品名稱) AS 商品名稱, 
+              MAX(商品圖片) AS 商品圖片, 
+              MAX(庫存數量) AS 庫存數量, 
+              MAX(商品單位) AS 商品單位, 
+              MAX(進貨單價) AS 進貨單價, 
+              MAX(售出單價) AS 售出單價, 
+              MAX(現預購商品) AS 現預購商品 
               FROM Product_information NATURAL JOIN Purchase_Information 
-              WHERE {test1} 
-              order by 進貨時間 desc
-              limit 1;"""
-  category = 'select'  # 重試類別 select/notselect
-  result = retry(category, query)
+              WHERE 廠商編號 = '{manufacturer_id}' and 現預購商品 <> '現購停售' and 現預購商品 <> '預購截止'
+              GROUP BY 商品ID  
+              order by MAX(進貨時間) desc;"""
+    category = 'select'  # 重試類別 select/notselect
+    result = retry(category, query)
+  else:
+    query = f"""SELECT 商品ID, 
+      MAX(商品名稱) AS 商品名稱, 
+      MAX(商品圖片) AS 商品圖片, 
+      MAX(庫存數量) AS 庫存數量, 
+      MAX(商品單位) AS 商品單位, 
+      MAX(進貨單價) AS 進貨單價, 
+      MAX(售出單價) AS 售出單價, 
+      MAX(現預購商品) AS 現預購商品 
+      FROM Product_information 
+      NATURAL JOIN Purchase_Information 
+      WHERE 現預購商品 = '現購停售' OR 現預購商品 = '預購截止' 
+      GROUP BY 商品ID 
+      ORDER BY  MAX(進貨時間) DESC;"""
+    category = 'select'  # 重試類別 select/notselect
+    result = retry(category, query)
   return result
 #-------------分類下所有商品列表------------
 def db_categoryate(selected_category):
@@ -722,13 +742,13 @@ def db_infotmation(pid):
   return result
 # ---------------修改商品系列-----------------
 def MP_information_modify(field_to_modify, new_value, pid):
-    if field_to_modify in ["商品名稱", "商品簡介", "售出單價", "售出單價2", "預購數量限制_倍數","預購截止時間","商品圖片"]:
-        query = f"UPDATE Product_information SET {field_to_modify} = '{new_value}' WHERE 商品ID = '{pid}';"
-        category = 'notselect' # 重試類別 select/notselect
-        result = retry(category, query) # 成功回傳 ok
-        return result
-    else:
-        return "無效欄位名稱" 
+  if field_to_modify in ["商品名稱", "商品簡介", "售出單價", "售出單價2", "預購數量限制_倍數","預購截止時間","商品圖片"]:
+    query = f"UPDATE Product_information SET {field_to_modify} = '{new_value}' WHERE 商品ID = '{pid}';"
+    category = 'notselect' # 重試類別 select/notselect
+    result = retry(category, query) # 成功回傳 ok
+    return result
+  else:
+    return "無效欄位名稱" 
 #--------------辨識商品狀態進而選擇FM------------
 def Product_status():
   user_id = info.user_id
@@ -833,10 +853,10 @@ def getTotalByOrder(order):
 def updateOrder(id):
   storage = info.global_Storage
   if storage[id+'order'][:1] == '0':
-    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = '{datetime.now() + timedelta(hours=8)}'  WHERE 電話 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取' ;"
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = '{datetime.now()}'  WHERE 電話 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取' ;"
     result = retry('notselect', query)
   else : 
-    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = '{datetime.now() + timedelta(hours=8)}'   WHERE 訂單編號 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取';"
+    query = f"UPDATE Order_information SET 訂單狀態未取已取 = CASE WHEN 訂單狀態未取已取 = '現購未取' THEN '現購已取' WHEN 訂單狀態未取已取 = '預購未取' THEN '預購已取' ELSE 訂單狀態未取已取 END , 取貨完成時間 = '{datetime.now()}'   WHERE 訂單編號 = '{storage[id+'order']}' and 訂單狀態未取已取 like '%未取';"
     # query = f"UPDATE Order_information SET 訂單狀態未取已取 = ''  WHERE 訂單編號 = '{storage[id+'order']} and 訂單狀態未取已取 like '%未取'';"
     result = retry('notselect', query)
   return result
@@ -854,7 +874,7 @@ def createProduct(id):
     returnProduct= storage[id+'returnProduct'][6:]
     manufacturerId = storage[id+'manufacturerId']
     num = count(category)
-    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}','{datetime.now() + timedelta(hours=8)}' ,'{returnProduct}', '{unitPrice2}','{manufacturerId}');"
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,商品可否退換貨,售出單價2,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}','{datetime.now()}' ,'{returnProduct}', '{unitPrice2}','{manufacturerId}');"
   else :
     pname = storage[id+'pname'][3:]
     category= storage[id+'category'][5:]
@@ -867,7 +887,7 @@ def createProduct(id):
     multiple = storage[id+'multiple'][7:]
     manufacturerId = storage[id+'manufacturerId']
     num = count(category)
-    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,售出單價2,預購數量限制_倍數,預購截止時間,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}','{datetime.now() + timedelta(hours=8)}', '{unitPrice2}','{multiple}','{deadline}','{manufacturerId}');"
+    query = f"INSERT INTO Product_information (商品ID,商品名稱,現預購商品,商品圖片,商品簡介,商品單位,售出單價,商品建立時間,售出單價2,預購數量限制_倍數,預購截止時間,廠商編號) VALUES ('{category+num}','{pname}','現購','{picture}','{introduction}','{unit}','{unitPrice}','{datetime.now()}', '{unitPrice2}','{multiple}','{deadline}','{manufacturerId}');"
   result = retry('notselect', query)
   return result
 
@@ -897,9 +917,105 @@ def report_query_list(report_type, time_query):
   else:
     image_msg = TextSendMessage(text="找不到符合條件的資料。")
   return image_msg
+# #--------------------繪製月報表----------------------------------
+# def month_report_list():
+#   formatted_datetime_obj = datetime.now()
+#   modified_year = formatted_datetime_obj.year # 取年份
+#   modified_month = formatted_datetime_obj.month #取月份
+#   int_modified_month = int(modified_month)-1
+#   query = f"""
+#     SELECT
+#             Product_information.商品名稱,
+#             order_details.訂購數量,
+#             Purchase_Information.進貨單價,
+#             order_details.商品小計
+#           FROM
+#             Order_information
+#           JOIN
+#             order_details ON Order_information.訂單編號 = order_details.訂單編號
+#           JOIN
+#             Product_information ON order_details.商品ID = Product_information.商品ID
+# 		  JOIN
+# 			Purchase_Information ON order_details.商品ID = Purchase_Information.商品ID
+#           WHERE (訂單狀態未取已取='現購已取' OR 訂單狀態未取已取='預購已取') AND 取貨完成時間 like {modified_year}-{int_modified_month}%';;
+#     """
+#   result = retry('select', query)
+#   if result == []:
+#     report_data = '找不到符合條件的資料。'
+#   else:
+#     report_data = result
+#   return report_data
+# #--------------------繪製年報表----------------------------------
+# def year_report_list():
+#   formatted_datetime_obj = datetime.now()
+#   modified_year = formatted_datetime_obj.year # 取年份
+#   int_modified_year = int(modified_year)-1
+#   query = f"""
+#     SELECT 年月,月成本_值, 月利潤_值
+#     FROM Statistical_Product
+#     WHERE 年月 like '{int_modified_year}%' AND 年月 != '{int_modified_year}-99';
+#     """
+#   result = retry('select', query)
+#   if result == []:
+#     report_data = '找不到符合條件的資料。'
+#   else:
+#     report_data = result
+#   return report_data
+# #--------------------上傳月報表_圖-------------------------------
+# def upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_figure_chart_database_link,month_total_cost,month_total_profit):
+#   formatted_datetime_obj = datetime.now()
+#   modified_year = formatted_datetime_obj.year # 取年份
+#   modified_month = formatted_datetime_obj.month # 取月份
+#   year_month = modified_year+modified_month
+#   query = f"""
+#     INSERT INTO Statistical_Product (年月,月成本_圖,月利潤_圖,月熱門商品_圖,月成本_值,月利潤_值)
+#     VALUES ( '{year_month}','{cost_pie_database_link}','{profit_pie_database_link}','{saled_figure_chart_database_link}','{month_total_cost}','{month_total_profit}');
+#     """
+#   result = retry('notselect', query)
+#   if result == []:
+#     report_data = '找不到符合條件的資料。'
+#   else:
+#     report_data = result
+#   return report_data
+# #--------------------上傳年報表_圖-------------------------------
+# def upload_year_report(cost_line_database_link,profit_line_database_link):
+#   formatted_datetime_obj = datetime.now()
+#   modified_year = formatted_datetime_obj.year # 取年份
+#   query = f"""
+#     INSERT INTO Statistical_Product (年月,年成本_圖,年利潤_圖)
+#     VALUES ( '{modified_year}-99','{cost_line_database_link}','{profit_line_database_link}');
+#     """
+#   result = retry('notselect', query)
+#   if result == []:
+#     report_data = '找不到符合條件的資料。'
+#   else:
+#     report_data = result
+#   return report_data
+
+#-------------------(單張)images資料夾中圖片轉連結、完成並刪除----------------------
+def single_imagetolink():
+  id = info.user_id
+  storageimg = info.storage
+  imgurdata = imgurinfo()
+  # 取得圖片路徑
+  image_files = f"{storageimg[id+'img']}" #例：images/FXR0.jpg
+  #執行轉換連結
+  CLIENT_ID = imgurdata['CLIENT_ID_data']
+  PATH = image_files
+  title = image_files[:-4]
+  im = pyimgur.Imgur(CLIENT_ID)
+  uploaded_image = im.upload_image(PATH, title=title)
+  imagelink = uploaded_image.link
+  storageimg[id+'imagelink'] = imagelink #儲存圖片連結
+  #執行資料夾中此圖片刪除
+  if os.path.isfile(image_files):
+      os.remove(image_files)
+  return imagelink
 #--------------------繪製月報表----------------------------------
 def month_report_list():
-  formatted_datetime_obj = datetime.now()
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   modified_month = formatted_datetime_obj.month #取月份
   int_modified_month = int(modified_month)-1
@@ -927,7 +1043,9 @@ def month_report_list():
   return report_data
 #--------------------繪製年報表----------------------------------
 def year_report_list():
-  formatted_datetime_obj = datetime.now()
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   int_modified_year = int(modified_year)-1
   query = f"""
@@ -943,7 +1061,9 @@ def year_report_list():
   return report_data
 #--------------------上傳月報表_圖-------------------------------
 def upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_figure_chart_database_link,month_total_cost,month_total_profit):
-  formatted_datetime_obj = datetime.now()
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   modified_month = formatted_datetime_obj.month # 取月份
   year_month = modified_year+modified_month
@@ -959,7 +1079,9 @@ def upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_fi
   return report_data
 #--------------------上傳年報表_圖-------------------------------
 def upload_year_report(cost_line_database_link,profit_line_database_link):
-  formatted_datetime_obj = datetime.now()
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   query = f"""
     INSERT INTO Statistical_Product (年月,年成本_圖,年利潤_圖)
