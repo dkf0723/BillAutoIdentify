@@ -1,48 +1,12 @@
-from database import month_report_list
+from database import month_report_list,upload_month_report
+from linebot.models import TextSendMessage
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from linebot.models import TextSendMessage
-import matplotlib.font_manager as FM
-import os, pyimgur, glob
-import random
-import string
+
+import matplotlib.font_manager as fm
+import os,random,string,pyimgur
 font_path = "Noto_Sans_TC/NotoSansTC-VariableFont_wght.ttf"
-font = FM.FontProperties(fname=font_path, size=14)
-# #-------------------------------
-# current_datetime = datetime.now()# 取得當前的日期和時間
-# modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
-# order_date = modified_datetime.strftime('%Y-%m')#格式化日期，清除
-# #-------------------------------
-# # 建立連接字串
-# conn_str = {
-#     'host': '140.131.114.242',
-#     'user': '112405',
-#     'password': '!mdEe24@5',
-#     'database': '112-112405'
-# }
-
-# try:
-#     # 建立連接
-#     cnxn = mysql.connector.connect(**conn_str)
-
-#     # 連接成功
-#     print("連線成功！")
-
-# except pyodbc.Error as err:
-#     # 連接失敗
-#     print(f"連線失敗：{err}")
-# cursor = cnxn.cursor()
-# query = """
-#     SELECT 商品名稱, 訂購數量, 進貨單價, 商品小計
-#     FROM Statistics_Data
-#     WHERE 年月='2023-08'
-#     Order by 商品ID;
-#     """
-
-# cursor.execute(query)
-# result = cursor.fetchall()
-# cursor.close()
-# cnxn.close()
+font = fm.FontProperties(fname=font_path, size=14)
 def manager_month_report():
     db_report = month_report_list()
 #---------------------------------
@@ -125,8 +89,8 @@ def manager_month_report():
         if bar_len > 0:
             for i in range(bar_len):
                 remaining_total_saled_figure += int(heapsort_saled_figure[i])
-        heapsort_saled_figure_product_name_limited.insert(0, '其他')
-        heapsort_saled_figure_limited.insert(0,remaining_total_saled_figure)
+            heapsort_saled_figure_product_name_limited.insert(0, '其他')
+            heapsort_saled_figure_limited.insert(0,remaining_total_saled_figure)
 
         #-----------------------------------------------------------
         def imgurinfo():
@@ -208,34 +172,5 @@ def manager_month_report():
                     pad_inches=1)
         saled_figure_chart_database_link = imagetolink(link)
         plt.show()
-#-------------------------------
-# #建立連接字串
-# conn_str = {
-#     'host': '140.131.114.242',
-#     'user': '112405',
-#     'password': '!mdEe24@5',
-#     'database': '112-112405'
-# }
-
-# try:
-#     # 建立連接
-#     cnxn = mysql.connector.connect(**conn_str)
-
-#     # 連接成功
-#     print("連線成功！")
-
-# except pyodbc.Error as err:
-#     # 連接失敗
-#     print(f"連線失敗：{err}")
-# cursor = cnxn.cursor()
-
-# query = f"""
-#     INSERT INTO Statistical_Product (年月,月成本_圖,月利潤_圖,月熱門商品_圖,月成本_值,月利潤_值)
-#     VALUES ( '2023-08','{cost_pie_database_link}','{profit_pie_database_link}','{saled_figure_chart_database_link}','{month_total_cost}','{month_total_profit}');
-#     """
-
-
-# cursor.execute(query)
-# cnxn.commit()
-# cursor.close()
-# cnxn.close()
+        upload_month_report()
+    upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_figure_chart_database_link,month_total_cost,month_total_profit)

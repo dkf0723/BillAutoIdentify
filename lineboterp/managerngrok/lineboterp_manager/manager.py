@@ -12,10 +12,12 @@ selected_category = None
 from DFM import  Customer_pickup,Report_management
 #======這裡是呼叫的檔案內容=====
 import info
+import random
+import string
 from flexmsg import (quick_purchase_manufacturers_list,quickmanu_pro_list,nopur_inf_flex_msg,product_ing_flex_msg,
                      quick_catepro_list,stock_manufacturers_name_list,stock_manuinf_list,stock_categoryinf_list,
                      pured_pro_list,puring_pro_list,Order_preorder_selectionscreen,Inventory_management,preorderli_list,noworderli_list,report_list_selectionscreen,manager_month_choise,manager_year_choise,Report_statistics_selectionscreen)
-from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay, report_query_list
+from database import databasetest,Product_status,stop_time,nopur_inf,product_ing,puring_trastate,bankpay, report_query_list,single_imagetolink
 from relevant_information import linebotinfo,dbinfo
 from nepurinf import purchase_check,gettime,new_manufacturer
 from manufacturerFM import Manufacturer_fillin_and_check_screen,Manufacturer_list_and_new_chosen_screen,wishes_list
@@ -1086,7 +1088,6 @@ def send_category_selection(event, line_bot_api):
 @handler.add(PostbackEvent)
 def handle_postback(event):
     user_id = info.user_id
-    msg = info.msg
     storage = info.storage
     postback_data = event.postback.data
     state1 = info.user_state1
@@ -1103,21 +1104,43 @@ def handle_postback(event):
             response = Purchase_fillin_and_check_screen('')
             #line_bot_api.reply_message(event.reply_token, response)
         elif postback_data == '修改商品資訊-預購截止時間':
-            msg = str(date_time_obj)
+            info.msg = str(date_time_obj)
             response = purchase_check()
         elif postback_data == '預購截止時間':
-            msg = str(restock_datetime)
+            info.msg = str(restock_datetime)
             if state1[user_id] == 'changeDeadline':
                 state1[user_id] = 'ShowFM'
             else:
                 state1[user_id] = 'seven'
+            response = purchase_check()
+        elif postback_data == '快速進貨商品匯款時間':
+            storage[id+'purchase_all'] += str(date_time_obj)
             response = purchase_check()
         else:
             response = '都沒有'
         #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f"{msg}\n{user_state[user_id]}\n{response}"))
         line_bot_api.reply_message(event.reply_token, response)
         
-
+#使用者圖片處理
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image_message(event):
+    storage = info.storage
+    user_id = info.user_id
+    user_state = info.user_state
+    if user_state[user_id] in ['createNowProduct','Product_Modification_Photo']:#新增商品、修改商品圖片
+        image_name = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(4))#為圖片隨機命名
+        image_content = line_bot_api.get_message_content(event.message.id)#取得訊息的ID
+        image_name = image_name.upper()+'.jpg'#轉換大寫並加入副檔名
+        path='images/'+image_name #儲存資料夾路徑
+        with open(path, 'wb') as fd: #執行檔案寫入
+            for chunk in image_content.iter_content():
+                fd.write(chunk)
+        storage[user_id+'img'] = path #暫存圖片路徑
+        info.msg = single_imagetolink()
+        line_bot_api.reply_message(event.reply_token, purchase_check())
+    else:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='目前動作狀態無需發送照片呦～'))
+#//--------------------------------------------
 #-------------------排程設定----------------------
 scheduler = BackgroundScheduler()
 #資料庫連線1

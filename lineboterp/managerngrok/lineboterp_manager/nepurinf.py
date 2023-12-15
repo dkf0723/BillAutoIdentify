@@ -426,16 +426,16 @@ def new_manufacturer():
             if message in ['1','2']:
                 if message == '1':
                     citycall = f"({message_storage[id+'manufacturer_localcalls_code']}){message_storage[id+'manufacturer_localcalls_num']}"
-                    check,info = manufacturer(message_storage[id+'manufacturer_name'],message_storage[id+'manufacturer_principal'],
+                    check,info1 = manufacturer(message_storage[id+'manufacturer_name'],message_storage[id+'manufacturer_principal'],
                                               citycall,message_storage[id+'manufacturer_phonenum'],
                                               message_storage[id+'manufacturer_Payment'],message_storage[id+'manufacturer_bankid'],
                                               message_storage[id+'manufacturer_bankname'],message_storage[id+'manufacturer_bankaccount'])
                     if check == 'ok':
                         #廠商編號, 廠商名, 負責或對接人, 市話, 電話, 付款方式, 行庫名, 行庫代號, 匯款帳號
-                        check_text = Manufacturer_establishment_screen(info[0][0],info[0][1],info[0][2],info[0][3],info[0][4],info[0][5],
-                                                                       info[0][6],info[0][7],info[0][8])
+                        check_text = Manufacturer_establishment_screen(info1[0][0],info1[0][1],info1[0][2],info1[0][3],info1[0][4],info1[0][5],
+                                                                       info1[0][6],info1[0][7],info1[0][8])
                     else:
-                        check_text = TextSendMessage(text=f"{info}廠商建立流程失敗！")
+                        check_text = TextSendMessage(text=f"{info1}廠商建立流程失敗！")
                     #check_text = TextSendMessage(text=f"廠商建立成功！")
                 elif message == '2':
                     check_text = TextSendMessage(text="取消新增廠商流程囉！")
@@ -753,26 +753,26 @@ def check_manufacturer_localcalls():
     if message.isdigit():
         check_areacode = 'no'
         if len(message) in [9,10]:
-            for info in citytalkinfo:
+            for info2 in citytalkinfo:
                 for i in range(4, 0, -1):#從前4,3,2,1倒數切割
-                    if message[:(i)] == info['code']:#從區碼清單中比對是否存在
+                    if message[:(i)] == info2['code']:#從區碼清單中比對是否存在
                         check_areacode = 'ok'
-                        if message[i:][0] in info['starting_number']:
-                            if len(message[i:]) in info['back_code_length']:
+                        if message[i:][0] in info2['starting_number']:
+                            if len(message[i:]) in info2['back_code_length']:
                                 message_storage[id+'manufacturer_localcalls'] = message #市話暫存
-                                message_storage[id+'manufacturer_localcalls_code'] = info['code'] #區碼
+                                message_storage[id+'manufacturer_localcalls_code'] = info2['code'] #區碼
                                 message_storage[id+'manufacturer_localcalls_num'] = message[i:] #市話
                                 check_step = 'ok'
                                 check_text = ''
                             else:
                                 lengthmsg = ''
-                                for length in info['back_code_length']:
+                                for length in info2['back_code_length']:
                                     lengthmsg += str(length)+'或'
                                 check_step = ''
-                                check_text = f"區碼「{info['code']}」與市話開頭「{message[i:][0]}」正確，扣除區碼之市話長度不是「{lengthmsg[:-1]}」！"
+                                check_text = f"區碼「{info2['code']}」與市話開頭「{message[i:][0]}」正確，扣除區碼之市話長度不是「{lengthmsg[:-1]}」！"
                         else:
                             check_step = ''
-                            check_text = f"「{info['code']}」區碼正確，市話號碼開頭錯誤！"
+                            check_text = f"「{info2['code']}」區碼正確，市話號碼開頭錯誤！"
                         break
                 if check_areacode == 'ok':
                     break#提早尋找到
@@ -917,23 +917,23 @@ def product_modification():
     before_all = db_infotmation(product_id)
     
     if state[id] == 'Product_Modification_Product':#這邊是按鈕按下去後的流程
-        info = message[8:]
-        if '商品名稱' == info:
+        m_info = message[8:]
+        if '商品名稱' == m_info:
             state[id] = 'Product_Modification_Product_Pname'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的商品名稱:')
-        elif '商品簡介' == info:
+        elif '商品簡介' == m_info:
             state[id] = 'Product_Modification_Pintroduction'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的商品簡介:')
-        elif '商品售出單價' == info:
+        elif '商品售出單價' == m_info:
             state[id] = 'Product_Modification_Punit_price_sold'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的商品售出單價:')
-        elif '商品售出單價2'== info:
+        elif '商品售出單價2'== m_info:
             state[id] = 'Product_Modification_Punit_price_sold2'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的商品售出單價2:')
-        elif '預購倍數' == info:
+        elif '預購倍數' == m_info:
             state[id] = 'Product_Modification_order_multiple'
             flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入想修改的預購倍數:')
-        elif '預購截止時間' == info:
+        elif '預購截止時間' == m_info:
             timeget = gettime()
             datetime = timeget['formatted_datetime2']#2023-10-18T21:00 用於LINE的格式
             state[id] = 'Product_Modification_order_deadline'
@@ -984,9 +984,9 @@ def product_modification():
                                 } 
                             )
             flex_message = template_message
-        elif '更換商品圖片' == info:
+        elif '更換商品圖片' == m_info:
             state[id] = 'Product_Modification_Photo'
-            flex_message = TextSendMessage(text='(◍•ᴗ•◍)請輸入新的商品圖片連結:')
+            flex_message = TextSendMessage(text='(◍•ᴗ•◍)請上傳新的商品圖片連結:')
         elif message == '取消':
             state[id] = 'normal'
             flex_message = TextSendMessage(text='已經取消囉！')
@@ -1411,18 +1411,21 @@ def createNowProduct():
             return check_text        
         global_Storage[id+'unitPrice2'] = '商品售出單價2：' + message
         check_text = ('%s\n%s\n%s\n%s\n%s\n %s' %(global_Storage[id+'pname'],global_Storage[id+'category'],global_Storage[id+'unit'],global_Storage[id+'introduction'],global_Storage[id+'unitPrice'],global_Storage[id+'unitPrice2']))
-        check_text += '\n=>請接著輸入「商品圖片」'
+        check_text += '\n=>請接著上傳「商品圖片」'
         check_text = TextSendMessage(text=check_text)
         state1[id] = 'six'
     elif state1[id] == 'six':
-        global_Storage[id+'picture'] = '商品圖片：' + message
-        check_text = ('%s\n%s\n%s\n%s\n%s\n%s\n%s' %(global_Storage[id+'pname'],global_Storage[id+'category'],global_Storage[id+'unit'],global_Storage[id+'introduction'],global_Storage[id+'unitPrice'],global_Storage[id+'unitPrice2'],global_Storage[id+'picture']))
-        check_text += '\n=>請接著選擇「可否退換貨」'
-        actions=[]
-        for option in returnoptions:
-           actions.append(QuickReplyButton(action=MessageAction(label=option, text=option)))
-        check_text=TextSendMessage(text=check_text, quick_reply=QuickReply(items=actions))
-        state1[id] = 'seven'
+        if 'http' in message:
+            global_Storage[id+'picture'] = '商品圖片：' + message
+            check_text = ('%s\n%s\n%s\n%s\n%s\n%s\n%s' %(global_Storage[id+'pname'],global_Storage[id+'category'],global_Storage[id+'unit'],global_Storage[id+'introduction'],global_Storage[id+'unitPrice'],global_Storage[id+'unitPrice2'],global_Storage[id+'picture']))
+            check_text += '\n=>請接著選擇「可否退換貨」'
+            actions=[]
+            for option in returnoptions:
+                actions.append(QuickReplyButton(action=MessageAction(label=option, text=option)))
+            check_text=TextSendMessage(text=check_text, quick_reply=QuickReply(items=actions))
+            state1[id] = 'seven'
+        else:
+            check_text = TextSendMessage(text='這不是圖片喔！請重新傳送')
     elif state1[id] == 'seven':
         if message not in returnoptions:
             check_text = ('您輸入的可否退換貨錯誤，請重新輸入')
@@ -1484,8 +1487,12 @@ def createNowProduct():
         state1[id] = 'ShowFM'
         global_Storage[id+'unitPrice2'] = '商品售出單價2:'+message
     elif state1[id] == 'changePicture':
-        state1[id] = 'ShowFM'
-        global_Storage[id+'picture'] = '商品圖片'+message
+        if 'http' in message:
+            state1[id] = 'ShowFM'
+            global_Storage[id+'picture'] = '商品圖片'+message
+        else:
+            check_text = TextSendMessage(text='這不是圖片喔！請重新傳送')
+            return check_text 
     elif state1[id] == 'changeReturnProduct':
         if message not in returnoptions:
             check_text = ('您輸入的可否退換貨錯誤，請重新輸入')
@@ -1528,7 +1535,7 @@ def createNowProduct():
             state1[id] = 'changeUnitPrice2'
             check_text = TextSendMessage(text=check_text)
         if(message=='修改商品圖片'):
-            check_text = '請輸入商品圖片'
+            check_text = '請上傳商品圖片'
             state1[id] = 'changePicture'
             check_text = TextSendMessage(text=check_text)
         if(message=='修改可否退換貨'):
