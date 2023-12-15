@@ -1,45 +1,12 @@
-from databse import month_report_list
+from database import month_report_list,upload_month_report
+from linebot.models import TextSendMessage
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import matplotlib.font_manager as fm
+import os,random,string,pyimgur
 font_path = "Noto_Sans_TC/NotoSansTC-VariableFont_wght.ttf"
 font = fm.FontProperties(fname=font_path, size=14)
-# #-------------------------------
-# current_datetime = datetime.now()# 取得當前的日期和時間
-# modified_datetime = current_datetime + timedelta(hours=8)#時區轉換+8
-# order_date = modified_datetime.strftime('%Y-%m')#格式化日期，清除
-# #-------------------------------
-# # 建立連接字串
-# conn_str = {
-#     'host': '140.131.114.242',
-#     'user': '112405',
-#     'password': '!mdEe24@5',
-#     'database': '112-112405'
-# }
-
-# try:
-#     # 建立連接
-#     cnxn = mysql.connector.connect(**conn_str)
-
-#     # 連接成功
-#     print("連線成功！")
-
-# except pyodbc.Error as err:
-#     # 連接失敗
-#     print(f"連線失敗：{err}")
-# cursor = cnxn.cursor()
-# query = """
-#     SELECT 商品名稱, 訂購數量, 進貨單價, 商品小計
-#     FROM Statistics_Data
-#     WHERE 年月='2023-08'
-#     Order by 商品ID;
-#     """
-
-# cursor.execute(query)
-# result = cursor.fetchall()
-# cursor.close()
-# cnxn.close()
 def manager_month_report():
     db_report = month_report_list()
 #---------------------------------
@@ -112,18 +79,18 @@ def manager_month_report():
         remaining_total_profit = 0 #取剩餘的成本
         remaining_total_saled_figure = 0 #取剩餘的成本
         if arr_len > 0:
-        for i in range(arr_len):
-            remaining_total_cost +=  int(heapsort_purchase_cost[i])
-            remaining_total_profit +=  int(heapsort_profit[i])
-        heapsort_purchase_cost_product_name_limited.insert(0, '其他')
-        heapsort_purchase_cost_limited.insert(0,remaining_total_cost)
-        heapsort_profit_product_name_limited.insert(0, '其他')
-        heapsort_profit_limited.insert(0,remaining_total_profit)
+            for i in range(arr_len):
+                remaining_total_cost +=  int(heapsort_purchase_cost[i])
+                remaining_total_profit +=  int(heapsort_profit[i])
+            heapsort_purchase_cost_product_name_limited.insert(0, '其他')
+            heapsort_purchase_cost_limited.insert(0,remaining_total_cost)
+            heapsort_profit_product_name_limited.insert(0, '其他')
+            heapsort_profit_limited.insert(0,remaining_total_profit)
         if bar_len > 0:
-        for i in range(bar_len):
-            remaining_total_saled_figure += int(heapsort_saled_figure[i])
-        heapsort_saled_figure_product_name_limited.insert(0, '其他')
-        heapsort_saled_figure_limited.insert(0,remaining_total_saled_figure)
+            for i in range(bar_len):
+                remaining_total_saled_figure += int(heapsort_saled_figure[i])
+            heapsort_saled_figure_product_name_limited.insert(0, '其他')
+            heapsort_saled_figure_limited.insert(0,remaining_total_saled_figure)
 
         #-----------------------------------------------------------
         def imgurinfo():
@@ -140,22 +107,22 @@ def manager_month_report():
             #line_bot_api.push_message(event.reply_token, imagetolink(path))
         #-------------------images資料夾中圖片轉連結----------------------
         def imagetolink(link):
-        imgurdata = imgurinfo()
-        #執行轉換連結
-        CLIENT_ID = imgurdata['CLIENT_ID_data']
-        #title = image_files[:-4] #選擇的關鍵字(報表類型)
-        title = '測試' #選擇的關鍵字(報表類型)
-        im = pyimgur.Imgur(CLIENT_ID)
-        uploaded_image = im.upload_image(link, title=title)
-        imagelink = uploaded_image.link
-        #執行資料夾中此圖片刪除
-        if os.path.isfile(link):
-            os.remove(link)
-        return imagelink
+            imgurdata = imgurinfo()
+            #執行轉換連結
+            CLIENT_ID = imgurdata['CLIENT_ID_data']
+            #title = image_files[:-4] #選擇的關鍵字(報表類型)
+            title = '測試' #選擇的關鍵字(報表類型)
+            im = pyimgur.Imgur(CLIENT_ID)
+            uploaded_image = im.upload_image(link, title=title)
+            imagelink = uploaded_image.link
+            #執行資料夾中此圖片刪除
+            if os.path.isfile(link):
+                os.remove(link)
+            return imagelink
         #--------------------------透過百分比反推原本的數值---------------------------------------
         def func(s,d):
-        t = int(round(s/100.*sum(d)))
-        return f'{s:.1f}%\n( {t}元 )'
+            t = int(round(s/100.*sum(d)))
+            return f'{s:.1f}%\n( {t}元 )'
         #--------------------------月成本圓餅圖---------------------------------------
         plt.title('月成本',x=0.5,y=1.2)
         plt.pie(heapsort_purchase_cost_limited,
@@ -205,34 +172,5 @@ def manager_month_report():
                     pad_inches=1)
         saled_figure_chart_database_link = imagetolink(link)
         plt.show()
-#-------------------------------
-# #建立連接字串
-# conn_str = {
-#     'host': '140.131.114.242',
-#     'user': '112405',
-#     'password': '!mdEe24@5',
-#     'database': '112-112405'
-# }
-
-# try:
-#     # 建立連接
-#     cnxn = mysql.connector.connect(**conn_str)
-
-#     # 連接成功
-#     print("連線成功！")
-
-# except pyodbc.Error as err:
-#     # 連接失敗
-#     print(f"連線失敗：{err}")
-# cursor = cnxn.cursor()
-
-# query = f"""
-#     INSERT INTO Statistical_Product (年月,月成本_圖,月利潤_圖,月熱門商品_圖,月成本_值,月利潤_值)
-#     VALUES ( '2023-08','{cost_pie_database_link}','{profit_pie_database_link}','{saled_figure_chart_database_link}','{month_total_cost}','{month_total_profit}');
-#     """
-
-
-# cursor.execute(query)
-# cnxn.commit()
-# cursor.close()
-# cnxn.close()
+        upload_month_report()
+    upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_figure_chart_database_link,month_total_cost,month_total_profit)
