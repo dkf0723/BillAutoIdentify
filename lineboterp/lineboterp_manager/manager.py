@@ -23,8 +23,8 @@ from FMtestpur import Purchase_fillin_and_check_screen
 from DidnotPickedup import *
 from Preorder import *
 from Inventoryinquiry import *
-from month_report import manager_month_report()
-from year_report import manager_year_report()
+from month_report import manager_month_report
+from year_report import manager_year_report
 import database
 #======python的函式庫==========
 from mysql.connector import pooling
@@ -1122,9 +1122,9 @@ def checkdb():
     timeget = gettime()
     formatted_millisecond = timeget['formatted_datetime']
     formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
-    modified_month = formatted_datetime_obj.month 取月份
-    modified_day = formatted_datetime_obj.day 取日期
-    modified_hour = formatted_datetime_obj.hour 取小時
+    modified_month = formatted_datetime_obj.month #取月份
+    modified_day = formatted_datetime_obj.day #取日期
+    modified_hour = formatted_datetime_obj.hour #取小時
     modified_minutes = formatted_datetime_obj.minute
     minutes = int(modified_minutes)
     if minutes not in [0,15,30,45,60]:

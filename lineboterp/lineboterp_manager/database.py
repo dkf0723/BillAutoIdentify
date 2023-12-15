@@ -898,6 +898,9 @@ def report_query_list(report_type, time_query):
   return image_msg
 #--------------------繪製月報表----------------------------------
 def month_report_list():
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   modified_month = formatted_datetime_obj.month #取月份
   int_modified_month = int(modified_month)-1
@@ -925,6 +928,9 @@ def month_report_list():
   return report_data
 #--------------------繪製年報表----------------------------------
 def year_report_list():
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   int_modified_year = int(modified_year)-1
   query = f"""
@@ -940,6 +946,9 @@ def year_report_list():
   return report_data
 #--------------------上傳月報表_圖-------------------------------
 def upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_figure_chart_database_link,month_total_cost,month_total_profit):
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   modified_month = formatted_datetime_obj.month # 取月份
   year_month = modified_year+modified_month
@@ -955,12 +964,15 @@ def upload_month_report(cost_pie_database_link,profit_pie_database_link,saled_fi
   return report_data
 #--------------------上傳年報表_圖-------------------------------
 def upload_year_report(cost_line_database_link,profit_line_database_link):
+  timeget = gettime()
+  formatted_millisecond = timeget['formatted_datetime']
+  formatted_datetime_obj = datetime.strptime(formatted_millisecond, '%Y-%m-%d %H:%M:%S')
   modified_year = formatted_datetime_obj.year # 取年份
   query = f"""
     INSERT INTO Statistical_Product (年月,年成本_圖,年利潤_圖)
     VALUES ( '{modified_year}-99','{cost_line_database_link}','{profit_line_database_link}');
     """
-    result = retry('notselect', query)
+  result = retry('notselect', query)
   if result == []:
     report_data = '找不到符合條件的資料。'
   else:
